@@ -20,3 +20,10 @@ proto_src
 生成与`proto_src/`相同目录结构的代码文件。
 
 proto文件中的`option go_package=...`能够保证在proto文件之间存在import时，生成的代码中的import路径也是正确的。
+
+
+## 运行示例
+当前所在的`./proto_example`目录包含了运行脚本所需的全部源（protoc编译器、proto协议文件、protoc提供的常用协议规范实现`protoc-v3.5.1/`）
+```shell
+sh build_mac.sh
+```
