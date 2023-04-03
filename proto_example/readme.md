@@ -19,4 +19,4 @@ proto_src
 从`build_mac.sh`中可以看到protoc命令使用的`--go_out=paths=source_relative:./proto_dst`这样的相对路径来生成代码，这样的目的是在`proto_dst/`下
 生成与`proto_src/`相同目录结构的代码文件。
 
-proto文件中的`option go_package=...`能够保证在proto文件中存在import情况时，生成代码中的import路径也是正确的。
+proto文件中的`option go_package=...`能够保证在proto文件之间存在import时，生成的代码中的import路径也是正确的。
