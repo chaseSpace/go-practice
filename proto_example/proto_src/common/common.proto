@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "go-practice/proto_example/proto_dst/common";
+
+
+enum Sex {
+  None = 0;
+  Male = 1;
+  Female = 2;
+}

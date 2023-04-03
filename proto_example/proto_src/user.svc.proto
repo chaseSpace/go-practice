@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "go-practice/proto_example/proto_dst/api/pb";
+import "common/common.proto";
+
+message User {
+  string id = 1;
+  string name = 2;
+  common.Sex sex = 3;
+}

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "go-practice/proto_example/proto_dst/api/pb";
+import "common/common.proto";
+
+message Product {
+  string id = 1;
+  string name = 2;
+  common.Sex sex = 3; // 这里假设一个比较偏门的业务场景：产品绑定了性别 (为了引用common/)
+}
