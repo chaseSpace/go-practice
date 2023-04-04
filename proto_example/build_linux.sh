@@ -4,9 +4,9 @@
 # https://github.com/google/protobuf/releases 指定平台、版本下载 (本项目使用2023年4月发布的v22.2)
 
 # 两个插件安装 （默认最新）
-# go env -w GOPROXY=https://goproxy.cn,direct   (不能用http://goproxy.io)
-# go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30.0   # 2023年4月最新版本v1.30.0
-# go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0   # 2023年4月最新版本v1.3.0
+# go env -w GOPROXY=https://goproxy.cn,direct   (http://goproxy.io 无法使用)
+# go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30.0   # 2023年4月初最新版本v1.30.0
+# go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0   # 2023年4月初最新版本v1.3.0
 
 <<comment
 # protoc-gen-go 和 protoc-gen-go-grpc 插件之间的区别
