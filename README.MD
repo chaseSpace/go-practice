@@ -7,6 +7,10 @@
 ### 拉取仓库后
 
 ```shell
-go mod tidy
-go mod vendor  将下载的包保存到 /vendor 才能正常引用
+sh build.sh
 ```
+
+### 关于代码
+
+- 每个目录都是不同的主题，目录中会包含 `xxx_test.go` 来执行目录下的示例代码。
+- 根目录的`main.go`作用不大。
