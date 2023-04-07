@@ -1,5 +1,8 @@
 # github.com/google/go-cmp v0.5.9
 ## explicit; go 1.13
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
 # github.com/smartwalle/crypto4go v1.0.3
 ## explicit; go 1.12
 github.com/smartwalle/crypto4go
