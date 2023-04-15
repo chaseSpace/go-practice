@@ -1,7 +1,5 @@
 package tcp_stream
 
-import "fmt"
-
 /*
 1. 使用一个4字节变量（uint32）存储TCP报文段中的所有字节（包括首部和数据部分）相加的和。
 2. 如果和的高16位不为0，则将其与低16位相加，直到高16位为0为止。
@@ -27,5 +25,6 @@ func runExampleChecksum() {
 
 	checksum := calculateChecksum(data)
 
-	fmt.Printf("Checksum: %04X\n", checksum) // 16b=2B=4个hex字符（每个hex字符表示4b）
+	_ = checksum
+	//fmt.Printf("Checksum: %04X\n", checksum) // 16b=2B=4个hex字符（每个hex字符表示4b）
 }

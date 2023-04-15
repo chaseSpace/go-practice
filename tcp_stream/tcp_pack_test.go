@@ -1,17 +1,36 @@
 package tcp_stream
 
 import (
+	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
 
-func TestParsePack(t *testing.T) {
-	_, err := parsePack([]byte{
-		0x1,                // version
-		0x0, 0x0, 0x0, 0x3, // data len
-		0x11, 0x11, // checksum
-		0x1, 0x1, 0x1, // data
+func TestWrapParsePack(t *testing.T) {
+	data := []byte("Hello, Tcp!")
+	s, err := wrapPack(data)
+	Convey("wrapPack", t, func() {
+		So(err, ShouldBeNil)
 	})
-	if err != nil {
-		t.Error(err)
+
+	Convey("parsePack", t, func() {
+		data2, err := parsePack(s)
+		So(err, ShouldBeNil)
+		So(data2, ShouldResemble, data) // ShouldResemble 用于数组、切片、map和结构体相等
+	})
+}
+
+// go test -benchmem -bench=^BenchmarkWrapPack$
+func BenchmarkWrapPack(b *testing.B) {
+	data := []byte("Hello, Tcp!")
+	for i := 0; i < b.N; i++ {
+		_, _ = parsePack(data)
+	}
+}
+
+// go test -benchmem -bench=BenchmarkParsePack
+func BenchmarkParsePack(b *testing.B) {
+	data := []byte("Hello, Tcp!")
+	for i := 0; i < b.N; i++ {
+		_, _ = parsePack(data)
 	}
 }
