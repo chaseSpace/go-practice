@@ -3,7 +3,7 @@ package tencent_svc
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tencentcloud/tls-sig-api-v2-golang/tencentyun"
+	"github.com/tencentyun/tls-sig-api-v2-golang/tencentyun"
 	"log"
 	"math/rand"
 	"net/http"
