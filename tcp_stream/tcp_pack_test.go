@@ -19,7 +19,9 @@ func TestWrapParsePack(t *testing.T) {
 	})
 }
 
-// go test -benchmem -bench=^BenchmarkWrapPack$
+/*
+go test -run=none -benchmem -bench=.
+*/
 func BenchmarkWrapPack(b *testing.B) {
 	data := []byte("Hello, Tcp!")
 	for i := 0; i < b.N; i++ {
@@ -27,7 +29,6 @@ func BenchmarkWrapPack(b *testing.B) {
 	}
 }
 
-// go test -benchmem -bench=BenchmarkParsePack
 func BenchmarkParsePack(b *testing.B) {
 	data := []byte("Hello, Tcp!")
 	for i := 0; i < b.N; i++ {
