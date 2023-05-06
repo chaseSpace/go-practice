@@ -8,6 +8,9 @@ require (
 )
 
 require (
+	github.com/antchfx/htmlquery v1.3.0 // indirect
+	github.com/antchfx/xpath v1.2.3 // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
@@ -17,5 +20,7 @@ require (
 	github.com/smartystreets/assertions v1.2.0 // indirect
 	github.com/smartystreets/goconvey v1.7.2 // indirect
 	github.com/tencentyun/tls-sig-api-v2-golang v1.3.0 // indirect
-	golang.org/x/tools v0.0.0-20190328211700-ab21143f2384 // indirect
+	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/tools v0.1.12 // indirect
 )
