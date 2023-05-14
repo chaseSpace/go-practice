@@ -1,0 +1,49 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus:v2.43.1 # 2023/05/09最新
+    user: "0:0"  # 重要！继承root用户权限，以允许容器读写映射的目录
+    container_name: prometheus
+    network_mode: host
+#    ports:
+#      - "11000:11000"  # 服务端口
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /service/prometheus:/etc/prometheus # 挂载Prometheus目录到容器内（含配置文件）
+      - /service/prometheus/data:/prometheus/data # data目录
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml' # 指定配置文件路径
+      - '--web.listen-address=:11000'  # 指定prometheus的web端口
+
+  grafana:
+    image: grafana/grafana:9.5.1 # 2023/05/09最新
+    user: "0:0"  # 重要！继承root用户权限，以允许容器读写映射的目录
+    container_name: grafana
+    network_mode: host
+    restart: always
+#    ports:
+#      - "11001:11001"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /service/grafana:/service/grafana
+      - /service/grafana/log:/var/log/grafana
+      - /service/grafana/data:/var/lib/grafana
+      - /service/grafana/provisioning:/etc/grafana/provisioning
+    command:
+      - '--config=/service/grafana/grafana.ini'
+
+  pushgateway:
+    image: prom/pushgateway
+    user: "0:0"  # 重要！继承root用户权限，以允许容器读写映射的目录
+    container_name: prometheus-pushgateway
+    network_mode: host
+    restart: always
+    #    ports:
+    #      - "11003:9091"
+    command:
+      - '--persistence.file=/pushgateway/data.file'
+      - '--persistence.interval=1m'
+      - '--web.listen-address=:11003'
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /service/pushgateway:/pushgateway

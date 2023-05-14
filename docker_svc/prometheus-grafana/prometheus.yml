@@ -1,0 +1,33 @@
+# my global config
+global:
+  scrape_interval: 5s # 设置抓取间隔时间
+  evaluation_interval: 5s # 设置评估间隔时间
+
+# Alertmanager 配置
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: # - alertmanager:9093 引入 Alertmanager 地址
+
+# 规则文件引入
+rule_files:
+# - "first.rules"
+# - "second.rules"
+
+# 抓取目标设置
+scrape_configs:
+  # 设置一个命名为 prometheus 的 Job，用于抓取本地的 Prometheus 服务器的 metrics
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'localhost:11000' ]  # 与prometheus自身的web服务端口一致，它自身的监控地址
+
+  # 设置一个命名为 node_exporter 的 Job，用于抓取本地运行的 node_exporter 的 metrics
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: [ 'localhost:11002' ] # node_exporter是docker-compose.yml中对应的容器名 所以才能这么填
+
+  - job_name: "pushgateway"
+    honor_labels: true  # 控制在合并多个时间序列数据时是否保留所有标签（不被覆盖）
+    honor_timestamps: true # 使用pushgateway采集时间作为数据时间戳，而不是prometheus拉取时的时间
+    static_configs:
+      - targets: [ "localhost:11003" ]
