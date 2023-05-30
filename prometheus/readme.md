@@ -4,9 +4,12 @@
 
 [Prometheus book 中文](https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/promql/prometheus-metrics-types)
 
+[Prometheus 实战](https://songjiayang.gitbooks.io/prometheus/content/)
+
 学习链接
 - [什么是指标类型?](https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/promql/prometheus-metrics-types)
 - [初识查询语言PromQL](https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/promql/prometheus-query-language)
+- [理解四大指标类型以及对应PromQL](https://pandaychen.github.io/2020/04/11/PROMETHEUS-METRICS-INTRO/)
 
 ### 安装
 
@@ -25,6 +28,21 @@ cd prometheus-2.35.0.linux-amd64
 # 若正常，ctrl+c 重新后台启动
 nohup ./prometheus --config.file=prometheus.yml --web.listen-address=:11000 &
 ```
+
+通过HTTP API删除prometheus数据：
+```shell
+# 删除具有标签kubernetes_name="redis"的时间序列指标
+curl -X POST -g 'http://localhost:9090/api/v1/admin/tsdb/delete_series?match[]={kubernetes_name="redis"}'
+
+# 删除所有的数据
+curl -X POST -g 'http://localhost:9090/api/v1/admin/tsdb/delete_series?match[]={__name__=~".+"}'
+
+# 彻底清除
+curl -X PUT　http://localhost:9090/api/v1/admin/tsdb/clean_tombstones
+
+```
+不过需要注意的是上面的 API 调用并不会立即删除数据，实际数据任然还存在磁盘上，会在后面进行数据清理。
+要确定何时删除旧数据，可以使用--storage.tsdb.retention参数进行配置（默认情况下，Prometheus 会将数据保留15天）。
 
 访问 http://ip:11000 进入仪表台。
 
@@ -113,24 +131,9 @@ docker run -it --rm -p 9222:9091 \
 
 检查数据是否被收到：`curl -X GET http://127.0.0.1:9222/api/v1/metrics | jq`
 
+删除某个job下的某个instance中的全部指标数据：`  curl -X DELETE http://pushgateway.example.org:9091/metrics/job/some_job/instance/some_instance`
 
-下面展示docker-compose的配置:
-```yml
-version: '3'
-services:
-  pushgateway:
-    image: prom/pushgateway
-    user: "0:0"  # 重要！继承root用户权限，以允许容器读写映射的目录
-    container_name: prometheus-pushgateway
-    network_mode: host
-    restart: always
-    #    ports:
-    #      - "11003:9091"
-    command:
-      - '--persistence.file=/pushgateway/data.file'
-      - '--persistence.interval=1m'
-      - '--web.listen-address=:11003'
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /service/pushgateway:/pushgateway
-```
+删除某个job下的全部指标数据：`  curl -X DELETE http://127.0.0.1:9222/metrics/job/some_job`
+
+#### 生产部署
+参考本仓库下的 [docker-compose.yml](../docker_svc/prometheus-grafana/docker-compose.yml)

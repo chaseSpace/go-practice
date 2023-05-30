@@ -48,7 +48,7 @@ func XpathIPToAddr(ip string) {
 	defer resp.Body.Close()
 
 	b, _ := io.ReadAll(resp.Body)
-	//fmt.Println(string(b))
+	fmt.Println(string(b))
 	//fmt.Println(222)
 	doc, err := htmlquery.Parse(strings.NewReader(string(b)))
 	if err != nil {
@@ -137,5 +137,111 @@ func QueryAddrByIP_IPCn(ip string) {
 	ss := strings.Split(d, " ")
 	for _, i := range ss {
 		println(i)
+	}
+}
+
+func QueryAddrByIP_Chinaz(ip string) {
+	url := fmt.Sprintf("https://ip.tool.chinaz.com/%s", ip)
+	req, _ := http.NewRequest("POST", url, nil)
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3776.0 Safari/537.36")
+	client := &http.Client{Timeout: time.Second * 3}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	b, _ := io.ReadAll(resp.Body)
+	//t.Log(string(b)) // 直接打印 不出全部内容，只能strings.Contains判断
+	if strings.Contains(string(b), "香港") {
+		println(111)
+	}
+	doc, err := htmlquery.Parse(strings.NewReader(string(b)))
+	if err != nil {
+		panic(err)
+	}
+	span, err := htmlquery.Query(doc, "//*[@id=\"infoLocation\"]")
+	if err != nil {
+		panic(err)
+	}
+	if span == nil || span.FirstChild == nil {
+		fmt.Println("span is nil")
+		return
+	}
+	fmt.Println("Addr=", span.FirstChild.Data)
+}
+
+// 有JS反扒，暂无法破解
+func QueryAddrByIP_Ping0(ip string) {
+	url := fmt.Sprintf("https://ping0.cc/ip/%s", ip)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3776.0 Safari/537.36")
+	req.Header.Add("cookie", "jskey=1139d09f4785e2e01cb81caaf7228b0e")
+	client := &http.Client{Timeout: time.Second * 3}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	b, _ := io.ReadAll(resp.Body)
+	fmt.Println(string(b)) // 直接打印 不出全部内容，只能strings.Contains判断
+	if strings.Contains(string(b), "香港") {
+		println(111)
+	}
+	doc, err := htmlquery.Parse(strings.NewReader(string(b)))
+	if err != nil {
+		panic(err)
+	}
+	span, err := htmlquery.Query(doc, "//*[@id=\"check\"]/div[2]/div[1]/div[2]/div[2]/div[2]")
+	if err != nil {
+		panic(err)
+	}
+	if span == nil || span.FirstChild == nil {
+		fmt.Println("span is nil")
+		return
+	}
+	fmt.Println("Addr=", span.FirstChild.Data)
+}
+
+/*
+eg.
+Addr=&{Status:success Country:中国 CountryCode:CN Region:GD 	  RegionName:广东 City:广州市 Zip: Lat:23.1181 Lon:113.2539 Timezone:Asia/Shanghai      Isp:Chinanet Org:Chinanet GD As:AS4134 CHINANET-BACKBONE Query:119.131.198.248}
+Addr=&{Status:success Country:香港 CountryCode:HK Region:KYT   RegionName:油尖旺區 City:旺角 Zip:96521 Lat:22.316 Lon:114.172 Timezone:Asia/Hon      g_Kong Isp:Nearoute Limited Org:Kidc Limited As:AS134972 IKUUU NETWORK LTD Query:103.151.172.30}
+*/
+type Ip125Resp struct {
+	Status      string  `json:"status"`
+	Country     string  `json:"country"`
+	CountryCode string  `json:"countryCode"`
+	Region      string  `json:"region"`
+	RegionName  string  `json:"regionName"`
+	City        string  `json:"city"`
+	Zip         string  `json:"zip"`
+	Lat         float64 `json:"lat"`
+	Lon         float64 `json:"lon"`
+	Timezone    string  `json:"timezone"`
+	Isp         string  `json:"isp"`
+	Org         string  `json:"org"`
+	As          string  `json:"as"`
+	Query       string  `json:"query"`
+}
+
+func QueryAddrByIP_Ip125(ip string) {
+	url := fmt.Sprintf("https://ip125.com/api/%s?lang=zh-CN", ip)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3776.0 Safari/537.36")
+	req.Header.Add("cookie", "jskey=1139d09f4785e2e01cb81caaf7228b0e")
+	client := &http.Client{Timeout: time.Second * 3}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	r := new(Ip125Resp)
+	_ = json.NewDecoder(resp.Body).Decode(r)
+
+	fmt.Printf("Addr=%+v\n", r)
+	if r.Status != "success" {
+		return
 	}
 }

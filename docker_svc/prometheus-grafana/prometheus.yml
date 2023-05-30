@@ -1,7 +1,7 @@
 # my global config
 global:
-  scrape_interval: 5s # 设置抓取间隔时间
-  evaluation_interval: 5s # 设置评估间隔时间
+  scrape_interval: 15s # 设置抓取间隔时间
+  evaluation_interval: 15s # 设置评估间隔时间
 
 # Alertmanager 配置
 alerting:
