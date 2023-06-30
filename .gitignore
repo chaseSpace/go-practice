@@ -1,2 +1,4 @@
 .idea/
 _ignore/  # 各种本地配置
+dist/
+node_modules/

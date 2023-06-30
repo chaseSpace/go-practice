@@ -1,0 +1,11 @@
+mysql:
+  host: '175.178.200.251'
+  port: 20000
+  username: test
+  password: 'asd!@#RF;!FR'
+
+redis:
+  host: '175.178.200.251'
+  port: 20001
+  db: 7
+  password: redis123456
