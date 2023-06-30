@@ -1,7 +1,7 @@
 package handler
 
 type Rsp struct {
-	Code int         `json:"code"`
+	Code int         `json:"code"` // 默认200
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data"`
 }

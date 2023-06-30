@@ -6,11 +6,8 @@ import sugar "go_accost/log"
 Handler func命名以Do开头
 */
 
-func DoUserOnline(c *GCtx) (any, error) {
-	req := c.Req.(*UserOnlineReq)
-	sugar.Info("111", req)
+func DoUserOnline[T UserOnlineReq](c *GCtx, in *UserOnlineReq) (any, error) {
+	sugar.Info("111", in)
 
-	return &UserOnlineRes{Uid: req.Uid}, nil
+	return &UserOnlineRes{Uid: in.Uid}, nil
 }
-
-// TODO 用户注册通知

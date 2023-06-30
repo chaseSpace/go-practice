@@ -8,15 +8,16 @@ import (
 func Setup(eng *gin.Engine) {
 	r := eng.Group("/")
 
-	r.POST("/user_online", W[UserOnlineReq](DoUserOnline))
+	r.POST("/user_online", W(DoUserOnline[UserOnlineReq]))
 }
 
 type GCtx struct {
 	Ctx *gin.Context
-	Req any
 }
 
-func W[T any](do func(ctx *GCtx) (any, error)) func(ctx *gin.Context) {
+type handler[T any] func(ctx *GCtx, r *T) (any, error)
+
+func W[T any](f handler[T]) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		req := new(T)
 		err := ctx.Bind(req)
@@ -24,13 +25,10 @@ func W[T any](do func(ctx *GCtx) (any, error)) func(ctx *gin.Context) {
 			sugar.Errorf("parseReq [%T] %v", req, err)
 			return
 		}
-		cc := &GCtx{
-			Ctx: ctx,
-			Req: req,
-		}
+		cc := &GCtx{}
 
 		var res *Rsp
-		rsp, err := do(cc)
+		rsp, err := f(cc, req)
 		if err != nil {
 			res = &Rsp{
 				Code: 500,
