@@ -31,13 +31,13 @@ pm2 start admin --time
 更新服务，以admin为例：
 ```shell
 # 1. 备份现在的bin文件
-$# cd /service/like
-$# cp admin admin-old
+$ cd /service/like
+$ cp admin admin-old
 
 # 2. 上传并覆盖现有的admin二进制
 
-# 3. 重启
-$# pm2 restart admin
+# 3. 重启(需要给执行权限，才能正确重启)
+$ chmod +x admin && pm2 reload admin 
 ```
 
 其他命令：
@@ -54,7 +54,7 @@ pm2 save # 冻结当前应用列表，以便在开机时快速恢复
 
 配置日志分割：
 ```shell
-$# pm2 install pm2-logrotate
+$ pm2 install pm2-logrotate
 
 # 支持下面配置
 $ pm2 set pm2-logrotate:max_size 10M
