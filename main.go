@@ -1,16 +1,17 @@
 package main
 
-func main() {
-	c := make(chan int)
-	close(c)
-	println(IsChannelClosed(c))
-}
+import (
+	"os"
+	"runtime"
+)
 
-func IsChannelClosed(ch chan int) bool {
-	select {
-	case _, ok := <-ch:
-		return !ok // 返回通道已关闭的状态
-	default:
-		return false // 通道仍然可用
+func main() {
+	f, _ := os.OpenFile("111.log", os.O_WRONLY|os.O_APPEND, 666)
+	defer f.Close()
+	os.Stderr = f
+	runtime.WriteFile = func() {
+		f.WriteString("222")
 	}
+	var c chan int
+	<-c
 }

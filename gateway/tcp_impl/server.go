@@ -1,8 +1,6 @@
 package tcp_impl
 
 import (
-	"code.com/tars/goframework/kissgo/appzaplog"
-	"code.com/tars/goframework/kissgo/appzaplog/zap"
 	"fmt"
 	"net"
 	"service/gateway2/gutil"
