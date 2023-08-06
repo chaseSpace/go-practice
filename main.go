@@ -1,12 +1,17 @@
 package main
 
-import "regexp"
+import (
+	"os"
+	"runtime"
+)
 
 func main() {
-	re := regexp.MustCompile(`0{3,5}|1{3,5}|2{3,5}|3{3,5}|4{3,5}|5{3,5}|6{3,5}|7{3,5}|8{3,5}|9{3,5}|^520|^1314|.520|.1314`)
-
-	for _, s := range []string{`00000123`, `100000654`, `54000000`} {
-		println(re.MatchString(s))
+	f, _ := os.OpenFile("111.log", os.O_WRONLY|os.O_APPEND, 666)
+	defer f.Close()
+	os.Stderr = f
+	runtime.WriteFile = func() {
+		f.WriteString("222")
 	}
-
+	var c chan int
+	<-c
 }

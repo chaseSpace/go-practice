@@ -1,22 +1,19 @@
-<script>
-
-    const xhr = new XMLHttpRequest();
-    const data = {
-        uuid: 'Q3EiPBPR',
-        graphic_code: "BDXJ",
-        account_id: 102631,
-        password: "123aaa",
-        app: "aklive"
-    };
-    const json = JSON.stringify(data);
-    xhr.open('POST', 'https://testsvc.aklivechat.com/uauth/user/account_login');
-    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    xhr.send(json);
-
-    xhr.onreadystatechange = function () {
-        console.log(xhr.responseText);
-
-        xhr.getAllResponseHeaders().toLowerCase();
-    };
-
-</script>
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8"/>
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>AK语音充值中心</title>
+</head>
+<body>
+<div class="pay_img_success" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 2rem;">
+    <img src="img/icon_payment_success.png" alt="" style="max-width: 100%;">
+    <p style="margin-top: 1rem; text-align: center; "><b>充值成功！</b></p>
+</div>
+</body>
+</html>

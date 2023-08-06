@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const auditImageAPI = "https://console.tim.qq.com/v4/im_msg_audit/content_moderation?sdkappid=%d&identifier=%s&usersig=%s&random=%d&contenttype=json"
+const auditAPI = "https://console.tim.qq.com/v4/im_msg_audit/content_moderation?sdkappid=%d&identifier=%s&usersig=%s&random=%d&contenttype=json"
 
 type AuditResp struct {
 	ActionStatus string   `json:"ActionStatus"`
@@ -43,7 +43,7 @@ func IMAuditImage(imgURL string, appId int, key, identifier string) (*AuditResp,
 	sig, _ := GetUserSig(appId, key, identifier)
 	log.Println("UserSig", sig)
 
-	url := fmt.Sprintf(auditImageAPI, appId, identifier, sig, rand.Int31())
+	url := fmt.Sprintf(auditAPI, appId, identifier, sig, rand.Int31())
 	log.Println("API", url)
 
 	req, _ := http.NewRequest("POST", url, strings.NewReader(fmt.Sprintf(body, imgURL)))
