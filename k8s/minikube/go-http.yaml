@@ -1,0 +1,9 @@
+# go-http.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: go-http
+spec:
+  containers:
+    - name: go-http-container
+      image: leigg/hellok8s:v1
