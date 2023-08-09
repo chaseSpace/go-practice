@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -12,6 +13,6 @@ func hello(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", hello)
 
-	println("access http://localhost:3000")
+	log.Printf("access http://localhost:3000\n")
 	panic(http.ListenAndServe(":3000", nil))
 }
