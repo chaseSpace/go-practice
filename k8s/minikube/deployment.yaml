@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # deployment唯一名称
+  name: hellok8s-deployment
+spec:
+  replicas: 3 # 副本数量
+  selector:
+    matchLabels:
+      app1: hellok8s # 管理template下所有 app1=hellok8s的pod，（要求和template.metadata.labels完全一致！！！否则无法部署deployment）
+      app: aaa
+  template:   # template 定义一组pod
+    metadata:
+      labels:
+        app1: hellok8s
+        app: aaa
+    spec:
+      containers:
+        - image: leigg/hellok8s:v2
+          name: hellok8s-container

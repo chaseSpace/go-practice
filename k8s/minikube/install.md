@@ -229,7 +229,7 @@ kubectl logs -f nginx-pod  # 查看日志（stdout/stderr）
 
 #### 4.6 Pod 与 Container 的不同
 
-在刚刚创建的资源里，在最内层是我们的服务 nginx，运行在 container 容器当中， container (容器) 的本质是进程，而 pod 是管理这一组进程的资源。
+在刚刚创建的资源里，在最内层是我们的服务 nginx，运行在 container 容器当中， container (容器) 的**本质是进程**，而 pod 是管理这一组进程的资源。
 
 所以 pod 可以管理多个 container，在某些场景例如服务之间需要文件交换(日志收集)，本地网络通信需求(使用 localhost 或者 Socket 文件进行本地通信)，
 在这些场景中使用 pod 管理多个 container 就非常的推荐。而这，也是 k8s 如何处理服务之间复杂关系的第一个例子。
@@ -276,8 +276,121 @@ kubectl port-forward go-http 3000:3000
 - Pending（挂起）： Pod 正在等待调度。
 - ContainerCreating（容器创建中）： Pod 已经被调度，但其中的容器尚未完全创建和启动。
 - Running（运行中）： Pod 中的容器已经在运行。
-- Succeeded（已成功）： 所有容器都成功终止，任务或工作完成。
+- Succeeded（已成功）： 所有容器都成功终止，任务或工作完成，特指那些批处理任务而不是常驻容器。
 - Failed（已失败）： 至少一个容器以非零退出码终止。
 - Unknown（未知）： 无法获取 Pod 的状态。
 
 ### 5. 了解Deployment
+先创建一个[deployment文件](./deployment.yaml)， 用来编排多个pod。
+
+#### 5.1 部署deployment：
+```shell
+root@VM-0-13-centos ~/install_k8s » k apply -f deployment.yaml
+deployment.apps/hellok8s-deployment created
+
+# 查看启动的pod
+root@VM-0-13-centos ~/install_k8s » k get pods
+NAME                                   READY   STATUS    RESTARTS   AGE
+hellok8s-deployment-784d5f676d-zcnr6   1/1     Running   0          17s
+```
+
+**删除pod会自动重启一个**。
+
+#### 5.2 修改deployment
+通过vi修改内容中的replicas=3，再次部署，开始之前，我们使用下面的命令来观察pod数量变化
+```shell
+root@VM-0-13-centos ~/install_k8s » kubectl get pods --watch
+NAME                                   READY   STATUS    RESTARTS   AGE
+hellok8s-deployment-58cb496c84-cft9j   1/1     Running   0          4m7s
+
+
+# 在另一个CLI执行 K apply -f ...
+
+hellok8s-deployment-58cb496c84-sdrt2   0/1     Pending   0          0s
+hellok8s-deployment-58cb496c84-sdrt2   0/1     Pending   0          0s
+hellok8s-deployment-58cb496c84-pjkp9   0/1     Pending   0          0s
+hellok8s-deployment-58cb496c84-pjkp9   0/1     Pending   0          0s
+hellok8s-deployment-58cb496c84-sdrt2   0/1     ContainerCreating   0          0s
+hellok8s-deployment-58cb496c84-pjkp9   0/1     ContainerCreating   0          0s
+hellok8s-deployment-58cb496c84-pjkp9   1/1     Running             0          1s
+hellok8s-deployment-58cb496c84-sdrt2   1/1     Running             0          1s
+```
+
+#### 5.3 升级之前的镜像
+这一步通过修改main.go来模拟实际项目中的服务更新，修改后的文件是`main2.go`。
+
+需要再次push镜像到仓库：
+```shell
+docker push leigg/hellok8s:v2
+```
+然后重新部署并测试：
+```shell
+root@VM-0-13-centos ~/install_k8s » k apply -f deployment.yaml
+deployment.apps/hellok8s-deployment configured
+
+root@VM-0-13-centos ~/install_k8s » k port-forward hellok8s-deployment-c7fdf4bc9-wh46w 3000:3000
+Forwarding from 127.0.0.1:3000 -> 3000
+Forwarding from [::1]:3000 -> 3000
+Handling connection for 3000
+```
+
+#### 5.4 滚动更新（Rolling Update）
+上一步骤的更新方式比较粗暴，因为它是在新的镜像拉取后立即同时更新全部旧pod，这会导致
+服务短暂不可用，所以我们要使用更安全的滚动更新。
+
+在 deployment 的资源定义中, spec.strategy.type 有两种选择:
+
+- RollingUpdate: 逐渐增加新版本的 pod，逐渐减少旧版本的 pod。
+- Recreate: 在新版本的 pod 增加前，先将所有旧版本 pod 删除。
+
+另外，还可以通过以下字段来控制升级 pod 的速率：
+- maxSurge: 最大峰值，用来指定可以创建的超出期望 Pod 个数的 Pod 数量。
+- maxUnavailable: 最大不可用，用来指定更新过程中不可用的 Pod 的个数上限。
+
+下面先回滚刚才的更新：
+```shell
+kubectl rollout undo -f deployment.yaml
+
+kubectl get pods                                    
+# NAME                                   READY   STATUS    RESTARTS   AGE
+# hellok8s-deployment-77bffb88c5-cvm5c   1/1     Running   0          39s
+# hellok8s-deployment-77bffb88c5-lktbl   1/1     Running   0          41s
+# hellok8s-deployment-77bffb88c5-nh82z   1/1     Running   0          37s
+
+kubectl describe pod hellok8s-deployment-77bffb88c5-cvm5c
+# Image: leigg/hellok8s:v1
+```
+
+在这里我们也可以查看更新历史：
+```shell
+root@VM-0-13-centos ~/install_k8s » kubectl rollout history -f deployment.yaml                                                                                                          1 ↵
+deployment.apps/hellok8s-deployment
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+```
+回滚也会产生一次revision，如下：
+```shell
+root@VM-0-13-centos ~/install_k8s » kubectl rollout history -f deployment.yaml
+deployment.apps/hellok8s-deployment
+REVISION  CHANGE-CAUSE
+2         <none>
+3         <none>
+```
+还可以查看具体revision的详细信息，包括每个pod使用的镜像版本：
+```shell
+root@VM-0-13-centos ~/install_k8s » kubectl rollout history -f deployment.yaml --revision=2                                                                                             1 ↵
+deployment.apps/hellok8s-deployment with revision #2
+Pod Template:
+  Labels:	app=aaa
+	app1=hellok8s
+	pod-template-hash=66695888cf
+  Containers:
+   hellok8s-container:
+    Image:	leigg/hellok8s:v2
+    Port:	<none>
+    Host Port:	<none>
+    Environment:	<none>
+    Mounts:	<none>
+  Volumes:	<none>
+```

@@ -7,12 +7,12 @@ import (
 )
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "[v1] Hello, Kubernetes!")
+	io.WriteString(w, "[v2] Hello, Kubernetes!")
 }
 
 func main() {
 	http.HandleFunc("/", hello)
 
-	log.Printf("access http://localhost:3000\n")
+	log.Printf("v2 access http://localhost:3000\n")
 	panic(http.ListenAndServe(":3000", nil))
 }
