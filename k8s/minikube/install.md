@@ -340,8 +340,8 @@ Handling connection for 3000
 
 在 deployment 的资源定义中, spec.strategy.type 有两种选择:
 
-- RollingUpdate: 逐渐增加新版本的 pod，逐渐减少旧版本的 pod。
-- Recreate: 在新版本的 pod 增加前，先将所有旧版本 pod 删除。
+- RollingUpdate: 逐渐增加新版本的 pod，逐渐减少旧版本的 pod。（常用）
+- Recreate: 在新版本的 pod 增加前，先将所有旧版本 pod 删除（针对那些不能多进程部署的服务）
 
 另外，还可以通过以下字段来控制升级 pod 的速率：
 - maxSurge: 最大峰值，用来指定可以创建的超出期望 Pod 个数的 Pod 数量。

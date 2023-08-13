@@ -23,4 +23,4 @@ RUN echo -e  "http://mirrors.aliyun.com/alpine/v3.5/main\nhttp://mirrors.aliyun.
 WORKDIR /
 COPY --from=builder /src/main /main
 EXPOSE 3000
-ENTRYPOINT ["/main"]
+ENTRYPOINT ["main"]
