@@ -378,6 +378,22 @@ RollingUpdateStrategy:  25% max unavailable, 25% max surge # <------ 看这
 ```
 **所以，在使用滚动更新时，k8s会始终保持服务可用，在新的pod未完全正常启动前，不会停止旧的pod。**
 
+为了明确地指定deployment的更新方式，我们需要在yaml中配置：
+```shell
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hellok8s-deployment
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  replicas: 3
+省略其他熟悉的配置项。。。
+```
+这样，我们通过`k apply`命令时会以滚动更新方式进行。
+>从`maxSurge: 1`可以看出更新时最多会出现4个pod，从`maxUnavailable: 1`可以看出最少会有2个pod正常运行。
 
 #### 5.5 minikube的镜像管理
 当我们启动pod时，引用的镜像会从远程拉取到本地（而不是`docker images`），存入minikube自身的本地镜像库中管理，它和docker images是不同的东西。
