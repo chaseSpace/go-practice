@@ -1,28 +1,30 @@
 ## Centos上使用minikube安装k8s
 
 <!-- TOC -->
-
-* [Centos上使用minikube安装k8s](#centos上使用minikube安装k8s)
-    * [参考链接](#参考链接)
+  * [Centos上使用minikube安装k8s](#centos上使用minikube安装k8s)
     * [0. 安装最新docker](#0-安装最新docker)
     * [1. 安装启动minikube](#1-安装启动minikube)
     * [2. 创建程序和使用docker打包镜像](#2-创建程序和使用docker打包镜像)
     * [3. 推送到docker仓库](#3-推送到docker仓库)
     * [4. 了解并创建Pod](#4-了解并创建pod)
-        * [4.1 创建nginx pod](#41-创建nginx-pod)
-        * [4.2 安装kubectl](#42-安装kubectl)
-        * [4.3 创建pod](#43-创建pod)
-        * [4.4 查看nginx-pod状态](#44-查看nginx-pod状态)
-        * [4.5 与pod交互](#45-与pod交互)
-        * [4.6 Pod 与 Container 的不同](#46-pod-与-container-的不同)
-        * [4.7 创建go程序的pod](#47-创建go程序的pod)
-        * [4.8 pod有哪些状态](#48-pod有哪些状态)
-    * [5. Deployment](#5-deployment)
-
+      * [4.1 创建nginx pod](#41-创建nginx-pod)
+      * [4.2 安装kubectl](#42-安装kubectl)
+      * [4.3 创建pod](#43-创建pod)
+      * [4.4 查看nginx-pod状态](#44-查看nginx-pod状态)
+      * [4.5 与pod交互](#45-与pod交互)
+      * [4.6 Pod 与 Container 的不同](#46-pod-与-container-的不同)
+      * [4.7 创建go程序的pod](#47-创建go程序的pod)
+      * [4.8 pod有哪些状态](#48-pod有哪些状态)
+    * [5. 了解Deployment](#5-了解deployment)
+      * [5.1 部署deployment：](#51-部署deployment)
+      * [5.2 修改deployment](#52-修改deployment)
+      * [5.3 使用新的镜像更新pod](#53-使用新的镜像更新pod)
+      * [5.4 滚动更新（Rolling Update）](#54-滚动更新rolling-update)
+      * [5.5 minikube的镜像管理](#55-minikube的镜像管理)
+      * [5.6 deployment的回滚](#56-deployment的回滚)
 <!-- TOC -->
-目录：
 
-环境：
+**环境准备**：
 
 ```
 - 两台机，相同配置
@@ -31,12 +33,12 @@
     - Disk: 100g
 ```
 
-#### 参考链接
+**参考资料：**
 
 - [总教程](https://github.com/guangzhengli/k8s-tutorials/blob/main/docs/pre.md)
 - [Docker教程](https://yeasy.gitbook.io/docker_practice/)
 - [kubectl全部命令-官方](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [国内centos机器安装clash代理](../../pure_doc/use_clash_linux.md)
+- [国内Centos机器安装clash代理](../../pure_doc/use_clash_linux.md)
 
 ### 0. 安装最新docker
 
@@ -161,6 +163,8 @@ spec:
 #### 4.2 安装kubectl
 
 由于minikube下载kubectl命令太慢，所以笔者自行下载kubectl。
+
+>如备有代理，可参考前面**参考资料**中的文档连接代理后再直接下载kubectl
 
 先导入源
 
