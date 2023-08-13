@@ -13,6 +13,6 @@ func hello(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", hello)
 
-	log.Printf("v2 access http://localhost:3000\n")
+	log.Printf("access http://localhost:3000\n")
 	panic(http.ListenAndServe(":3000", nil))
 }

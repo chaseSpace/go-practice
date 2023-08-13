@@ -1,5 +1,12 @@
 ## 安装clash linux版
 
+目的，为了Centos主机能够畅通世界互联网。
+
+准备：
+- 一个可使用clash连接的订阅链接
+- 一台国内Centos服务器
+- 暴露外网9090端口，之后可关闭
+
 ```shell
 cd ~
 wget https://github.com/Dreamacro/clash/releases/download/v1.14.0/clash-linux-amd64-v1.14.0.gz # 拉取clash压缩包，也可直接GitHub下载后上传文件
