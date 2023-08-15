@@ -1,8 +1,6 @@
 package orm
 
 import (
-	"encoding/json"
-	"os"
 	"testing"
 	"time"
 )
@@ -32,19 +30,8 @@ func (RealPeopleCert) TableName() string {
 	return "real_people_cert"
 }
 
-type Conf struct {
-	GormTestdb struct {
-		Dsn string `json:"dsn"`
-	} `json:"gorm_testdb"`
-}
-
 func TestX(t *testing.T) {
-	b, _ := os.ReadFile("../_ignore/db.json")
-	if b == nil {
-		panic("no db.json found")
-	}
-	cc := new(Conf)
-	_ = json.Unmarshal(b, cc)
+	cc := mustLoadConf()
 	db, v := initGorm(cc.GormTestdb.Dsn)
 	defer db.Close()
 
