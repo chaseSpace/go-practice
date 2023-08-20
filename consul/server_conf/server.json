@@ -1,0 +1,15 @@
+{
+  "node_name": "consul-server",
+  "server": true,
+  "bootstrap": true,
+  "data_dir": "/Users/lei/Desktop/Consul/data/server",
+  "retry_join": [],
+  "ui_config": {
+    "enabled": true
+  },
+  "datacenter": "dc1",
+  "log_level": "INFO",
+  "addresses": {
+    "http": "0.0.0.0"
+  }
+}

@@ -1,0 +1,61 @@
+# doc: https://developer.hashicorp.com/consul/docs/services/configuration/services-configuration-reference
+service:
+  - name: web  # required, 除了name，其他字段基本都是可选
+    address: 10.0.0.1  # optional, ip of service that is used for communication to service consumer. Default is agent node ip.
+    port: 80  # optional
+    tags: # service-level labels
+      - db
+    meta: # custom key-val, kv都只能是string，只能是ASCII字符，A-Z，a-z，0-9，_-； key限长128 val限长512
+      - custom_meta_key: custom_meta_value
+    check: # single health check conf. doc on https://developer.hashicorp.com/consul/docs/services/usage/checks
+      - name: redis-health # 必须，随意起
+#      - id:  # 可选，唯一string，默认使用name，一般不设置
+        notes: string备注
+        interval: 10s  # 必须，string，检查频率，支持格式： https://pkg.go.dev/time#ParseDuration
+        timeout: 3s # 可选，有默认值
+        status: critical # 执行检查之前的服务的初始状态，默认 critical, 还有warning/passing
+        deregister_critical_service_after: 10s # 可选，status=critical 一段时间后 移除异常的注册服务
+        success_before_passing: 0 # 可选，连续多少次成功才标记 status=passing，默认0
+        failures_before_warning: 2 # 可选，连续多少次失败才标记 status=warning，默认 failures_before_critical
+        failures_before_critical: 2 # 可选，连续多少次失败才标记 status=critical，默认 0
+
+        # 健康检查有多个方式，包括HTTP、GRPC、Shell script、TCP、UDP、TTL、HTTP2。。选择其一即可
+
+        # 1. http健康检查配置
+        http: https://example.com:5000/health  # service的http健康检查地址
+        tls_skip_verify: false # 使用http方式时，关闭tls验证，一般为true
+        tls_server_name: example222.com  # 可选，指定tls连接时的SNI，在 tls_skip_verify=false 时有效
+        method: POST # 可选，http请求方式，默认GET
+        header: # 可选，http header，service可用于对请求鉴权
+          Authorization:
+            - Bearer your-access-token
+          Custom-Header:
+            - custom-value1
+            - custom-value2
+        body: '{"attribute1": "value1", "attribute2": "value2"}' # 可选，http req body in json
+        disable_redirects: false # 可选，禁用http重定向，默认false
+
+        # 2. grpc健康检查配置
+        grpc: "127.0.0.1:12345"  # service的grpc健康检查地址
+        grpc_use_tls: true
+
+        # 3. tcp 推荐（指定为服务监听的HTTP或GRPC端口即可）
+        tcp: localhost:80 # host:port
+
+        # 4. udp
+        udp: localhost:90 # host:port
+
+        # 5. ttl，
+        ttl: 30s  # time-to-live指定consul认为服务超时的时间，若设置为30s，则服务一般需要每10-15一次来调用consul API续期自己处于某个健康状态
+
+        # script等方式请查阅上方给出的文档链接
+
+    #    checks:  # 这里配置健康检查的数组对象，与check字段二选一
+
+    tagged_addresses:
+      - lan: # 当前dc内可访问的地址，可配置多个，但一般不需要
+          - address: 192.168.0.55
+            port: 8000
+        wan: # 跨data center访问
+          - address: 198.18.0.23
+            port: 80

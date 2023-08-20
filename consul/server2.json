@@ -1,0 +1,26 @@
+{
+  "node_name": "consul-server3",
+  "server": true,
+  "bootstrap": false,
+  "data_dir": "/Users/lei/Desktop/Consul/data/server3",
+  "retry_join": [
+    "127.0.0.1:8301"
+  ],
+  "ports": {
+    "http": 28500,
+    "dns": 28600,
+    "server": 28300,
+    "grpc": -1,
+    "grpc_tls": -1,
+    "serf_lan": 28301,
+    "serf_wan": 28302
+  },
+  "ui_config": {
+    "enabled": true
+  },
+  "datacenter": "dc1",
+  "log_level": "INFO",
+  "addresses": {
+    "http": "0.0.0.0"
+  }
+}

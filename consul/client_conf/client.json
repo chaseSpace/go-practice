@@ -1,0 +1,29 @@
+{
+  "node_name": "consul-client",
+  "node_id": "adf4238a-882b-9ddc-4a9d-5b6758e4159e",
+  "server": false,
+  "datacenter": "dc1",
+  "data_dir": "/Users/lei/Desktop/Consul/data/client",
+  "log_level": "INFO",
+  "retry_join": ["127.0.0.1:8301"],
+  "ports": {
+    "http": 18500,
+    "dns": 18600,
+    "serf_lan": 18301,
+    "serf_wan": 18302
+  },
+  "service": {
+    "id": "dns",
+    "name": "dns",
+    "tags": ["primary"],
+    "address": "localhost",
+    "port": 18600,
+    "check": {
+      "id": "dns",
+      "name": "Consul DNS TCP on port 18600",
+      "tcp": "localhost:18600",
+      "interval": "10s",
+      "timeout": "1s"
+    }
+  }
+}

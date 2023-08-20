@@ -1,0 +1,10 @@
+# service 定义一个 Consul 服务
+service:
+  name: user
+  tags:
+    - go-svc
+  port: 8080
+  checks:
+    - id: svc-user
+      name: "svc user status"
+      ttl: 30s
