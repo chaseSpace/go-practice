@@ -7,9 +7,11 @@ import (
 
 type RealPeopleCert struct {
 	Id            int32      `gorm:"column:id" json:"id"`
-	Uid           int64      `gorm:"column:uid" json:"uid"`
+	Uid           int64      `gorm:"column:uid;primary_key" json:"uid"` // uid是唯一键，但可以标识为主键，以利用gorm的save方法实现存在则更新
 	SamePerc      int32      `gorm:"column:same_perc" json:"same_perc"`
+	Avatar        string     `gorm:"column:avatar" json:"avatar"`
 	CertImg       string     `gorm:"column:cert_img" json:"cert_img"`
+	CertId        string     `gorm:"column:cert_id" json:"cert_id"`
 	IpLoc         string     `gorm:"column:ip_loc" json:"ip_loc"`
 	IsFirstUpload bool       `gorm:"column:is_first_upload" json:"is_first_upload"`
 	AuditUid      int32      `gorm:"column:audit_uid" json:"audit_uid"`
@@ -50,4 +52,20 @@ func TestX(t *testing.T) {
 		t.Fatalf("err:%v", err)
 	}
 	t.Logf("LIST:%+v", list[0])
+}
+
+func TestUniqueKeySave(t *testing.T) {
+	cc := mustLoadConf()
+	db, v := initGorm(cc.GormTestdb.Dsn)
+	defer db.Close()
+
+	r := &RealPeopleCert{
+		Uid:      1,
+		SamePerc: 212,
+		UploadAt: time.Now(),
+	}
+	err := v.Omit("id").Save(r)
+	if err != nil {
+		t.Log(err.Error)
+	}
 }
