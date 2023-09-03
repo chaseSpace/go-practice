@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/jinzhu/now"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 )
@@ -46,21 +45,11 @@ func (n *DeletedAt) UnmarshalJSON(b []byte) error {
 }
 
 func (DeletedAt) QueryClauses(f *schema.Field) []clause.Interface {
-	return []clause.Interface{SoftDeleteQueryClause{Field: f, ZeroValue: parseZeroValueTag(f)}}
-}
-
-func parseZeroValueTag(f *schema.Field) sql.NullString {
-	if v, ok := f.TagSettings["ZEROVALUE"]; ok {
-		if _, err := now.Parse(v); err == nil {
-			return sql.NullString{String: v, Valid: true}
-		}
-	}
-	return sql.NullString{Valid: false}
+	return []clause.Interface{SoftDeleteQueryClause{Field: f}}
 }
 
 type SoftDeleteQueryClause struct {
-	ZeroValue sql.NullString
-	Field     *schema.Field
+	Field *schema.Field
 }
 
 func (sd SoftDeleteQueryClause) Name() string {
@@ -89,19 +78,18 @@ func (sd SoftDeleteQueryClause) ModifyStatement(stmt *Statement) {
 		}
 
 		stmt.AddClause(clause.Where{Exprs: []clause.Expression{
-			clause.Eq{Column: clause.Column{Table: clause.CurrentTable, Name: sd.Field.DBName}, Value: sd.ZeroValue},
+			clause.Eq{Column: clause.Column{Table: clause.CurrentTable, Name: sd.Field.DBName}, Value: nil},
 		}})
 		stmt.Clauses["soft_delete_enabled"] = clause.Clause{}
 	}
 }
 
 func (DeletedAt) UpdateClauses(f *schema.Field) []clause.Interface {
-	return []clause.Interface{SoftDeleteUpdateClause{Field: f, ZeroValue: parseZeroValueTag(f)}}
+	return []clause.Interface{SoftDeleteUpdateClause{Field: f}}
 }
 
 type SoftDeleteUpdateClause struct {
-	ZeroValue sql.NullString
-	Field     *schema.Field
+	Field *schema.Field
 }
 
 func (sd SoftDeleteUpdateClause) Name() string {
@@ -116,17 +104,18 @@ func (sd SoftDeleteUpdateClause) MergeClause(*clause.Clause) {
 
 func (sd SoftDeleteUpdateClause) ModifyStatement(stmt *Statement) {
 	if stmt.SQL.Len() == 0 && !stmt.Statement.Unscoped {
-		SoftDeleteQueryClause(sd).ModifyStatement(stmt)
+		if _, ok := stmt.Clauses["WHERE"]; stmt.DB.AllowGlobalUpdate || ok {
+			SoftDeleteQueryClause(sd).ModifyStatement(stmt)
+		}
 	}
 }
 
 func (DeletedAt) DeleteClauses(f *schema.Field) []clause.Interface {
-	return []clause.Interface{SoftDeleteDeleteClause{Field: f, ZeroValue: parseZeroValueTag(f)}}
+	return []clause.Interface{SoftDeleteDeleteClause{Field: f}}
 }
 
 type SoftDeleteDeleteClause struct {
-	ZeroValue sql.NullString
-	Field     *schema.Field
+	Field *schema.Field
 }
 
 func (sd SoftDeleteDeleteClause) Name() string {
@@ -146,7 +135,7 @@ func (sd SoftDeleteDeleteClause) ModifyStatement(stmt *Statement) {
 		stmt.SetColumn(sd.Field.DBName, curTime, true)
 
 		if stmt.Schema != nil {
-			_, queryValues := schema.GetIdentityFieldValuesMap(stmt.Context, stmt.ReflectValue, stmt.Schema.PrimaryFields)
+			_, queryValues := schema.GetIdentityFieldValuesMap(stmt.ReflectValue, stmt.Schema.PrimaryFields)
 			column, values := schema.ToQueryValues(stmt.Table, stmt.Schema.PrimaryFieldDBNames, queryValues)
 
 			if len(values) > 0 {
@@ -154,7 +143,7 @@ func (sd SoftDeleteDeleteClause) ModifyStatement(stmt *Statement) {
 			}
 
 			if stmt.ReflectValue.CanAddr() && stmt.Dest != stmt.Model && stmt.Model != nil {
-				_, queryValues = schema.GetIdentityFieldValuesMap(stmt.Context, reflect.ValueOf(stmt.Model), stmt.Schema.PrimaryFields)
+				_, queryValues = schema.GetIdentityFieldValuesMap(reflect.ValueOf(stmt.Model), stmt.Schema.PrimaryFields)
 				column, values = schema.ToQueryValues(stmt.Table, stmt.Schema.PrimaryFieldDBNames, queryValues)
 
 				if len(values) > 0 {
@@ -163,7 +152,12 @@ func (sd SoftDeleteDeleteClause) ModifyStatement(stmt *Statement) {
 			}
 		}
 
-		SoftDeleteQueryClause(sd).ModifyStatement(stmt)
+		if _, ok := stmt.Clauses["WHERE"]; !stmt.DB.AllowGlobalUpdate && !ok {
+			stmt.DB.AddError(ErrMissingWhereClause)
+		} else {
+			SoftDeleteQueryClause(sd).ModifyStatement(stmt)
+		}
+
 		stmt.AddClauseIfNotExists(clause.Update{})
 		stmt.Build(stmt.DB.Callback().Update().Clauses...)
 	}

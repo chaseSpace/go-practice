@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"context"
 	"fmt"
 	"reflect"
 	"strings"
@@ -123,17 +122,16 @@ func (schema *Schema) parseRelation(field *Field) *Relationship {
 }
 
 // User has many Toys, its `Polymorphic` is `Owner`, Pet has one Toy, its `Polymorphic` is `Owner`
-//
-//	type User struct {
-//	  Toys []Toy `gorm:"polymorphic:Owner;"`
-//	}
-//	type Pet struct {
-//	  Toy Toy `gorm:"polymorphic:Owner;"`
-//	}
-//	type Toy struct {
-//	  OwnerID   int
-//	  OwnerType string
-//	}
+//     type User struct {
+//       Toys []Toy `gorm:"polymorphic:Owner;"`
+//     }
+//     type Pet struct {
+//       Toy Toy `gorm:"polymorphic:Owner;"`
+//     }
+//     type Toy struct {
+//       OwnerID   int
+//       OwnerType string
+//     }
 func (schema *Schema) buildPolymorphicRelation(relation *Relationship, field *Field, polymorphic string) {
 	relation.Polymorphic = &Polymorphic{
 		Value:           schema.Table,
@@ -192,8 +190,7 @@ func (schema *Schema) buildMany2ManyRelation(relation *Relationship, field *Fiel
 		err             error
 		joinTableFields []reflect.StructField
 		fieldsMap       = map[string]*Field{}
-		ownFieldsMap    = map[string]*Field{} // fix self join many2many
-		referFieldsMap  = map[string]*Field{}
+		ownFieldsMap    = map[string]bool{} // fix self join many2many
 		joinForeignKeys = toColumns(field.TagSettings["JOINFOREIGNKEY"])
 		joinReferences  = toColumns(field.TagSettings["JOINREFERENCES"])
 	)
@@ -231,19 +228,21 @@ func (schema *Schema) buildMany2ManyRelation(relation *Relationship, field *Fiel
 			joinFieldName = strings.Title(joinForeignKeys[idx])
 		}
 
-		ownFieldsMap[joinFieldName] = ownField
+		ownFieldsMap[joinFieldName] = true
 		fieldsMap[joinFieldName] = ownField
 		joinTableFields = append(joinTableFields, reflect.StructField{
 			Name:    joinFieldName,
 			PkgPath: ownField.StructField.PkgPath,
 			Type:    ownField.StructField.Type,
-			Tag: removeSettingFromTag(appendSettingFromTag(ownField.StructField.Tag, "primaryKey"),
-				"column", "autoincrement", "index", "unique", "uniqueindex"),
+			Tag:     removeSettingFromTag(ownField.StructField.Tag, "column", "autoincrement", "index", "unique", "uniqueindex"),
 		})
 	}
 
 	for idx, relField := range refForeignFields {
 		joinFieldName := strings.Title(relation.FieldSchema.Name) + relField.Name
+		if len(joinReferences) > idx {
+			joinFieldName = strings.Title(joinReferences[idx])
+		}
 
 		if _, ok := ownFieldsMap[joinFieldName]; ok {
 			if field.Name != relation.FieldSchema.Name {
@@ -253,22 +252,13 @@ func (schema *Schema) buildMany2ManyRelation(relation *Relationship, field *Fiel
 			}
 		}
 
-		if len(joinReferences) > idx {
-			joinFieldName = strings.Title(joinReferences[idx])
-		}
-
-		referFieldsMap[joinFieldName] = relField
-
-		if _, ok := fieldsMap[joinFieldName]; !ok {
-			fieldsMap[joinFieldName] = relField
-			joinTableFields = append(joinTableFields, reflect.StructField{
-				Name:    joinFieldName,
-				PkgPath: relField.StructField.PkgPath,
-				Type:    relField.StructField.Type,
-				Tag: removeSettingFromTag(appendSettingFromTag(relField.StructField.Tag, "primaryKey"),
-					"column", "autoincrement", "index", "unique", "uniqueindex"),
-			})
-		}
+		fieldsMap[joinFieldName] = relField
+		joinTableFields = append(joinTableFields, reflect.StructField{
+			Name:    joinFieldName,
+			PkgPath: relField.StructField.PkgPath,
+			Type:    relField.StructField.Type,
+			Tag:     removeSettingFromTag(relField.StructField.Tag, "column", "autoincrement", "index", "unique", "uniqueindex"),
+		})
 	}
 
 	joinTableFields = append(joinTableFields, reflect.StructField{
@@ -324,37 +314,31 @@ func (schema *Schema) buildMany2ManyRelation(relation *Relationship, field *Fiel
 				f.Size = fieldsMap[f.Name].Size
 			}
 			relation.JoinTable.PrimaryFields = append(relation.JoinTable.PrimaryFields, f)
+			ownPrimaryField := schema == fieldsMap[f.Name].Schema && ownFieldsMap[f.Name]
 
-			if of, ok := ownFieldsMap[f.Name]; ok {
+			if ownPrimaryField {
 				joinRel := relation.JoinTable.Relationships.Relations[relName]
 				joinRel.Field = relation.Field
 				joinRel.References = append(joinRel.References, &Reference{
-					PrimaryKey: of,
+					PrimaryKey: fieldsMap[f.Name],
 					ForeignKey: f,
 				})
-
-				relation.References = append(relation.References, &Reference{
-					PrimaryKey:    of,
-					ForeignKey:    f,
-					OwnPrimaryKey: true,
-				})
-			}
-
-			if rf, ok := referFieldsMap[f.Name]; ok {
+			} else {
 				joinRefRel := relation.JoinTable.Relationships.Relations[relRefName]
 				if joinRefRel.Field == nil {
 					joinRefRel.Field = relation.Field
 				}
 				joinRefRel.References = append(joinRefRel.References, &Reference{
-					PrimaryKey: rf,
-					ForeignKey: f,
-				})
-
-				relation.References = append(relation.References, &Reference{
-					PrimaryKey: rf,
+					PrimaryKey: fieldsMap[f.Name],
 					ForeignKey: f,
 				})
 			}
+
+			relation.References = append(relation.References, &Reference{
+				PrimaryKey:    fieldsMap[f.Name],
+				ForeignKey:    f,
+				OwnPrimaryKey: ownPrimaryField,
+			})
 		}
 	}
 }
@@ -404,34 +388,33 @@ func (schema *Schema) guessRelation(relation *Relationship, field *Field, cgl gu
 	case guessBelongs:
 		primarySchema, foreignSchema = relation.FieldSchema, schema
 	case guessEmbeddedBelongs:
-		if field.OwnerSchema == nil {
+		if field.OwnerSchema != nil {
+			primarySchema, foreignSchema = relation.FieldSchema, field.OwnerSchema
+		} else {
 			reguessOrErr()
 			return
 		}
-		primarySchema, foreignSchema = relation.FieldSchema, field.OwnerSchema
 	case guessHas:
 	case guessEmbeddedHas:
-		if field.OwnerSchema == nil {
+		if field.OwnerSchema != nil {
+			primarySchema, foreignSchema = field.OwnerSchema, relation.FieldSchema
+		} else {
 			reguessOrErr()
 			return
 		}
-		primarySchema, foreignSchema = field.OwnerSchema, relation.FieldSchema
 	}
 
 	if len(relation.foreignKeys) > 0 {
 		for _, foreignKey := range relation.foreignKeys {
-			f := foreignSchema.LookUpField(foreignKey)
-			if f == nil {
+			if f := foreignSchema.LookUpField(foreignKey); f != nil {
+				foreignFields = append(foreignFields, f)
+			} else {
 				reguessOrErr()
 				return
 			}
-			foreignFields = append(foreignFields, f)
 		}
 	} else {
-		primarySchemaName := primarySchema.Name
-		if primarySchemaName == "" {
-			primarySchemaName = relation.FieldSchema.Name
-		}
+		var primaryFields []*Field
 
 		if len(relation.primaryKeys) > 0 {
 			for _, primaryKey := range relation.primaryKeys {
@@ -444,7 +427,7 @@ func (schema *Schema) guessRelation(relation *Relationship, field *Field, cgl gu
 		}
 
 		for _, primaryField := range primaryFields {
-			lookUpName := primarySchemaName + primaryField.Name
+			lookUpName := primarySchema.Name + primaryField.Name
 			if gl == guessBelongs {
 				lookUpName = field.Name + primaryField.Name
 			}
@@ -464,11 +447,10 @@ func (schema *Schema) guessRelation(relation *Relationship, field *Field, cgl gu
 		}
 	}
 
-	switch {
-	case len(foreignFields) == 0:
+	if len(foreignFields) == 0 {
 		reguessOrErr()
 		return
-	case len(relation.primaryKeys) > 0:
+	} else if len(relation.primaryKeys) > 0 {
 		for idx, primaryKey := range relation.primaryKeys {
 			if f := primarySchema.LookUpField(primaryKey); f != nil {
 				if len(primaryFields) < idx+1 {
@@ -482,7 +464,7 @@ func (schema *Schema) guessRelation(relation *Relationship, field *Field, cgl gu
 				return
 			}
 		}
-	case len(primaryFields) == 0:
+	} else if len(primaryFields) == 0 {
 		if len(foreignFields) == 1 && primarySchema.PrioritizedPrimaryField != nil {
 			primaryFields = append(primaryFields, primarySchema.PrioritizedPrimaryField)
 		} else if len(primarySchema.PrimaryFields) == len(foreignFields) {
@@ -594,7 +576,7 @@ func (rel *Relationship) ParseConstraint() *Constraint {
 	return &constraint
 }
 
-func (rel *Relationship) ToQueryConditions(ctx context.Context, reflectValue reflect.Value) (conds []clause.Expression) {
+func (rel *Relationship) ToQueryConditions(reflectValue reflect.Value) (conds []clause.Expression) {
 	table := rel.FieldSchema.Table
 	foreignFields := []*Field{}
 	relForeignKeys := []string{}
@@ -634,7 +616,7 @@ func (rel *Relationship) ToQueryConditions(ctx context.Context, reflectValue ref
 		}
 	}
 
-	_, foreignValues := GetIdentityFieldValuesMap(ctx, reflectValue, foreignFields)
+	_, foreignValues := GetIdentityFieldValuesMap(reflectValue, foreignFields)
 	column, values := ToQueryValues(table, relForeignKeys, foreignValues)
 
 	conds = append(conds, clause.IN{Column: column, Values: values})

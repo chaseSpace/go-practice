@@ -3,8 +3,8 @@ package utils
 import (
 	"database/sql/driver"
 	"fmt"
-	"path/filepath"
 	"reflect"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -16,18 +16,7 @@ var gormSourceDir string
 func init() {
 	_, file, _, _ := runtime.Caller(0)
 	// compatible solution to get gorm source directory with various operating systems
-	gormSourceDir = sourceDir(file)
-}
-
-func sourceDir(file string) string {
-	dir := filepath.Dir(file)
-	dir = filepath.Dir(dir)
-
-	s := filepath.Dir(dir)
-	if filepath.Base(s) != "gorm.io" {
-		s = dir
-	}
-	return filepath.ToSlash(s) + "/"
+	gormSourceDir = regexp.MustCompile(`utils.utils\.go`).ReplaceAllString(file, "")
 }
 
 // FileWithLineNum return the file name and line number of the current file
@@ -47,14 +36,17 @@ func IsValidDBNameChar(c rune) bool {
 	return !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != '.' && c != '*' && c != '_' && c != '$' && c != '@'
 }
 
-// CheckTruth check string true or not
-func CheckTruth(vals ...string) bool {
-	for _, val := range vals {
-		if val != "" && !strings.EqualFold(val, "false") {
-			return true
-		}
+func CheckTruth(val interface{}) bool {
+	if v, ok := val.(bool); ok {
+		return v
 	}
-	return false
+
+	if v, ok := val.(string); ok {
+		v = strings.ToLower(v)
+		return v != "false"
+	}
+
+	return !reflect.ValueOf(val).IsZero()
 }
 
 func ToStringKey(values ...interface{}) string {

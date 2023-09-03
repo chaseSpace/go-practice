@@ -4,11 +4,6 @@ import (
 	"strings"
 )
 
-const (
-	AndWithSpace = " AND "
-	OrWithSpace  = " OR "
-)
-
 // Where where clause
 type Where struct {
 	Exprs []Expression
@@ -31,7 +26,7 @@ func (where Where) Build(builder Builder) {
 		}
 	}
 
-	buildExprs(where.Exprs, builder, AndWithSpace)
+	buildExprs(where.Exprs, builder, " AND ")
 }
 
 func buildExprs(exprs []Expression, builder Builder, joinCond string) {
@@ -40,7 +35,7 @@ func buildExprs(exprs []Expression, builder Builder, joinCond string) {
 	for idx, expr := range exprs {
 		if idx > 0 {
 			if v, ok := expr.(OrConditions); ok && len(v.Exprs) == 1 {
-				builder.WriteString(OrWithSpace)
+				builder.WriteString(" OR ")
 			} else {
 				builder.WriteString(joinCond)
 			}
@@ -51,30 +46,30 @@ func buildExprs(exprs []Expression, builder Builder, joinCond string) {
 			case OrConditions:
 				if len(v.Exprs) == 1 {
 					if e, ok := v.Exprs[0].(Expr); ok {
-						sql := strings.ToUpper(e.SQL)
-						wrapInParentheses = strings.Contains(sql, AndWithSpace) || strings.Contains(sql, OrWithSpace)
+						sql := strings.ToLower(e.SQL)
+						wrapInParentheses = strings.Contains(sql, "and") || strings.Contains(sql, "or")
 					}
 				}
 			case AndConditions:
 				if len(v.Exprs) == 1 {
 					if e, ok := v.Exprs[0].(Expr); ok {
-						sql := strings.ToUpper(e.SQL)
-						wrapInParentheses = strings.Contains(sql, AndWithSpace) || strings.Contains(sql, OrWithSpace)
+						sql := strings.ToLower(e.SQL)
+						wrapInParentheses = strings.Contains(sql, "and") || strings.Contains(sql, "or")
 					}
 				}
 			case Expr:
-				sql := strings.ToUpper(v.SQL)
-				wrapInParentheses = strings.Contains(sql, AndWithSpace) || strings.Contains(sql, OrWithSpace)
+				sql := strings.ToLower(v.SQL)
+				wrapInParentheses = strings.Contains(sql, "and") || strings.Contains(sql, "or")
 			case NamedExpr:
-				sql := strings.ToUpper(v.SQL)
-				wrapInParentheses = strings.Contains(sql, AndWithSpace) || strings.Contains(sql, OrWithSpace)
+				sql := strings.ToLower(v.SQL)
+				wrapInParentheses = strings.Contains(sql, "and") || strings.Contains(sql, "or")
 			}
 		}
 
 		if wrapInParentheses {
-			builder.WriteByte('(')
+			builder.WriteString(`(`)
 			expr.Build(builder)
-			builder.WriteByte(')')
+			builder.WriteString(`)`)
 			wrapInParentheses = false
 		} else {
 			expr.Build(builder)
@@ -115,10 +110,10 @@ type AndConditions struct {
 func (and AndConditions) Build(builder Builder) {
 	if len(and.Exprs) > 1 {
 		builder.WriteByte('(')
-		buildExprs(and.Exprs, builder, AndWithSpace)
+		buildExprs(and.Exprs, builder, " AND ")
 		builder.WriteByte(')')
 	} else {
-		buildExprs(and.Exprs, builder, AndWithSpace)
+		buildExprs(and.Exprs, builder, " AND ")
 	}
 }
 
@@ -136,10 +131,10 @@ type OrConditions struct {
 func (or OrConditions) Build(builder Builder) {
 	if len(or.Exprs) > 1 {
 		builder.WriteByte('(')
-		buildExprs(or.Exprs, builder, OrWithSpace)
+		buildExprs(or.Exprs, builder, " OR ")
 		builder.WriteByte(')')
 	} else {
-		buildExprs(or.Exprs, builder, OrWithSpace)
+		buildExprs(or.Exprs, builder, " OR ")
 	}
 }
 
@@ -161,7 +156,7 @@ func (not NotConditions) Build(builder Builder) {
 
 	for idx, c := range not.Exprs {
 		if idx > 0 {
-			builder.WriteString(AndWithSpace)
+			builder.WriteString(" AND ")
 		}
 
 		if negationBuilder, ok := c.(NegationExpressionBuilder); ok {
@@ -170,8 +165,8 @@ func (not NotConditions) Build(builder Builder) {
 			builder.WriteString("NOT ")
 			e, wrapInParentheses := c.(Expr)
 			if wrapInParentheses {
-				sql := strings.ToUpper(e.SQL)
-				if wrapInParentheses = strings.Contains(sql, AndWithSpace) || strings.Contains(sql, OrWithSpace); wrapInParentheses {
+				sql := strings.ToLower(e.SQL)
+				if wrapInParentheses = strings.Contains(sql, "and") || strings.Contains(sql, "or"); wrapInParentheses {
 					builder.WriteByte('(')
 				}
 			}
