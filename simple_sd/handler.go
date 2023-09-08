@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"go-practice/simple_sd/core"
 	"net/http"
+	"time"
 )
 
 type HttpRes struct {
@@ -73,7 +74,9 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	err = core.Sd.Register(instanceReq)
 	if err == nil {
-		data, err = core.Sd.Discovery(context.TODO(), instanceReq.Service, "", false)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*10)
+		defer cancel()
+		data, _, err = core.Sd.Discovery(ctx, instanceReq.Service, "")
 	}
 }
 
@@ -122,11 +125,17 @@ func handleDeregister(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type discoveryBody struct {
+type discoveryReq struct {
 	Service  string
 	LastHash string
-	Block    bool
+	WaitMs   int64
 }
+type discoveryRsp struct {
+	Instances []core.ServiceInstance
+	Hash      string
+}
+
+const MaxDiscoveryTimeout = time.Minute * 5
 
 func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -134,14 +143,15 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body := new(discoveryBody)
+	body := new(discoveryReq)
 
 	var err error
 	var code = 200
-	var instances []core.ServiceInstance
+
+	var response *discoveryRsp
 
 	defer func() {
-		rsp := ToJson(newRes(instances, code, err))
+		rsp := ToJson(newRes(response, code, err))
 		w.Write(rsp)
 		if err != nil {
 			core.Sdlogger.Error("handleDiscovery: body:%+v error: %v", body, err)
@@ -162,5 +172,24 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 		err = errors.Wrap(ErrParams, "need service")
 		return
 	}
-	instances, err = core.Sd.Discovery(context.TODO(), body.Service, body.LastHash, body.Block)
+	if body.WaitMs > MaxDiscoveryTimeout.Milliseconds() {
+		code = 400
+		err = errors.Wrapf(ErrParams, "max wait ms is %s", MaxDiscoveryTimeout)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*time.Duration(body.WaitMs))
+	defer cancel()
+
+	var (
+		instances []core.ServiceInstance
+		hash      string
+	)
+	instances, hash, err = core.Sd.Discovery(ctx, body.Service, body.LastHash)
+	if err == nil {
+		response = &discoveryRsp{
+			Instances: instances,
+			Hash:      hash,
+		}
+	}
 }

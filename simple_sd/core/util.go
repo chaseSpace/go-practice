@@ -1,7 +1,7 @@
 package core
 
 import (
-	"crypto/sha256"
+	"crypto/md5"
 	"fmt"
 	"github.com/samber/lo"
 	"net"
@@ -23,7 +23,7 @@ func netDialTest(addr string, retry int, intvl time.Duration) bool {
 	return false
 }
 
-func calInstanceHash(instances []ServiceInstance) string {
+func CalInstanceHash(instances []ServiceInstance) string {
 	if len(instances) == 0 {
 		return ""
 	}
@@ -32,7 +32,7 @@ func calInstanceHash(instances []ServiceInstance) string {
 	})
 	sort.Strings(addrs)
 
-	hasher := sha256.New()
+	hasher := md5.New()
 	hasher.Write([]byte(strings.Join(addrs, "")))
 	return fmt.Sprintf("%x", hasher.Sum(nil))
 }

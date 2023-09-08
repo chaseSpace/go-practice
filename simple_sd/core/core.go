@@ -24,6 +24,8 @@ var (
 	ErrInstanceNotRegistered = errors.New("instance not registered")
 )
 
+const DiscoveryInterval = time.Millisecond * 200
+
 func (s *SimpleSd) Register(instance ServiceInstance) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -45,29 +47,32 @@ func (s *SimpleSd) Deregister(service, addr string) error {
 	return errors.Wrap(ErrInstanceNotRegistered, fmt.Sprintf("service: %s, addr: %s", service, addr))
 }
 
-func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash string, block bool) ([]ServiceInstance, error) {
+func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash string) ([]ServiceInstance, string, error) {
 	for {
 		select {
 		case <-ctx.Done():
-			return nil, ctx.Err()
-		case <-time.After(time.Millisecond * 500): // refresh interval
-			s.mu.RLock()
-			serv := s.store[service]
-			s.mu.RUnlock()
+			instances, currHash := s.getInstances(service)
+			return instances, currHash, nil
 
-			if serv == nil {
-				if lastHash == "" || !block {
-					Sdlogger.Debug("SimpleSd: returned with lastHash:%s and block:%v", lastHash, block)
-					return nil, nil
-				}
-			} else {
-				list := serv.InstanceList()
-				if lastHash == "" || lastHash != calInstanceHash(list) || !block {
-					Sdlogger.Debug("SimpleSd: returned with lastHash:%s and block:%v", lastHash, block)
-					return list, nil
-				}
+		case <-time.After(DiscoveryInterval): // refresh interval
+			instances, currHash := s.getInstances(service)
+			if currHash != lastHash {
+				return instances, currHash, nil
 			}
 		}
+	}
+}
+
+func (s *SimpleSd) getInstances(service string) ([]ServiceInstance, string) {
+	s.mu.RLock()
+	serv := s.store[service]
+	s.mu.RUnlock()
+
+	if serv == nil {
+		return nil, ""
+	} else {
+		list, currHash := serv.InstanceList()
+		return list, currHash
 	}
 }
 
@@ -75,6 +80,8 @@ type Service struct {
 	service string
 	mu      sync.RWMutex
 	smap    map[string]*ServiceInstance
+
+	nowHash string
 	quit    chan struct{}
 }
 
@@ -98,7 +105,8 @@ func (s *Service) healthCheck() {
 			Sdlogger.Debug("Service: %s health check stopped", s.service)
 			return
 		case <-time.After(healthCheckInterval):
-			for _, ins := range s.InstanceList() {
+			__inst, _ := s.InstanceList()
+			for _, ins := range __inst {
 				if ins.IsUDP {
 					pass := netDialTest(ins.Addr(), 3, time.Second)
 					if pass {
@@ -124,6 +132,7 @@ func (s *Service) Add(instance *ServiceInstance) error {
 	s.mu.Lock()
 	s.smap[instance.Addr()] = instance
 	s.mu.Unlock()
+	s.resetHash()
 	return nil
 }
 
@@ -134,14 +143,24 @@ func (s *Service) Remove(addr string) error {
 		return fmt.Errorf("instance: %s not found", addr)
 	}
 	delete(s.smap, addr)
+	s.resetHash()
 	return nil
 }
 
-func (s *Service) InstanceList() (list []ServiceInstance) {
+func (s *Service) resetHash() {
+	var __inst []ServiceInstance
+	for _, instance := range s.smap {
+		__inst = append(__inst, *instance)
+	}
+	s.nowHash = CalInstanceHash(__inst)
+}
+
+func (s *Service) InstanceList() (list []ServiceInstance, hash string) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for _, instance := range s.smap {
 		list = append(list, *instance)
 	}
+	hash = s.nowHash
 	return
 }
