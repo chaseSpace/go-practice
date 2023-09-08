@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"sync"
 	"time"
 )
@@ -13,11 +14,15 @@ type SimpleSd struct {
 	newServiceNotify sync.Cond
 }
 
-var Sd ServiceDiscovery = new(SimpleSd)
+var Sd ServiceDiscovery = &SimpleSd{store: map[string]*Service{}}
 
 func (s *SimpleSd) Name() string {
 	return "SimpleSd"
 }
+
+var (
+	ErrInstanceNotRegistered = errors.New("instance not registered")
+)
 
 func (s *SimpleSd) Register(instance ServiceInstance) error {
 	s.mu.Lock()
@@ -37,7 +42,7 @@ func (s *SimpleSd) Deregister(service, addr string) error {
 	if serv := s.store[service]; serv != nil {
 		return serv.Remove(addr)
 	}
-	return fmt.Errorf("instance: %s not found", addr)
+	return errors.Wrap(ErrInstanceNotRegistered, fmt.Sprintf("service: %s, addr: %s", service, addr))
 }
 
 func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash string, block bool) ([]ServiceInstance, error) {
@@ -45,7 +50,7 @@ func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash strin
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		case <-time.After(time.Millisecond * 500):
+		case <-time.After(time.Millisecond * 500): // refresh interval
 			s.mu.RLock()
 			serv := s.store[service]
 			s.mu.RUnlock()
@@ -94,7 +99,7 @@ func (s *Service) healthCheck() {
 			return
 		case <-time.After(healthCheckInterval):
 			for _, ins := range s.InstanceList() {
-				if ins.IsTCP {
+				if ins.IsUDP {
 					pass := netDialTest(ins.Addr(), 3, time.Second)
 					if pass {
 						if ins.fails > 0 {
