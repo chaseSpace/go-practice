@@ -10,14 +10,13 @@ type HTTPServer struct {
 }
 
 func NewSimpleSdHTTPServer() *HTTPServer {
-	core.InitLogger(core.LogLevelDebug)
 	return &HTTPServer{}
 }
 
 func (s *HTTPServer) Run(port int) {
 	http.HandleFunc("/service/register", handleRegister)
-	http.HandleFunc("/service/deregister", handleRegister)
-	http.HandleFunc("/service/discovery", handleRegister)
+	http.HandleFunc("/service/deregister", handleDeregister)
+	http.HandleFunc("/service/discovery", handleDiscovery)
 
 	core.Sdlogger.Info("SimpleSdHTTPServer is running on http://localhost:%d", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)

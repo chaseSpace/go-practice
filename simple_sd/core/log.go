@@ -12,14 +12,10 @@ type Logger struct {
 	level int
 }
 
-var Sdlogger *Logger
+var Sdlogger Logger
 
-func InitLogger(level int) {
-	if Sdlogger == nil {
-		Sdlogger = &Logger{
-			level: level,
-		}
-	}
+func SetLogLevel(level int) {
+	Sdlogger.level = level
 }
 
 func (m *Logger) Debug(msg string, args ...interface{}) {

@@ -16,7 +16,7 @@ type ServiceDiscovery interface {
 // ServiceInstance 表示注册的单个实例
 type ServiceInstance struct {
 	Service  string
-	IsTCP    bool
+	IsUDP    bool // TCP by default
 	Host     string
 	Port     int
 	Metadata map[string]string
