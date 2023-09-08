@@ -13,14 +13,12 @@ func NewSimpleSdHTTPServer() *HTTPServer {
 	return &HTTPServer{}
 }
 
-func (s *HTTPServer) Run(port int) {
+func (s *HTTPServer) Run(port int) error {
 	http.HandleFunc("/service/register", handleRegister)
 	http.HandleFunc("/service/deregister", handleDeregister)
 	http.HandleFunc("/service/discovery", handleDiscovery)
 
 	core.Sdlogger.Info("SimpleSdHTTPServer is running on http://localhost:%d", port)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-	if err != nil && err != http.ErrServerClosed {
-		panic(err)
-	}
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+
 }
