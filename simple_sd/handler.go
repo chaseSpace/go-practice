@@ -39,27 +39,31 @@ func newRes(data interface{}, code int, err error) *HttpRes {
 	}
 }
 
+type registerReq struct {
+	core.ServiceInstance
+}
+
 func handleRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.Write(ToJson(newRes(nil, 400, ErrMethod)))
+		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
 		return
 	}
-	instanceReq := core.ServiceInstance{}
+	req := new(registerReq)
 
-	var data []core.ServiceInstance
+	var data []*core.ServiceInstance
 	var err error
 	var code = 200
 	defer func() {
 		rsp := ToJson(newRes(data, code, err))
-		w.Write(rsp)
+		_, _ = w.Write(rsp)
 		if err != nil {
-			core.Sdlogger.Error("handleRegister: service:%s instanceReq:%s error: %v", instanceReq.Service, instanceReq.Addr(), err)
+			core.Sdlogger.Error("handleRegister: service:%s req:%s error: %v", req.Service, req.Addr(), err)
 			return
 		}
-		core.Sdlogger.Info("handleRegister OK, service:%s instanceReq:%s", instanceReq.Service, instanceReq.Addr())
+		core.Sdlogger.Info("handleRegister OK, service:%s req:%s", req.Service, req.Addr())
 	}()
 
-	err = json.NewDecoder(r.Body).Decode(&instanceReq)
+	err = json.NewDecoder(r.Body).Decode(req)
 	if err != nil {
 		code = 400
 		err = errors.Wrap(ErrParams, err.Error())
@@ -67,16 +71,16 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = r.Body.Close()
 
-	if err = instanceReq.Check(); err != nil {
+	if err = req.Check(); err != nil {
 		code = 400
 		err = errors.Wrap(ErrParams, err.Error())
 		return
 	}
-	err = core.Sd.Register(instanceReq)
+	err = core.Sd.Register(req.ServiceInstance)
 	if err == nil {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*10)
 		defer cancel()
-		data, _, err = core.Sd.Discovery(ctx, instanceReq.Service, "")
+		data, _, err = core.Sd.Discovery(ctx, req.Service, "")
 	}
 }
 
@@ -88,7 +92,7 @@ type deregisterBody struct {
 
 func handleDeregister(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.Write(ToJson(newRes(nil, 400, ErrMethod)))
+		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
 		return
 	}
 	req := new(deregisterBody)
@@ -97,7 +101,7 @@ func handleDeregister(w http.ResponseWriter, r *http.Request) {
 	var code = 200
 	defer func() {
 		rsp := ToJson(newRes(nil, code, err))
-		w.Write(rsp)
+		_, _ = w.Write(rsp)
 		if err != nil {
 			core.Sdlogger.Error("handleDeregister: req:%+v error: %v", req, err)
 			return
@@ -126,12 +130,12 @@ func handleDeregister(w http.ResponseWriter, r *http.Request) {
 }
 
 type discoveryReq struct {
-	Service  string
-	LastHash string
-	WaitMs   int64
+	Service   string
+	LastHash  string
+	WaitMaxMs int64
 }
 type discoveryRsp struct {
-	Instances []core.ServiceInstance
+	Instances []*core.ServiceInstance
 	Hash      string
 }
 
@@ -139,7 +143,7 @@ const MaxDiscoveryTimeout = time.Minute * 5
 
 func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.Write(ToJson(newRes(nil, 400, ErrMethod)))
+		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
 		return
 	}
 
@@ -152,7 +156,7 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		rsp := ToJson(newRes(response, code, err))
-		w.Write(rsp)
+		_, _ = w.Write(rsp)
 		if err != nil {
 			core.Sdlogger.Error("handleDiscovery: body:%+v error: %v", body, err)
 			return
@@ -172,17 +176,17 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 		err = errors.Wrap(ErrParams, "need service")
 		return
 	}
-	if body.WaitMs > MaxDiscoveryTimeout.Milliseconds() {
+	if body.WaitMaxMs > MaxDiscoveryTimeout.Milliseconds() {
 		code = 400
 		err = errors.Wrapf(ErrParams, "max wait ms is %s", MaxDiscoveryTimeout)
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*time.Duration(body.WaitMs))
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*time.Duration(body.WaitMaxMs))
 	defer cancel()
 
 	var (
-		instances []core.ServiceInstance
+		instances []*core.ServiceInstance
 		hash      string
 	)
 	instances, hash, err = core.Sd.Discovery(ctx, body.Service, body.LastHash)

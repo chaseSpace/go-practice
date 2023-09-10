@@ -23,7 +23,7 @@ func TestHTTPServer_handleRegister(t *testing.T) {
 		{
 			name:    "T-无效body",
 			req:     []int{1},
-			wantRes: newRes(nil, 400, errors.Wrap(ErrParams, json.Unmarshal([]byte(`[1]`), new(core.ServiceInstance)).Error())),
+			wantRes: newRes(nil, 400, errors.Wrap(ErrParams, json.Unmarshal([]byte(`[1]`), new(registerReq)).Error())),
 		},
 		{
 			name: "T-空service",
@@ -57,7 +57,7 @@ func TestHTTPServer_handleRegister(t *testing.T) {
 				Host:    "localhost",
 				Port:    8080,
 			},
-			wantRes: newRes([]core.ServiceInstance{
+			wantRes: newRes([]*core.ServiceInstance{
 				{
 					Service: "go-user",
 					Host:    "localhost",
@@ -85,7 +85,7 @@ func TestHTTPServer_handleRegister(t *testing.T) {
 
 		b := rr.Body.Bytes()
 		if !bytes.Equal(ToJson(tt.wantRes), b) {
-			t.Fatalf(tt.name+"--handler res got：%+v, not want:%+v", b, tt.wantRes)
+			t.Fatalf(tt.name+"--handler res got：%s, not want:%+v", b, tt.wantRes)
 		}
 		//fmt.Printf(tt.name+"--handler want:%+v\n", tt.wantRes)
 	}
@@ -202,17 +202,17 @@ func TestHTTPServer_handleDiscovery(t *testing.T) {
 		name              string
 		req               interface{}
 		regAfter          time.Duration
-		regInstances      []core.ServiceInstance
-		regInstancesAfter []core.ServiceInstance
+		regInstances      []*core.ServiceInstance
+		regInstancesAfter []*core.ServiceInstance
 		wantRes           *HttpRes
 	}
 
-	__inst1 := []core.ServiceInstance{{
+	__inst1 := []*core.ServiceInstance{{
 		Service: "go-user",
 		Host:    "localhost",
 		Port:    8080,
 	}}
-	__inst2 := []core.ServiceInstance{{
+	__inst2 := []*core.ServiceInstance{{
 		Service: "go-user",
 		Host:    "localhost",
 		Port:    8081,
@@ -228,14 +228,14 @@ func TestHTTPServer_handleDiscovery(t *testing.T) {
 		},
 		{
 			name: "T-空service",
-			req: discoveryReq{
+			req: &discoveryReq{
 				Service: "",
 			},
 			wantRes: newRes(nil, 400, errors.Wrap(ErrParams, "need service")),
 		},
 		{
 			name: "T-设置Service",
-			req: discoveryReq{
+			req: &discoveryReq{
 				Service: "go-user",
 			},
 			regInstances: __inst1,
@@ -245,18 +245,18 @@ func TestHTTPServer_handleDiscovery(t *testing.T) {
 			}, 200, nil),
 		},
 		{
-			name: "T-设置Service、空Hash、WaitMs=10, 无实例（应耗尽时间再返回）",
-			req: discoveryReq{
-				Service: "go-user",
-				WaitMs:  10,
+			name: "T-设置Service、空Hash、WaitMaxMs=10, 无实例（应耗尽时间再返回）",
+			req: &discoveryReq{
+				Service:   "go-user",
+				WaitMaxMs: 10,
 			},
 			wantRes: newRes(discoveryRsp{}, 200, nil),
 		},
 		{
-			name: "T-设置Service、空Hash、WaitMs=10, 有实例（应立即返回）",
-			req: discoveryReq{
-				Service: "go-user",
-				WaitMs:  10,
+			name: "T-设置Service、空Hash、WaitMaxMs=10, 有实例（应立即返回）",
+			req: &discoveryReq{
+				Service:   "go-user",
+				WaitMaxMs: 10,
 			},
 			regInstances: __inst1,
 			wantRes: newRes(discoveryRsp{
@@ -265,11 +265,11 @@ func TestHTTPServer_handleDiscovery(t *testing.T) {
 			}, 200, nil),
 		},
 		{
-			name: "T-设置Service、与实例一致的Hash、WaitMs=10, 有实例（应耗尽时间再返回）",
-			req: discoveryReq{
-				Service:  "go-user",
-				WaitMs:   10,
-				LastHash: core.CalInstanceHash(__inst1),
+			name: "T-设置Service、与实例一致的Hash、WaitMaxMs=10, 有实例（应耗尽时间再返回）",
+			req: &discoveryReq{
+				Service:   "go-user",
+				WaitMaxMs: 10,
+				LastHash:  core.CalInstanceHash(__inst1),
 			},
 			regInstances: __inst1,
 			wantRes: newRes(discoveryRsp{
@@ -278,24 +278,24 @@ func TestHTTPServer_handleDiscovery(t *testing.T) {
 			}, 200, nil),
 		},
 		{
-			name: "T-设置Service、空Hash、WaitMs=15, 10ms后注册多个实例（应耗尽时间再返回多个实例）",
-			req: discoveryReq{
-				Service: "go-user",
-				WaitMs:  15,
+			name: "T-设置Service、空Hash、WaitMaxMs=15, 10ms后注册1个实例（应耗尽时间再返回1个实例）",
+			req: &discoveryReq{
+				Service:   "go-user",
+				WaitMaxMs: 20, // 需要稍微大于 regAfter
 			},
 			regAfter:          time.Millisecond * 10,
 			regInstancesAfter: __inst1,
 			wantRes: newRes(discoveryRsp{
 				Instances: __inst1,
-				Hash:      core.CalInstanceHash(__inst1),
+				Hash:      __oneInstHash,
 			}, 200, nil),
 		},
 		{
-			name: "T-设置Service、与1个实例一致的Hash、WaitMs=1000, 先注册1个实例，1000ms后再注册另一个实例（应耗尽时间再返回2个实例）",
-			req: discoveryReq{
-				Service:  "go-user",
-				WaitMs:   1000,
-				LastHash: __oneInstHash,
+			name: "T-设置Service、与1个实例一致的Hash、WaitMaxMs=1000, 先注册1个实例，1000ms后再注册另一个实例（应耗尽时间再返回2个实例）",
+			req: &discoveryReq{
+				Service:   "go-user",
+				WaitMaxMs: 1010, // 需要稍微大于 regAfter
+				LastHash:  __oneInstHash,
 			},
 			regInstances:      __inst1,
 			regAfter:          time.Millisecond * 1000,
@@ -309,15 +309,15 @@ func TestHTTPServer_handleDiscovery(t *testing.T) {
 
 	for _, tt := range tests {
 		for _, inst := range tt.regInstances {
-			err := core.Sd.Register(inst)
+			err := core.Sd.Register(*inst)
 			if err != nil {
 				t.Fatalf(tt.name+"--- Register failed %v", err)
 			}
 		}
-		go func(instances []core.ServiceInstance) {
+		go func(instances []*core.ServiceInstance) {
 			time.Sleep(tt.regAfter)
 			for _, inst := range instances {
-				err := core.Sd.Register(inst)
+				err := core.Sd.Register(*inst)
 				if err != nil {
 					t.Fatalf(tt.name+"--- Register failed %v", err)
 				}
@@ -340,13 +340,14 @@ func TestHTTPServer_handleDiscovery(t *testing.T) {
 			t.Fatalf(tt.name+"--handler unexpected statuscode: got %v, want %v", status, http.StatusOK)
 		}
 
-		body, ok := tt.req.(discoveryReq)
-		if ok && body.WaitMs > 0 && !isMillsTimeCostEqual(cost, body.WaitMs) {
-			t.Fatalf(tt.name+"--handler unexpected waitMs: got %v, want %v", cost, body.WaitMs)
+		body, ok := tt.req.(*discoveryReq)
+		if ok && body.WaitMaxMs > 0 && !isMillsTimeCostEqual(cost, tt.regAfter.Milliseconds()) {
+			t.Fatalf(tt.name+"--handler unexpected waitMs: got %v, want %v", cost, tt.regAfter.Milliseconds())
 		}
 
 		// default time cost limited to 2ms
-		if body.WaitMs == 0 && cost > 2 {
+		if ok && body.WaitMaxMs == 0 && cost > 2 {
+			println(222)
 			t.Fatalf(tt.name+"--handler unexpected waitMs: got %v, want %v", cost, 2)
 		}
 
@@ -361,4 +362,129 @@ func TestHTTPServer_handleDiscovery(t *testing.T) {
 
 		//fmt.Printf(tt.name+"--handler want:%+v\n", tt.wantRes)
 	}
+}
+
+func doRegister(insts []*core.ServiceInstance) []byte {
+	var res []byte
+	for _, inst := range insts {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(handleRegister)
+		req, _ := http.NewRequest("POST", "/service/register", bytes.NewReader(ToJson(registerReq{*inst})))
+		handler.ServeHTTP(rr, req)
+		res = rr.Body.Bytes()
+	}
+	return res
+}
+
+func doDiscovery(service string) []byte {
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(handleDiscovery)
+	req, _ := http.NewRequest("POST", "/service/discovery", bytes.NewReader(ToJson(&discoveryReq{
+		Service: service,
+	})))
+	handler.ServeHTTP(rr, req)
+	return rr.Body.Bytes()
+}
+
+func mustHaveInstance(t *testing.T, insts []*core.ServiceInstance, hash string) {
+	var wantRes = &discoveryRsp{
+		Instances: insts,
+		Hash:      hash,
+	}
+	resBytes := doDiscovery("go-user")
+
+	if !bytes.Equal(resBytes, ToJson(newRes(wantRes, 200, nil))) {
+		t.Fatalf("Discovery result failed, got res:%s", resBytes)
+	}
+}
+
+func mustNoInstance(t *testing.T) {
+	var wantRes = &discoveryRsp{}
+	resBytes := doDiscovery("go-user")
+
+	if !bytes.Equal(resBytes, ToJson(newRes(wantRes, 200, nil))) {
+		t.Fatalf("Discovery result failed, got res:%s", resBytes)
+	}
+}
+
+func TestHTTPServer_handleDiscoveryWithHealthCheckFail(t *testing.T) {
+	__inst1 := []*core.ServiceInstance{{
+		Service: "go-user",
+		Host:    "localhost",
+		Port:    8080,
+	}}
+	//__inst2 := []*core.ServiceInstance{{
+	//	Service: "go-user",
+	//	Host:    "localhost",
+	//	Port:    8081,
+	//}}
+
+	__oneInstHash := core.CalInstanceHash(__inst1)
+	//__twoInstHash := core.CalInstanceHash(append(__inst1, __inst2...))
+
+	resBytes := doRegister(__inst1)
+	if !bytes.Equal(resBytes, ToJson(newRes(__inst1, 200, nil))) {
+		t.Fatalf("doRegister failed: %s", resBytes)
+	}
+
+	// 在sd进行健康检测期间，实例应该一直存在
+	serverAliveSec := core.HealthCheckInterval.Seconds() * core.HealthCheckMaxFails
+	for i := 0; i < int(serverAliveSec); i++ {
+		println("--- No.1 sleep serverAliveSec", i+1)
+		mustHaveInstance(t, __inst1, __oneInstHash)
+		time.Sleep(time.Second)
+	}
+
+	println("No.1 sleep end...")
+	time.Sleep(time.Second) // 给一个合理的间隙时间
+	mustNoInstance(t)
+}
+
+func TestHTTPServer_handleDiscoveryWithHealthCheckPass(t *testing.T) {
+	__inst1 := []*core.ServiceInstance{{
+		Service: "go-user",
+		Host:    "localhost",
+		Port:    8080,
+	}}
+	//__inst2 := []*core.ServiceInstance{{
+	//	Service: "go-user",
+	//	Host:    "localhost",
+	//	Port:    8081,
+	//}}
+
+	__oneInstHash := core.CalInstanceHash(__inst1)
+	//__twoInstHash := core.CalInstanceHash(append(__inst1, __inst2...))
+
+	//
+	resBytes := doRegister(__inst1)
+	// -- 返回实例是按注册时间排序的，所以这里顺序固定
+	if !bytes.Equal(resBytes, ToJson(newRes(__inst1, 200, nil))) {
+		t.Fatalf("doRegister failed: %s", resBytes)
+	}
+
+	// -- 同时启动实例 以通过健康检测
+	__server := http.Server{Addr: __inst1[0].Addr()}
+	serverAliveSec := core.HealthCheckInterval.Seconds() * (core.HealthCheckMaxFails + 1)
+	go func() {
+		err := __server.ListenAndServe()
+		if err != http.ErrServerClosed {
+			panic(err)
+		}
+		println("No.2 server closed")
+	}()
+
+	time.AfterFunc(time.Duration(serverAliveSec)*time.Second, func() {
+		__server.Close()
+	})
+
+	// 以更长的时间来持续检测实例是否注册
+	for i := 0; i < int(serverAliveSec); i++ {
+		println("--- No.2 sleep serverAliveSec", i+1)
+		mustHaveInstance(t, __inst1, __oneInstHash)
+		time.Sleep(time.Second)
+	}
+
+	println("No.2 sleep end...")
+	time.Sleep(time.Second)
+	mustNoInstance(t)
 }

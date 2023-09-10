@@ -10,9 +10,13 @@ import (
 	"time"
 )
 
-func netDialTest(addr string, retry int, intvl time.Duration) bool {
+func netDialTest(isUDP bool, addr string, retry int, intvl time.Duration) bool {
+	network := "tcp"
+	if isUDP {
+		network = "udp"
+	}
 	for i := 0; i < retry; i++ {
-		conn, err := net.DialTimeout("tcp", addr, time.Second*3)
+		conn, err := net.DialTimeout(network, addr, time.Second*3)
 		if err == nil {
 			_ = conn.Close()
 			return true
@@ -23,11 +27,11 @@ func netDialTest(addr string, retry int, intvl time.Duration) bool {
 	return false
 }
 
-func CalInstanceHash(instances []ServiceInstance) string {
+func CalInstanceHash(instances []*ServiceInstance) string {
 	if len(instances) == 0 {
 		return ""
 	}
-	addrs := lo.Map(instances, func(item ServiceInstance, index int) string {
+	addrs := lo.Map(instances, func(item *ServiceInstance, index int) string {
 		return item.Addr()
 	})
 	sort.Strings(addrs)

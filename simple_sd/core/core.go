@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/pkg/errors"
+	"sort"
 	"sync"
 	"time"
 )
@@ -34,6 +35,7 @@ func (s *SimpleSd) Register(instance ServiceInstance) error {
 		serv = newService(instance.Service)
 		s.store[instance.Service] = serv
 	}
+	instance.registerAt = time.Now()
 	err := serv.Add(&instance)
 	return err
 }
@@ -47,7 +49,7 @@ func (s *SimpleSd) Deregister(service, addr string) error {
 	return errors.Wrap(ErrInstanceNotRegistered, fmt.Sprintf("service: %s, addr: %s", service, addr))
 }
 
-func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash string) ([]ServiceInstance, string, error) {
+func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash string) ([]*ServiceInstance, string, error) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -63,7 +65,7 @@ func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash strin
 	}
 }
 
-func (s *SimpleSd) getInstances(service string) ([]ServiceInstance, string) {
+func (s *SimpleSd) getInstances(service string) ([]*ServiceInstance, string) {
 	s.mu.RLock()
 	serv := s.store[service]
 	s.mu.RUnlock()
@@ -85,8 +87,8 @@ type Service struct {
 	quit    chan struct{}
 }
 
-const healthCheckInterval = time.Second * 5
-const healthCheckMaxFails = 2
+const HealthCheckInterval = time.Second * 5
+const HealthCheckMaxFails = 1
 
 func newService(service string) *Service {
 	s := &Service{service: service, smap: make(map[string]*ServiceInstance)}
@@ -99,28 +101,30 @@ func (s *Service) Stop() {
 }
 
 func (s *Service) healthCheck() {
+	Sdlogger.Debug("service %s launched health check", s.service)
 	for {
 		select {
 		case <-s.quit:
-			Sdlogger.Debug("Service: %s health check stopped", s.service)
+			Sdlogger.Debug("service: %s health check stopped", s.service)
 			return
-		case <-time.After(healthCheckInterval):
+		case <-time.After(HealthCheckInterval):
 			__inst, _ := s.InstanceList()
 			for _, ins := range __inst {
-				if ins.IsUDP {
-					pass := netDialTest(ins.Addr(), 3, time.Second)
-					if pass {
-						if ins.fails > 0 {
-							ins.fails = 0
-							Sdlogger.Debug("Service: %s, instance %s health recovered", s.service, ins.Addr())
-						}
-					} else {
-						ins.fails++
-						if ins.fails >= healthCheckMaxFails {
-							// remove instance
-							_ = s.Remove(ins.Addr())
-							Sdlogger.Debug("Service: %s, instance %s was removed", s.service, ins.Addr())
-						}
+				st := time.Now()
+				pass := netDialTest(ins.IsUDP, ins.Addr(), 1, time.Millisecond*20)
+				cost := time.Since(st)
+				if pass {
+					if ins.fails > 0 {
+						ins.fails = 0
+						Sdlogger.Debug("service: %s, instance %s health recovered", s.service, ins.Addr())
+					}
+				} else {
+					println(2222, ins.fails, cost.String())
+					ins.fails++
+					if ins.fails >= HealthCheckMaxFails {
+						// remove instance
+						_ = s.Remove(ins.Addr())
+						Sdlogger.Debug("service: %s, instance %s was removed", s.service, ins.Addr())
 					}
 				}
 			}
@@ -148,19 +152,23 @@ func (s *Service) Remove(addr string) error {
 }
 
 func (s *Service) resetHash() {
-	var __inst []ServiceInstance
+	var __inst []*ServiceInstance
 	for _, instance := range s.smap {
-		__inst = append(__inst, *instance)
+		__inst = append(__inst, instance)
 	}
 	s.nowHash = CalInstanceHash(__inst)
 }
 
-func (s *Service) InstanceList() (list []ServiceInstance, hash string) {
+func (s *Service) InstanceList() (list []*ServiceInstance, hash string) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for _, instance := range s.smap {
-		list = append(list, *instance)
+		list = append(list, instance)
 	}
+	// sort in ascending order by registration time
+	sort.SliceStable(list, func(i, j int) bool {
+		return list[i].registerAt.Before(list[j].registerAt)
+	})
 	hash = s.nowHash
 	return
 }
