@@ -1,9 +1,10 @@
-package core
+package simple_sd
 
 import (
 	"context"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/samber/lo"
 	"sort"
 	"sync"
 	"time"
@@ -11,18 +12,18 @@ import (
 
 type SimpleSd struct {
 	mu               sync.RWMutex
-	store            map[string]*Service
+	registry         map[string]*Service
 	newServiceNotify sync.Cond
 }
 
-var Sd ServiceDiscovery = &SimpleSd{store: map[string]*Service{}}
+var Sd ServiceDiscovery = &SimpleSd{registry: map[string]*Service{}}
 
 func (s *SimpleSd) Name() string {
 	return "SimpleSd"
 }
 
 var (
-	ErrInstanceNotRegistered = errors.New("instance not registered")
+	ErrInstanceNotRegistered = errors.New("instance not register")
 )
 
 const DiscoveryInterval = time.Millisecond * 200
@@ -30,26 +31,31 @@ const DiscoveryInterval = time.Millisecond * 200
 func (s *SimpleSd) Register(instance ServiceInstance) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	serv := s.store[instance.Service]
+	serv := s.registry[instance.Service]
 	if serv == nil {
 		serv = newService(instance.Service)
-		s.store[instance.Service] = serv
+		s.registry[instance.Service] = serv
 	}
 	instance.registerAt = time.Now()
 	err := serv.Add(&instance)
 	return err
 }
 
-func (s *SimpleSd) Deregister(service, addr string) error {
+func (s *SimpleSd) Deregister(service, id string) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	if serv := s.store[service]; serv != nil {
-		return serv.Remove(addr)
+	if serv := s.registry[service]; serv != nil {
+		return serv.Remove(id)
 	}
-	return errors.Wrap(ErrInstanceNotRegistered, fmt.Sprintf("service: %s, addr: %s", service, addr))
+	return errors.Wrap(ErrInstanceNotRegistered, fmt.Sprintf("service: %s, id: %s", service, id))
 }
 
-func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash string) ([]*ServiceInstance, string, error) {
+func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash string) ([]ServiceInstance, string, error) {
+	// when lastHash is empty, here is realtime discovery and returns
+	if lastHash == "" {
+		instances, currHash := s.getInstances(service)
+		return instances, currHash, nil
+	}
 	for {
 		select {
 		case <-ctx.Done():
@@ -58,23 +64,25 @@ func (s *SimpleSd) Discovery(ctx context.Context, service string, lastHash strin
 
 		case <-time.After(DiscoveryInterval): // refresh interval
 			instances, currHash := s.getInstances(service)
-			if currHash != lastHash {
+			if currHash != lastHash || lastHash == "" {
 				return instances, currHash, nil
 			}
 		}
 	}
 }
 
-func (s *SimpleSd) getInstances(service string) ([]*ServiceInstance, string) {
+func (s *SimpleSd) getInstances(service string) ([]ServiceInstance, string) {
 	s.mu.RLock()
-	serv := s.store[service]
+	serv := s.registry[service]
 	s.mu.RUnlock()
 
 	if serv == nil {
 		return nil, ""
 	} else {
 		list, currHash := serv.InstanceList()
-		return list, currHash
+		return lo.Map(list, func(item *ServiceInstance, index int) ServiceInstance {
+			return *item
+		}), currHash
 	}
 }
 
@@ -134,27 +142,27 @@ func (s *Service) healthCheck() {
 
 func (s *Service) Add(instance *ServiceInstance) error {
 	s.mu.Lock()
-	s.smap[instance.Addr()] = instance
+	s.smap[instance.Id] = instance
 	s.mu.Unlock()
 	s.resetHash()
 	return nil
 }
 
-func (s *Service) Remove(addr string) error {
+func (s *Service) Remove(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.smap[addr] == nil {
-		return fmt.Errorf("instance: %s not found", addr)
+	if s.smap[id] == nil {
+		return fmt.Errorf("instance: %s not found", id)
 	}
-	delete(s.smap, addr)
+	delete(s.smap, id)
 	s.resetHash()
 	return nil
 }
 
 func (s *Service) resetHash() {
-	var __inst []*ServiceInstance
+	var __inst []ServiceInstance
 	for _, instance := range s.smap {
-		__inst = append(__inst, instance)
+		__inst = append(__inst, *instance)
 	}
 	s.nowHash = CalInstanceHash(__inst)
 }

@@ -1,4 +1,4 @@
-package core
+package simple_sd
 
 import (
 	"crypto/md5"
@@ -27,11 +27,19 @@ func netDialTest(isUDP bool, addr string, retry int, intvl time.Duration) bool {
 	return false
 }
 
-func CalInstanceHash(instances []*ServiceInstance) string {
+var EmptyInstanceHash = ""
+
+func init() {
+	hasher := md5.New()
+	hasher.Write([]byte("EmptyInstanceHash"))
+	EmptyInstanceHash = fmt.Sprintf("%x", hasher.Sum(nil))
+}
+
+func CalInstanceHash(instances []ServiceInstance) string {
 	if len(instances) == 0 {
-		return ""
+		return EmptyInstanceHash
 	}
-	addrs := lo.Map(instances, func(item *ServiceInstance, index int) string {
+	addrs := lo.Map(instances, func(item ServiceInstance, index int) string {
 		return item.Addr()
 	})
 	sort.Strings(addrs)

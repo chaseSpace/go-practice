@@ -1,4 +1,4 @@
-package core
+package simple_sd
 
 import "log"
 

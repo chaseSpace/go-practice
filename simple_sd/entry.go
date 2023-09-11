@@ -2,7 +2,6 @@ package simple_sd
 
 import (
 	"fmt"
-	"go-practice/simple_sd/core"
 	"net/http"
 )
 
@@ -18,7 +17,7 @@ func (s *HTTPServer) Run(port int) error {
 	http.HandleFunc("/service/deregister", handleDeregister)
 	http.HandleFunc("/service/discovery", handleDiscovery)
 
-	core.Sdlogger.Info("SimpleSdHTTPServer is running on http://localhost:%d", port)
+	Sdlogger.Info("SimpleSdHTTPServer is running on http://localhost:%d", port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 
 }
