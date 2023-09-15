@@ -3,9 +3,7 @@ package simple_sd
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
-	"go-practice/simple_sd/core"
 	"net/http"
 	"time"
 )
@@ -39,70 +37,28 @@ func newRes(data interface{}, code int, err error) *HttpRes {
 	}
 }
 
+type registerReq struct {
+	ServiceInstance
+}
+
 func handleRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.Write(ToJson(newRes(nil, 400, ErrMethod)))
+		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
 		return
 	}
-	instanceReq := core.ServiceInstance{}
+	req := new(registerReq)
 
-	var data []core.ServiceInstance
+	var data []ServiceInstance
 	var err error
 	var code = 200
 	defer func() {
 		rsp := ToJson(newRes(data, code, err))
-		w.Write(rsp)
+		_, _ = w.Write(rsp)
 		if err != nil {
-			core.Sdlogger.Error("handleRegister: service:%s instanceReq:%s error: %v", instanceReq.Service, instanceReq.Addr(), err)
+			Sdlogger.Error("handleRegister: service:%s req:%s error: %v", req.Service, req.Addr(), err)
 			return
 		}
-		core.Sdlogger.Info("handleRegister OK, service:%s instanceReq:%s", instanceReq.Service, instanceReq.Addr())
-	}()
-
-	err = json.NewDecoder(r.Body).Decode(&instanceReq)
-	if err != nil {
-		code = 400
-		err = errors.Wrap(ErrParams, err.Error())
-		return
-	}
-	_ = r.Body.Close()
-
-	if err = instanceReq.Check(); err != nil {
-		code = 400
-		err = errors.Wrap(ErrParams, err.Error())
-		return
-	}
-	err = core.Sd.Register(instanceReq)
-	if err == nil {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*10)
-		defer cancel()
-		data, _, err = core.Sd.Discovery(ctx, instanceReq.Service, "")
-	}
-}
-
-type deregisterBody struct {
-	Service string
-	Host    string
-	Port    int
-}
-
-func handleDeregister(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.Write(ToJson(newRes(nil, 400, ErrMethod)))
-		return
-	}
-	req := new(deregisterBody)
-
-	var err error
-	var code = 200
-	defer func() {
-		rsp := ToJson(newRes(nil, code, err))
-		w.Write(rsp)
-		if err != nil {
-			core.Sdlogger.Error("handleDeregister: req:%+v error: %v", req, err)
-			return
-		}
-		core.Sdlogger.Info("handleDeregister OK, req:%+v", req)
+		Sdlogger.Info("handleRegister OK, service:%s req:%s", req.Service, req.Addr())
 	}()
 
 	err = json.NewDecoder(r.Body).Decode(req)
@@ -112,26 +68,69 @@ func handleDeregister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = r.Body.Close()
-	if req.Service == "" || req.Host == "" || req.Port == 0 {
+
+	if err = req.Check(); err != nil {
 		code = 400
-		err = errors.Wrap(ErrParams, "provide a valid service, host, port")
+		err = errors.Wrap(ErrParams, err.Error())
 		return
 	}
-	err = core.Sd.Deregister(req.Service, fmt.Sprintf("%s:%d", req.Host, req.Port))
+	err = Sd.Register(req.ServiceInstance)
+	if err == nil {
+		data, _, err = Sd.Discovery(context.TODO(), req.Service, "")
+	}
+}
+
+type deregisterReq struct {
+	Service string
+	Id      string
+}
+
+func handleDeregister(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
+		return
+	}
+	req := new(deregisterReq)
+
+	var err error
+	var code = 200
+	defer func() {
+		rsp := ToJson(newRes(nil, code, err))
+		_, _ = w.Write(rsp)
+		if err != nil {
+			Sdlogger.Error("handleDeregister: req:%+v error: %v", req, err)
+			return
+		}
+		Sdlogger.Info("handleDeregister OK, req:%+v", req)
+	}()
+
+	err = json.NewDecoder(r.Body).Decode(req)
 	if err != nil {
-		if errors.Is(err, core.ErrInstanceNotRegistered) {
+		code = 400
+		err = errors.Wrap(ErrParams, err.Error())
+		return
+	}
+	_ = r.Body.Close()
+	if req.Service == "" || req.Id == "" {
+		code = 400
+		err = errors.Wrap(ErrParams, "provide a valid service, id")
+		return
+	}
+	err = Sd.Deregister(req.Service, req.Id)
+	if err != nil {
+		if errors.Is(err, ErrInstanceNotRegistered) {
 			code = 400
 		}
 	}
 }
 
 type discoveryReq struct {
-	Service  string
-	LastHash string
-	WaitMs   int64
+	Service   string
+	LastHash  string
+	WaitMaxMs int64
 }
 type discoveryRsp struct {
-	Instances []core.ServiceInstance
+	Instances []ServiceInstance
 	Hash      string
 }
 
@@ -139,7 +138,7 @@ const MaxDiscoveryTimeout = time.Minute * 5
 
 func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.Write(ToJson(newRes(nil, 400, ErrMethod)))
+		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
 		return
 	}
 
@@ -152,12 +151,12 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		rsp := ToJson(newRes(response, code, err))
-		w.Write(rsp)
+		_, _ = w.Write(rsp)
 		if err != nil {
-			core.Sdlogger.Error("handleDiscovery: body:%+v error: %v", body, err)
+			Sdlogger.Error("handleDiscovery: body:%+v error: %v", body, err)
 			return
 		}
-		core.Sdlogger.Info("handleDiscovery OK, body:%+v", body)
+		Sdlogger.Info("handleDiscovery OK, body:%+v", body)
 	}()
 
 	err = json.NewDecoder(r.Body).Decode(body)
@@ -172,20 +171,20 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 		err = errors.Wrap(ErrParams, "need service")
 		return
 	}
-	if body.WaitMs > MaxDiscoveryTimeout.Milliseconds() {
+	if body.WaitMaxMs > MaxDiscoveryTimeout.Milliseconds() {
 		code = 400
 		err = errors.Wrapf(ErrParams, "max wait ms is %s", MaxDiscoveryTimeout)
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*time.Duration(body.WaitMs))
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*time.Duration(body.WaitMaxMs))
 	defer cancel()
 
 	var (
-		instances []core.ServiceInstance
+		instances []ServiceInstance
 		hash      string
 	)
-	instances, hash, err = core.Sd.Discovery(ctx, body.Service, body.LastHash)
+	instances, hash, err = Sd.Discovery(ctx, body.Service, body.LastHash)
 	if err == nil {
 		response = &discoveryRsp{
 			Instances: instances,
