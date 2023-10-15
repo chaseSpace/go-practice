@@ -37,7 +37,49 @@ func newRes(data interface{}, code int, err error) *HttpRes {
 	}
 }
 
-type registerReq struct {
+type PingReq struct {
+	Ping bool
+}
+type PingRspBody struct {
+	Pong bool
+}
+
+func handlePing(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
+		return
+	}
+
+	req := new(PingReq)
+
+	var err error
+	var code = 200
+
+	var response *PingRspBody
+
+	defer func() {
+		rsp := ToJson(newRes(response, code, err))
+		_, _ = w.Write(rsp)
+		if err != nil {
+			Sdlogger.Error("handlePing: req:%+v error: %v", req, err)
+			return
+		}
+		Sdlogger.Debug("handlePing OK, req:%+v", req)
+	}()
+
+	err = json.NewDecoder(r.Body).Decode(req)
+	if err != nil {
+		code = 400
+		err = errors.Wrap(ErrParams, err.Error())
+		return
+	}
+	_ = r.Body.Close()
+	if req.Ping {
+		response = &PingRspBody{Pong: true}
+	}
+}
+
+type RegisterReq struct {
 	ServiceInstance
 }
 
@@ -46,7 +88,9 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
 		return
 	}
-	req := new(registerReq)
+	req := new(RegisterReq)
+
+	st := time.Now()
 
 	var data []ServiceInstance
 	var err error
@@ -55,10 +99,10 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		rsp := ToJson(newRes(data, code, err))
 		_, _ = w.Write(rsp)
 		if err != nil {
-			Sdlogger.Error("handleRegister: service:%s req:%s error: %v", req.Service, req.Addr(), err)
+			Sdlogger.Error("handleRegister: service:%s req:%s error: %v", req.Name, req.Addr(), err)
 			return
 		}
-		Sdlogger.Info("handleRegister OK, service:%s req:%s", req.Service, req.Addr())
+		Sdlogger.Debug("handleRegister OK, dur:%s service:%s req:%s", time.Since(st), req.Name, req.Addr())
 	}()
 
 	err = json.NewDecoder(r.Body).Decode(req)
@@ -76,11 +120,11 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	err = Sd.Register(req.ServiceInstance)
 	if err == nil {
-		data, _, err = Sd.Discovery(context.TODO(), req.Service, "")
+		data, _, err = Sd.Discovery(context.TODO(), req.Name, "")
 	}
 }
 
-type deregisterReq struct {
+type DeregisterReq struct {
 	Service string
 	Id      string
 }
@@ -90,7 +134,7 @@ func handleDeregister(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
 		return
 	}
-	req := new(deregisterReq)
+	req := new(DeregisterReq)
 
 	var err error
 	var code = 200
@@ -101,7 +145,7 @@ func handleDeregister(w http.ResponseWriter, r *http.Request) {
 			Sdlogger.Error("handleDeregister: req:%+v error: %v", req, err)
 			return
 		}
-		Sdlogger.Info("handleDeregister OK, req:%+v", req)
+		Sdlogger.Debug("handleDeregister OK, req:%+v", req)
 	}()
 
 	err = json.NewDecoder(r.Body).Decode(req)
@@ -124,12 +168,12 @@ func handleDeregister(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type discoveryReq struct {
+type DiscoveryReq struct {
 	Service   string
 	LastHash  string
 	WaitMaxMs int64
 }
-type discoveryRsp struct {
+type DiscoveryRspBody struct {
 	Instances []ServiceInstance
 	Hash      string
 }
@@ -142,13 +186,14 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body := new(discoveryReq)
+	body := new(DiscoveryReq)
 
 	var err error
 	var code = 200
 
-	var response *discoveryRsp
+	var response *DiscoveryRspBody
 
+	st := time.Now()
 	defer func() {
 		rsp := ToJson(newRes(response, code, err))
 		_, _ = w.Write(rsp)
@@ -156,7 +201,7 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 			Sdlogger.Error("handleDiscovery: body:%+v error: %v", body, err)
 			return
 		}
-		Sdlogger.Info("handleDiscovery OK, body:%+v", body)
+		Sdlogger.Debug("handleDiscovery OK, dur:%dms  body:%+v  --rsp:%s", time.Since(st).Milliseconds(), body, rsp)
 	}()
 
 	err = json.NewDecoder(r.Body).Decode(body)
@@ -168,12 +213,12 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 	_ = r.Body.Close()
 	if body.Service == "" {
 		code = 400
-		err = errors.Wrap(ErrParams, "need service")
+		err = errors.Wrap(ErrParams, "params without service")
 		return
 	}
 	if body.WaitMaxMs > MaxDiscoveryTimeout.Milliseconds() {
 		code = 400
-		err = errors.Wrapf(ErrParams, "max wait ms is %s", MaxDiscoveryTimeout)
+		err = errors.Wrapf(ErrParams, "max wait-time ms is %d", MaxDiscoveryTimeout.Milliseconds())
 		return
 	}
 
@@ -186,9 +231,56 @@ func handleDiscovery(w http.ResponseWriter, r *http.Request) {
 	)
 	instances, hash, err = Sd.Discovery(ctx, body.Service, body.LastHash)
 	if err == nil {
-		response = &discoveryRsp{
+		response = &DiscoveryRspBody{
 			Instances: instances,
 			Hash:      hash,
 		}
 	}
+}
+
+type HealthCheckReq struct {
+	Service string
+	Id      string
+}
+type HealthCheckRspBody struct {
+	Registered bool
+}
+
+func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		_, _ = w.Write(ToJson(newRes(nil, 400, ErrMethod)))
+		return
+	}
+
+	req := new(HealthCheckReq)
+	rspBody := new(HealthCheckRspBody)
+
+	var err error
+	var code = 200
+
+	st := time.Now()
+	defer func() {
+		rsp := ToJson(newRes(rspBody, code, err))
+		_, _ = w.Write(rsp)
+		if err != nil {
+			Sdlogger.Error("handleHealthCheck: req:%+v error: %v", req, err)
+			return
+		}
+		Sdlogger.Debug("handleHealthCheck OK, dur:%dms  req:%+v  --rsp:%s", time.Since(st).Milliseconds(), req, rsp)
+	}()
+
+	err = json.NewDecoder(r.Body).Decode(req)
+	if err != nil {
+		code = 400
+		err = errors.Wrap(ErrParams, err.Error())
+		return
+	}
+	_ = r.Body.Close()
+	if req.Service == "" || req.Id == "" {
+		code = 400
+		err = errors.Wrap(ErrParams, "provide a valid service and id")
+		return
+	}
+
+	rspBody.Registered = Sd.HealthCheck(req.Service, req.Id)
 }
