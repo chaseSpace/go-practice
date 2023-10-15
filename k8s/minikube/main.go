@@ -6,12 +6,10 @@ import (
 	"net/http"
 )
 
-func hello(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "[v1] Hello, Kubernetes!")
-}
-
 func main() {
-	http.HandleFunc("/", hello)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "[v1] Hello, Kubernetes!")
+	})
 
 	log.Printf("v1 access http://localhost:3000\n")
 	panic(http.ListenAndServe(":3000", nil))

@@ -54,12 +54,32 @@ gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
 
-# 继续
+# ubuntu
+apt-get update && apt-get install -y apt-transport-https
+
+curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
+
+cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+EOF
+
+apt-get update
+# 2023-10-15 已经出了1.28
+apt-get install -y kubelet=1.25.14-00 kubeadm=1.25.14-00 kubectl=1.25.14-00
+# 查看软件仓库包含哪些版本 apt-cache madison kubelet
+# 删除 apt-get remove  -y kubelet kubeadm kubectl
+
+# 检查版本
+kubelet --version
+kubeadm version -o json
+kubectl version -o json
+
+# centos 继续
 sudo setenforce 0
 sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
-# 安装各组件最新版
-sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+# centos 安装各组件
+sudo yum install -y kubelet-1.25.14 kubeadm-1.25.14 kubectl-1.25.14 --disableexcludes=kubernetes
 
 # 开机启动，且立即启动
 sudo systemctl enable --now kubelet
