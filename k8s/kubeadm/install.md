@@ -276,7 +276,7 @@ This node has joined the cluster:
 Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 ```
 
-### 5.3 集群就绪验证
+### 5.4 集群就绪验证
 ```shell
 [root@k8s-master ~]# kubectl get nodes
 NAME         STATUS     ROLES           AGE     VERSION
@@ -285,7 +285,7 @@ k8s-node1    NotReady   <none>          6s      v1.25.14
 ```
 下面解决状态是NotReady的问题。
 
-### 5.3 安装第三方网络插件
+### 5.5 安装第三方网络插件
 Kubernetes 需要网络插件(Container Network Interface: CNI)来提供集群内部和集群外部的网络通信。以下是一些常用的 k8s 网络插件：
 ```
 Flannel：Flannel 是最常用的 k8s 网络插件之一，它使用了虚拟网络技术来实现容器之间的通信，支持多种网络后端，如 VXLAN、UDP 和 Host-GW。
