@@ -1,7 +1,7 @@
-## Centos上使用minikube安装k8s
+## k8s使用教程
 
 <!-- TOC -->
-  * [Centos上使用minikube安装k8s](#centos上使用minikube安装k8s)
+  * [k8s使用教程](#k8s使用教程)
     * [1. 创建程序和使用docker打包镜像](#1-创建程序和使用docker打包镜像)
     * [2. 推送到docker仓库](#2-推送到docker仓库)
     * [3. 了解并创建Pod](#3-了解并创建pod)
