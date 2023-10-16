@@ -414,6 +414,12 @@ $ curl http://10.0.2.3:30447
 <title>Welcome to nginx!</title>
 ...
 ```
+
+删除部署
+```shell
+kubectl delete deployment nginx 
+kubectl delete svc nginx
+```
 是的，nginx服务在所有集群上的暴露端口都是30447。
 
 至此，使用Kubeadmin搭建结束。但是还有一些进阶话题需要讨论，比如k8s镜像清理、日志存储等，参考下一篇文档。
