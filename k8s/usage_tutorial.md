@@ -30,12 +30,21 @@
 10.0.2.3 k8s-node1
 ```
 
+### 0. 安装docker
+[Centos安装docker](https://www.runoob.com/docker/centos-docker-install.html)
+
+```shell
+curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+docker version
+
+systemctl start docker
+systemctl enable docker
+```
 
 ### 1. 创建程序和使用docker打包镜像
 
-1. 编写一个简单的[main.go](./main.go)
-2. 编写[Dockerfile](./Dockerfile)
-    - 坑：因为运行go程序和编译的不是一个镜像？所以在编译程序时需要关闭CGO，否则启动main时会提示main文件找不到的问题。
+1. 编写一个简单的[main.go](./minikube/main.go)
+2. 编写[Dockerfile](Dockerfile)
 
 打包镜像（替换leigg为你的docker账户名）
 
@@ -46,7 +55,8 @@ docker build . -t leigg/hellok8s:v1
 这里有个小问题，（修改代码后）重新构建镜像若使用同样的镜像名会导致旧的镜像的名称和tag变成`<none>`，可通过下面的命令来一键删除：
 
 ```shell
-docker rmi $(docker images -f "dangling=true" -q)
+docker image prune -f
+# docker system prune # 删除
 ```
 
 测试运行：
@@ -90,38 +100,7 @@ spec:
       image: nginx  # 镜像默认来源 DockerHub
 ```
 
-#### 3.2 安装kubectl
-
-由于minikube下载kubectl命令太慢，所以笔者自行下载kubectl。
-
->如备有代理，可参考前面**参考资料**中的文档连接代理后再直接下载kubectl
-
-先导入源
-
-```shell
-cat <<EOF > /etc/yum.repos.d/kubernetes.repo
-[kubernetes]
-name=Kubernetes
-baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
-enabled=1
-gpgcheck=1
-repo_gpgcheck=1
-gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
-EOF
-```
-
-再配置和安装最新版本的k8s组件
-
-```shell
-setenforce 0
-yum install -y kubelet kubeadm kubectl
-systemctl enable kubelet && systemctl start kubelet
-```
-
-> 安装指定版本  
-> `yum install -y kubelet-<version> kubectl-<version> kubeadm-<version>`
-
-#### 3.3 创建pod
+#### 3.2 创建pod
 
 运行第一条k8s命令创建pod：
 
@@ -129,7 +108,7 @@ systemctl enable kubelet && systemctl start kubelet
 kubectl apply -f nginx.yaml
 ```
 
-#### 3.4 查看nginx-pod状态
+#### 3.3 查看nginx-pod状态
 
 ```shell
 kubectl get po nginx-pod
@@ -137,7 +116,7 @@ kubectl get po nginx-pod
 
 查看全部pods：`kubectl get pods`
 
-#### 3.5 与pod交互
+#### 3.4 与pod交互
 
 添加端口转发，然后就可以在宿主机访问nginx-pod
 
@@ -174,36 +153,30 @@ Pod 是 Kubernetes 最小的可部署单元，通常包含一个或多个容器�
 
 #### 3.7 创建go程序的pod
 
-定义pod.yaml:
-
-```yaml
-# go-http.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: go_http
-spec:
-  containers:
-    - name: go_http-container
-      image: leigg/hellok8s:v1
-```
+定义[pod.yaml](./pod.yaml)
 
 启动pod：
 
 ```shell
-$ k apply -f go-http.yaml
-➜  install_k8s_all k get pods
-NAME      READY   STATUS              RESTARTS   AGE
-go-http   0/1     ContainerCreating   0          16s
-➜  install_k8s_all k get pods
+$ kk apply -f pod.yaml
+# 几秒后
+$ kk get pods
 NAME      READY   STATUS    RESTARTS   AGE
 go-http   1/1     Running   0          17s
 ```
 
-开启端口转发：
+临时开启端口转发（在master节点）：
 
 ```shell
+# 绑定pod端口3000到 master节点的3000端口
 kubectl port-forward go-http 3000:3000
+```
+现在pod提供的http服务可以在master节点上可用。
+
+打开另一个会话测试：
+```shell
+$ curl http://localhost:3000
+[v1] Hello, Kubernetes!#
 ```
 
 #### 3.8 pod有哪些状态
@@ -215,72 +188,188 @@ kubectl port-forward go-http 3000:3000
 - Failed（已失败）： 至少一个容器以非零退出码终止。
 - Unknown（未知）： 无法获取 Pod 的状态。
 
-### 4. 了解Deployment
+### 4. 使用Deployment
+通常，Pod不会被（通过pod.yaml）直接创建和管理，而是由更高级别的控制器，如Deployment，来创建和管理。
+这是因为Deployment提供了更强大的应用程序管理功能。
+
+- **应用管理**：Deployment是Kubernetes中的一个控制器，用于管理应用程序的部署和更新。它允许你定义应用程序的期望状态，然后确保集群中的副本数符合这个状态。
+
+- **自愈能力**：Deployment可以自动修复故障，如果Pod失败，它将启动新的Pod来替代。这有助于确保应用程序的高可用性。
+
+- **滚动更新**：Deployment支持滚动更新，允许你逐步将新版本的应用程序部署到集群中，而不会导致中断。
+
+- **副本管理**：Deployment负责管理Pod的副本，可以指定应用程序需要的副本数量，Deployment将根据需求来自动调整。
+
+- **声明性配置**：Deployment的配置是声明性的，你只需定义所需的状态，而不是详细指定如何实现它。Kubernetes会根据你的声明来管理应用程序的状态。
+
 先创建一个[deployment文件](./deployment.yaml)， 用来编排多个pod。
 
 #### 4.1 部署deployment：
 ```shell
-root@VM-0-13-centos ~/install_k8s » k apply -f deployment.yaml
-deployment.apps/hellok8s-deployment created
+$ kk apply -f deployment.yaml
+deployment.apps/hellok8s-go-http created
 
 # 查看启动的pod
-root@VM-0-13-centos ~/install_k8s » k get pods
-NAME                                   READY   STATUS    RESTARTS   AGE
-hellok8s-deployment-784d5f676d-zcnr6   1/1     Running   0          17s
+$ kk get deployments                
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+hellok8s-go-http   2/2     2            2           3m
+```
+还可以查看pod运行的node：
+```shell
+# 这里的IP是pod ip，属于部署k8s集群时规划的pod网段
+# NODE就是集群中的node名称
+$ kk get pod -o wide
+NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE        NOMINATED NODE   READINESS GATES
+hellok8s-go-http-55cfd74847-5jw7f   1/1     Running   0          68s   20.2.36.75   k8s-node1   <none>           <none>
+hellok8s-go-http-55cfd74847-zlf49   1/1     Running   0          68s   20.2.36.74   k8s-node1   <none>           <none>
 ```
 
-**删除pod会自动重启一个**。
+**删除pod会自动重启一个，确保可用的pod数量与`replicas`保持一致，不再演示**。
 
 #### 4.2 修改deployment
 通过vi修改内容中的replicas=3，再次部署，开始之前，我们使用下面的命令来观察pod数量变化
 ```shell
-root@VM-0-13-centos ~/install_k8s » kubectl get pods --watch
+$ kubectl get pods --watch
 NAME                                   READY   STATUS    RESTARTS   AGE
-hellok8s-deployment-58cb496c84-cft9j   1/1     Running   0          4m7s
+hellok8s-go-http-58cb496c84-cft9j   1/1     Running   0          4m7s
 
 
-# 在另一个CLI执行 k apply ...
+# 在另一个CLI执行 kk apply ...
 
-hellok8s-deployment-58cb496c84-sdrt2   0/1     Pending   0          0s
-hellok8s-deployment-58cb496c84-sdrt2   0/1     Pending   0          0s
-hellok8s-deployment-58cb496c84-pjkp9   0/1     Pending   0          0s
-hellok8s-deployment-58cb496c84-pjkp9   0/1     Pending   0          0s
-hellok8s-deployment-58cb496c84-sdrt2   0/1     ContainerCreating   0          0s
-hellok8s-deployment-58cb496c84-pjkp9   0/1     ContainerCreating   0          0s
-hellok8s-deployment-58cb496c84-pjkp9   1/1     Running             0          1s
-hellok8s-deployment-58cb496c84-sdrt2   1/1     Running             0          1s
+hellok8s-go-http-58cb496c84-sdrt2   0/1     Pending   0          0s
+hellok8s-go-http-58cb496c84-sdrt2   0/1     Pending   0          0s
+hellok8s-go-http-58cb496c84-pjkp9   0/1     Pending   0          0s
+hellok8s-go-http-58cb496c84-pjkp9   0/1     Pending   0          0s
+hellok8s-go-http-58cb496c84-sdrt2   0/1     ContainerCreating   0          0s
+hellok8s-go-http-58cb496c84-pjkp9   0/1     ContainerCreating   0          0s
+hellok8s-go-http-58cb496c84-pjkp9   1/1     Running             0          1s
+hellok8s-go-http-58cb496c84-sdrt2   1/1     Running             0          1s
 ```
 
-#### 4.3 使用新的镜像更新pod
+#### 4.3 更新deployment
 这一步通过修改main.go来模拟实际项目中的服务更新，修改后的文件是[main2.go](./main2.go)。
 
-需要再次push镜像到仓库：
+重新构建镜像：
+```shell
+docker build . -t leigg/hellok8s:v2
+```
+
+再次push镜像到仓库：
 ```shell
 docker push leigg/hellok8s:v2
 ```
-然后重新部署并测试：
+然后更新deployment：
 ```shell
-root@VM-0-13-centos ~/install_k8s » k apply -f deployment.yaml
-deployment.apps/hellok8s-deployment configured
+$ kubectl set image deployment/hellok8s-go-http hellok8s=leigg/hellok8s:v2
 
-root@VM-0-13-centos ~/install_k8s » k port-forward hellok8s-deployment-c7fdf4bc9-wh46w 3000:3000
+$ 查看更新过程
+$ kubectl rollout status deployment/hellok8s-go-http
+Waiting for deployment "hellok8s-go-http" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "hellok8s-go-http" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "hellok8s-go-http" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "hellok8s-go-http" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "hellok8s-go-http" rollout to finish: 1 old replicas are pending termination...
+deployment "hellok8s-go-http" successfully rolled  # OK
+
+# 也可以直接查看pod信息，会观察到pod正在更新（这是一个启动新pod，删除旧pod的过程，最终会维持到所配置的replicas数量）
+$ kk get pods
+NAMESPACE     NAME                                       READY   STATUS              RESTARTS      AGE
+default       go-http                                    1/1     Running             0             14m
+default       hellok8s-go-http-55cfd74847-5jw7f          1/1     Terminating         0             27m
+default       hellok8s-go-http-55cfd74847-z29dl          1/1     Running             0             23m
+default       hellok8s-go-http-55cfd74847-zlf49          1/1     Running             0             27m
+default       hellok8s-go-http-668c7f75bd-m56pm          0/1     ContainerCreating   0             0s
+default       hellok8s-go-http-668c7f75bd-qlrk5          1/1     Running             0             14s
+
+# 绑定其中一个pod来测试
+$ kk port-forward hellok8s-go-http-668c7f75bd-m56pm 3000:3000
 Forwarding from 127.0.0.1:3000 -> 3000
 Forwarding from [::1]:3000 -> 3000
-Handling connection for 3000
 ```
-在另一个CLI窗口执行
+在另一个会话窗口执行
 ```shell
-root@VM-0-13-centos ~ » curl http://localhost:3000
+$ curl http://localhost:3000
 [v2] Hello, Kubernetes!
 ```
 
+这里演示的更新是容器更新，修改deployment.yaml的其他配置也属于更新。
+
+#### 4.4 回滚部署
+如果新的镜像无法正常启动，则旧的pod不会被删除，但需要回滚，使deployment回到正常状态。
+
+按照下面的步骤进行：
+
+1. 修改main.go，将最后监听端口那行先注释，添加一行：panic("something went wrong")
+2. 构建镜像: docker build . -t leigg/hellok8s:v2_problem
+3. push镜像：docker push leigg/hellok8s:v2_problem
+4. 更新deployment使用的镜像：kubectl set image deployment/hellok8s-go-http hellok8s=leigg/hellok8s:v2_problem
+5. 观察：kubectl rollout status deployment/hellok8s-go-http   （会停滞，按 Ctrl-C 停止观察）
+6. 观察pod：kubectl get pods
+
+```shell
+$ kk get pods
+NAME                                READY   STATUS             RESTARTS     AGE
+go-http                             1/1     Running            0            36m
+hellok8s-go-http-55cfd74847-fv2kp   1/1     Running            0            17m
+hellok8s-go-http-55cfd74847-l78pb   1/1     Running            0            17m
+hellok8s-go-http-55cfd74847-qtb59   1/1     Running            0            17m
+hellok8s-go-http-7c9d684dd-msj2c    0/1     CrashLoopBackOff   1 (4s ago)   6s
+
+# CrashLoopBackOff状态表示重启次数过多，过一会儿再试，这表示pod内的容器无法正常启动，或者启动就立即退出了
+
+# 查看每个副本集每次更新的pod情况（包含副本数量、上线时间、使用的镜像tag）
+# DESIRED-预期数量，CURRENT-当前数量，READY-可用数量
+# -l 进行标签筛选
+$ kubectl get rs -l app=hellok8s -o wide
+NAME                          DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES                      SELECTOR
+hellok8s-go-http-55cfd74847   0         0         0       76s   hellok8s     leigg/hellok8s:v1           app=hellok8s,pod-template-hash=55cfd74847
+hellok8s-go-http-668c7f75bd   3         3         3       55s   hellok8s     leigg/hellok8s:v2           app=hellok8s,pod-template-hash=668c7f75bd
+hellok8s-go-http-7c9d684dd    1         1         0       11s   hellok8s     leigg/hellok8s:v2_problem   app=hellok8s,pod-template-hash=7c9d684dd
+```
+
+现在进行回滚：
+```shell
+# 先查看deployment更新记录
+$ kk rollout history deployment/hellok8s-go-http               
+deployment.apps/hellok8s-go-http 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+3         <none>
+
+# 现在回到revision 2，可以先查看它具体信息（主要看用的哪个镜像tag）
+$ kk rollout history deployment/hellok8s-go-http --revision=2
+deployment.apps/hellok8s-go-http with revision #2
+Pod Template:
+  Labels:	app=hellok8s
+	pod-template-hash=668c7f75bd
+  Containers:
+   hellok8s:
+    Image:	leigg/hellok8s:v2
+    Port:	<none>
+    Host Port:	<none>
+    Environment:	<none>
+    Mounts:	<none>
+  Volumes:	<none>
+
+# 确认后，回滚（到上个版本）
+$ kubectl rollout undo deployment/hellok8s-go-http  #到指定版本 --to-revision=2          
+deployment.apps/hellok8s-go-http rolled back
+
+# 检查副本集状态（所处的版本）
+$ kk get rs -l app=hellok8s -o wide                                
+hellok8s-go-http-55cfd74847   0         0         0       9m31s   hellok8s     leigg/hellok8s:v1           app=hellok8s,pod-template-hash=55cfd74847
+hellok8s-go-http-668c7f75bd   3         3         3       9m10s   hellok8s     leigg/hellok8s:v2           app=hellok8s,pod-template-hash=668c7f75bd
+hellok8s-go-http-7c9d684dd    0         0         0       8m26s   hellok8s     leigg/hellok8s:v2_problem   app=hellok8s,pod-template-hash=7c9d684dd
+
+# 恢复正常
+$ kk get deployments hellok8s-go-http
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+hellok8s-go-http   3/3     3            3           7m42s
+```
+
 #### 4.4 滚动更新（Rolling Update）
-上一步骤的更新方式比较粗暴，因为它是在新的镜像拉取后立即同时更新全部旧pod，这会导致
-服务短暂不可用。如果新的镜像有问题，**这会导致更新失败，服务宕机**。
-
-所以我们要使用更安全的滚动更新
-
->不过在笔者使用的`v1.27`版本中，通过`k apply`同样是滚动更新了。
+k8s 1.15版本起支持滚动更新，即先创建新的pod，创建成功后再删除旧的pod，确保更新过程无感知，大大降低对业务影响。
 
 在 deployment 的资源定义中, spec.strategy.type 有两种选择:
 
@@ -293,8 +382,8 @@ root@VM-0-13-centos ~ » curl http://localhost:3000
 
 如果不设置，deployment会有默认的配置：
 ```shell
-root@VM-0-13-centos ~/install_k8s » k describe -f deployment.yaml
-Name:                   hellok8s-deployment
+$ kk describe -f deployment.yaml
+Name:                   hellok8s-go-http
 Namespace:              default
 CreationTimestamp:      Sun, 13 Aug 2023 21:09:33 +0800
 Labels:                 <none>
@@ -306,14 +395,13 @@ MinReadySeconds:        0
 RollingUpdateStrategy:  25% max unavailable, 25% max surge # <------ 看这
 省略。。。
 ```
-**所以，在使用滚动更新时，k8s会始终保持服务可用，在新的pod未完全正常启动前，不会停止旧的pod。**
 
 为了明确地指定deployment的更新方式，我们需要在yaml中配置：
 ```shell
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hellok8s-deployment
+  name: hellok8s-go-http
 spec:
   strategy:
     rollingUpdate:
@@ -325,141 +413,24 @@ spec:
 这样，我们通过`k apply`命令时会以滚动更新方式进行。
 >从`maxSurge: 1`可以看出更新时最多会出现4个pod，从`maxUnavailable: 1`可以看出最少会有2个pod正常运行。
 
-#### 4.5 minikube的镜像管理
-当我们启动pod时，引用的镜像会从远程拉取到本地（而不是`docker images`），存入minikube自身的本地镜像库中管理，它和docker images是不同的东西。
-```shell
-# alias m='minikube'
-root@VM-0-13-centos ~/install_k8s » m image -h
-管理 images
+注意：无论是通过`kubectl set image ...`还是`kubectl rollout restart deployment xxx`方式更新deployment都会遵循配置进行滚动更新。
 
-Available Commands:
-  build         在 minikube 中构建一个容器镜像
-  load          将镜像加载到 minikube 中
-  ls            列出镜像
-  pull          拉取镜像
-  push          推送镜像
-  rm            移除一个或多个镜像
-  save          从 minikube 中保存一个镜像
-  tag           为镜像打标签
+#### 4.5 deployment的扩缩容
+```shell
+# 指定副本数量
+$ kubectl scale deployment/hellok8s-go-http --replicas=10
+deployment.apps/hellok8s-go-http scaled
 
-Use "minikube <command> --help" for more information about a given command.
-root@VM-0-13-centos ~/install_k8s » m image ls
-registry.k8s.io/pause:3.9
-registry.k8s.io/kube-scheduler:v1.27.3
-registry.k8s.io/kube-proxy:v1.27.3
-registry.k8s.io/kube-controller-manager:v1.27.3
-registry.k8s.io/kube-apiserver:v1.27.3
-registry.k8s.io/etcd:3.5.7-0
-registry.k8s.io/coredns/coredns:v1.10.1
-gcr.io/k8s-minikube/storage-provisioner:v5
-docker.io/leigg/hellok8s:v2   <----------------
-docker.io/leigg/hellok8s:v1   <----------------
-```
-也就是说，`docker rmi`删除的镜像是不会影响minikube的镜像库的。即使通过`m image rm`删除了本地的一个minikube管理的镜像，
-再启动deployment，也可以启动的，因为minikube会去远程镜像库Pull，除非远程仓库也删除了这个镜像。
-重新启动后，可通过`m image ls`再次看到被删除的镜像又出现了。
-
-
-#### 4.6 deployment的回滚
-首次部署deployment后，通过`k rollout history`命令看到其第一次部署记录：
-```shell
-root@VM-0-13-centos ~/install_k8s » k rollout history -f deployment.yaml
-deployment.apps/hellok8s-deployment
-REVISION  CHANGE-CAUSE
-1         <none>
-```
-因为只有一次记录，所以无法执行回滚命令`k rollout undo`：
-```shell
-root@VM-0-13-centos ~/install_k8s » k rollout undo -f deployment.yaml
-error: no rollout history found for deployment "hellok8s-deployment"
-```
-现在我们修改`deployment.yaml`，使用v2镜像，然后再次部署，现在查看其部署记录：
-```shell
-root@VM-0-13-centos ~/install_k8s » k rollout history -f deployment.yaml
-deployment.apps/hellok8s-deployment
-REVISION  CHANGE-CAUSE
-1         <none>
-2         <none>
-```
-顺便查看deployment使用的镜像：
-```shell
-root@VM-0-13-centos ~/install_k8s » k describe -f deployment.yaml
-Name:                   hellok8s-deployment
-Namespace:              default
-CreationTimestamp:      Sun, 13 Aug 2023 21:22:44 +0800
-Labels:                 <none>
-Annotations:            deployment.kubernetes.io/revision: 2
-Selector:               app=aaa,app1=hellok8s
-Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
-StrategyType:           RollingUpdate
-MinReadySeconds:        0
-RollingUpdateStrategy:  25% max unavailable, 25% max surge
-Pod Template:
-  Labels:  app=aaa
-           app1=hellok8s
-  Containers:
-   hellok8s-container:
-    Image:        leigg/hellok8s:v2  # <--------------
+# 观察到副本集版本并没有变化，而是数量发生变化
+$ kubectl get rs -l app=hellok8s -o wide                 
+NAME                          DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES                      SELECTOR
+hellok8s-go-http-55cfd74847   0         0         0       33m   hellok8s     leigg/hellok8s:v1           app=hellok8s,pod-template-hash=55cfd74847
+hellok8s-go-http-668c7f75bd   10        10        10      33m   hellok8s     leigg/hellok8s:v2           app=hellok8s,pod-template-hash=668c7f75bd
+hellok8s-go-http-7c9d684dd    0         0         0       32m   hellok8s     leigg/hellok8s:v2_problem   app=hellok8s,pod-template-hash=7c9d684dd
 ```
 
-现在可以进行回滚：
-```shell
-root@VM-0-13-centos ~/install_k8s » k rollout undo -f deployment.yaml
-deployment.apps/hellok8s-deployment rolled back
-```
-然后通过上面的命令再次验证deployment使用的镜像即可。现在再看一下部署记录：
-```shell
-root@VM-0-13-centos ~/install_k8s » k rollout history -f deployment.yaml
-deployment.apps/hellok8s-deployment
-REVISION  CHANGE-CAUSE
-2         <none>
-3         <none>
-```
-可以看到 1 消失了，多了个 3。这不是因为最多保存2条，而是因为3和1是相同的镜像，只显示1条记录。
-下面通过部署`v3`镜像来验证这一点。
-
-执行下面的步骤：
-- 修改`main.go`，在接口返回`v3`字样，保存
-- 重新build v3镜像，并且push到docker远程仓库
-- 需改`deployment.yaml`引用v3镜像，然后部署
-
-验证：
-```shell
-root@VM-0-13-centos ~/install_k8s » k rollout history -f deployment.yaml
-deployment.apps/hellok8s-deployment
-REVISION  CHANGE-CAUSE
-2         <none>
-3         <none>
-4         <none>
-```
-
->注意：无论什么原因导致这次更换镜像的部署失败了，都不影响revision号的递增。
-
-
-上面演示的是回滚到上个版本，但可以回滚到指定revision版本：
-```shell
-k rollout undo -f deployment.yaml --to-revision=2
-```
-如果我们回滚到2，那么同样的道理，revision 2消失，增加revision 5。
-
-另外，在回滚前，我们可能需要查看这个revision的各项配置信息（容器、镜像、端口、挂载），可以查看：
-```shell
-root@VM-0-13-centos ~/install_k8s » k rollout history -f deployment.yaml --revision=2                                                                                             1 ↵
-deployment.apps/hellok8s-deployment with revision #2
-Pod Template:
-  Labels:	
-    app=aaa
-	app1=hellok8s
-	pod-template-hash=66695888cf
-  Containers:
-   hellok8s-container:
-    Image:	leigg/hellok8s:v2
-    Port:	<none>
-    Host Port:	<none>
-    Environment:	<none>
-    Mounts:	<none>
-  Volumes:	<none>
-```
+#### 4.6 k8s的镜像管理
+TODO
 
 
 ### 参考资料

@@ -25,6 +25,13 @@
 
     - 测试端口开放：`nc 127.0.0.1 6443`
 
+一台master，一台node。
+
+>在实战中，master节点配置通常是较低配，不需要较多cpu核心和内存，也不会运行pod（自动调度到非master节点）。
+> 因为它的角色非常重要，在master上运行pod可能导致节点资源被耗尽进而导致集群不可用
+> 
+> master的主要任务是作为管理者的角色来调度集群内的各项资源到其他工作节点上。
+
 ## 2. 安装容器运行时
 
 k8s使用 Container Runtime Interface（CRI）来连接你选择的runtime。
@@ -212,11 +219,9 @@ $ kubeadm init \
 后面如果想要删除集群，在所有节点执行:
 ```shell
 kubeadm reset -f
-rm -rf /etc/kubernetes
+rm -rf /etc/kubernetes && rm -rf /etc/cni/net.d
 
-# - 再删除网络配置
-rm -rf /etc/cni/net.d/*
-
+reboot
 # 然后可能需要重启master，否则其他节点无法加入新集群
 ```
 
@@ -229,6 +234,13 @@ rm -rf /etc/cni/net.d/*
 [preflight] This might take a minute or two, depending on the speed of your internet connection
 [preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
 ... 日志较长，建立复制保存这段日志，留作以后维护查看组件配置信息使用
+
+
+
+# 配置文件生效
+# 一台机器只需执行一次
+echo export KUBECONFIG=/etc/kubernetes/admin.conf >> /etc/profile
+source /etc/profile
 ```
 
 ### 5.2 准备用户的 k8s 配置文件
@@ -329,8 +341,9 @@ kubectl describe pod -n kube-system calico-node-bsqtv
 # - 如果仍然是 ErrImagePull ，可以执行 kubectl delete pod -n kube-system calico-node-bsqtv （删除两个pod，会自动重跑）
 ctr image pull docker.io/calico/cni:v3.26.1
 
-# 如有需要，可删除calico全部资源，再重新配置
-kubectl delete -f calico.yaml
+# 如有需要，可在【所有节点】删除calico全部资源，再重新配置
+kubectl delete -f calico.yaml && rm -rf /etc/cni/net.d
+service kubelet restart
 ```
 
 安装calicoctl，方便观察calico的各种信息和状态：
@@ -384,7 +397,8 @@ k8s-node1    Ready    <none>          61m   v1.25.14
 # 创建pod
 kubectl create deployment nginx --image=nginx
 
-# 暴露pod端口到宿主机
+#  添加nginx service，设置映射端口
+# 如果是临时测试：kubectl port-forward deployment nginx 3000:3000
 kubectl expose deployment nginx --port=80 --type=NodePort
 
 # 查看pod，svc状态

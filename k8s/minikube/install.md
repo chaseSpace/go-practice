@@ -104,7 +104,7 @@ minikube status 查看当前集群状态
 ### 2. 创建程序和使用docker打包镜像
 
 1. 编写一个简单的[main.go](./main.go)
-2. 编写[Dockerfile](./Dockerfile)
+2. 编写[Dockerfile](../Dockerfile)
     - 坑：因为运行go程序和编译的不是一个镜像？所以在编译程序时需要关闭CGO，否则启动main时会提示main文件找不到的问题。
 
 打包镜像（替换leigg为你的docker账户名）
@@ -247,7 +247,7 @@ Pod 是 Kubernetes 最小的可部署单元，通常包含一个或多个容器�
 定义pod.yaml:
 
 ```yaml
-# go-http.yaml
+# pod.yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -261,7 +261,7 @@ spec:
 启动pod：
 
 ```shell
-$ k apply -f go-http.yaml
+$ k apply -f pod.yaml
 ➜  install_k8s_all k get pods
 NAME      READY   STATUS              RESTARTS   AGE
 go-http   0/1     ContainerCreating   0          16s
@@ -286,7 +286,7 @@ kubectl port-forward go-http 3000:3000
 - Unknown（未知）： 无法获取 Pod 的状态。
 
 ### 5. 了解Deployment
-先创建一个[deployment文件](./deployment.yaml)， 用来编排多个pod。
+先创建一个[deployment文件](../deployment.yaml)， 用来编排多个pod。
 
 #### 5.1 部署deployment：
 ```shell
