@@ -2,24 +2,25 @@
 
 <!-- TOC -->
   * [k8s使用教程](#k8s使用教程)
+    * [0. 安装docker](#0-安装docker)
     * [1. 创建程序和使用docker打包镜像](#1-创建程序和使用docker打包镜像)
     * [2. 推送到docker仓库](#2-推送到docker仓库)
     * [3. 了解并创建Pod](#3-了解并创建pod)
       * [3.1 创建nginx pod](#31-创建nginx-pod)
-      * [3.2 安装kubectl](#32-安装kubectl)
-      * [3.3 创建pod](#33-创建pod)
-      * [3.4 查看nginx-pod状态](#34-查看nginx-pod状态)
-      * [3.5 与pod交互](#35-与pod交互)
-      * [3.6 Pod 与 Container 的不同](#36-pod-与-container-的不同)
-      * [3.7 创建go程序的pod](#37-创建go程序的pod)
-      * [3.8 pod有哪些状态](#38-pod有哪些状态)
-    * [4. 了解Deployment](#4-了解deployment)
+      * [3.2 创建pod](#32-创建pod)
+      * [3.3 查看nginx-pod状态](#33-查看nginx-pod状态)
+      * [3.4 与pod交互](#34-与pod交互)
+      * [3.5 Pod 与 Container 的不同](#35-pod-与-container-的不同)
+      * [3.6 创建go程序的pod](#36-创建go程序的pod)
+      * [3.7 pod有哪些状态](#37-pod有哪些状态)
+    * [4. 使用Deployment](#4-使用deployment)
       * [4.1 部署deployment：](#41-部署deployment)
       * [4.2 修改deployment](#42-修改deployment)
-      * [4.3 使用新的镜像更新pod](#43-使用新的镜像更新pod)
+      * [4.3 更新deployment](#43-更新deployment)
+      * [4.4 回滚部署](#44-回滚部署)
       * [4.4 滚动更新（Rolling Update）](#44-滚动更新rolling-update)
-      * [4.5 minikube的镜像管理](#45-minikube的镜像管理)
-      * [4.6 deployment的回滚](#46-deployment的回滚)
+      * [4.5 deployment的扩缩容](#45-deployment的扩缩容)
+      * [4.6 k8s的镜像管理](#46-k8s的镜像管理)
     * [参考资料](#参考资料)
 <!-- TOC -->
 
@@ -141,7 +142,7 @@ kubectl exec -it nginx-pod -- /bin/bash   # 进入pod shell
 kubectl logs -f nginx-pod  # 查看日志（stdout/stderr）
 ```
 
-#### 3.6 Pod 与 Container 的不同
+#### 3.5 Pod 与 Container 的不同
 
 在刚刚创建的资源里，在最内层是我们的服务 nginx，运行在 container 容器当中， container (容器) 的**本质是进程**，而 pod 是管理这一组进程的资源。
 
@@ -151,7 +152,7 @@ kubectl logs -f nginx-pod  # 查看日志（stdout/stderr）
 **Pod定义**  
 Pod 是 Kubernetes 最小的可部署单元，通常包含一个或多个容器。它们可以容纳紧密耦合的容器，例如运行在同一主机上的应用程序和其辅助进程。但是，在生产环境中，通常使用其他资源来更好地管理和扩展服务。
 
-#### 3.7 创建go程序的pod
+#### 3.6 创建go程序的pod
 
 定义[pod.yaml](./pod.yaml)
 
@@ -179,7 +180,7 @@ $ curl http://localhost:3000
 [v1] Hello, Kubernetes!#
 ```
 
-#### 3.8 pod有哪些状态
+#### 3.7 pod有哪些状态
 
 - Pending（挂起）： Pod 正在等待调度。
 - ContainerCreating（容器创建中）： Pod 已经被调度，但其中的容器尚未完全创建和启动。
@@ -368,7 +369,7 @@ NAME               READY   UP-TO-DATE   AVAILABLE   AGE
 hellok8s-go-http   3/3     3            3           7m42s
 ```
 
-#### 4.4 滚动更新（Rolling Update）
+#### 4.5 滚动更新（Rolling Update）
 k8s 1.15版本起支持滚动更新，即先创建新的pod，创建成功后再删除旧的pod，确保更新过程无感知，大大降低对业务影响。
 
 在 deployment 的资源定义中, spec.strategy.type 有两种选择:
@@ -415,7 +416,7 @@ spec:
 
 注意：无论是通过`kubectl set image ...`还是`kubectl rollout restart deployment xxx`方式更新deployment都会遵循配置进行滚动更新。
 
-#### 4.5 deployment的扩缩容
+#### 4.6 deployment的扩缩容
 ```shell
 # 指定副本数量
 $ kubectl scale deployment/hellok8s-go-http --replicas=10
@@ -429,7 +430,7 @@ hellok8s-go-http-668c7f75bd   10        10        10      33m   hellok8s     lei
 hellok8s-go-http-7c9d684dd    0         0         0       32m   hellok8s     leigg/hellok8s:v2_problem   app=hellok8s,pod-template-hash=7c9d684dd
 ```
 
-#### 4.6 k8s的镜像管理
+#### 4.7 k8s的镜像管理
 TODO
 
 
