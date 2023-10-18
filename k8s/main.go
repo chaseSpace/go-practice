@@ -12,6 +12,6 @@ func main() {
 	})
 
 	log.Printf("v1 access http://localhost:3000\n")
-	//panic(http.ListenAndServe(":3000", nil))
-	panic("something went wrong")
+	panic(http.ListenAndServe(":3000", nil))
+	//panic("something went wrong")
 }

@@ -1,4 +1,22 @@
-# kubeadm搭建k8s集群
+# 使用kubeadm搭建k8s集群
+
+**目录**
+<!-- TOC -->
+* [使用kubeadm搭建k8s集群](#使用kubeadm搭建k8s集群)
+  * [1. 准备资源](#1-准备资源)
+  * [2. 安装容器运行时](#2-安装容器运行时)
+    * [2.1 Linux支持的CRI的端点](#21-linux支持的cri的端点)
+    * [2.2 安装Containerd](#22-安装containerd)
+  * [3. 安装三大件](#3-安装三大件)
+  * [4. 为kubelet和runtime配置相同的cgroup driver](#4-为kubelet和runtime配置相同的cgroup-driver)
+  * [5. 使用kubeadmin创建集群](#5-使用kubeadmin创建集群)
+    * [5.1 在master上初始化集群](#51-在master上初始化集群)
+    * [5.2 准备用户的 k8s 配置文件](#52-准备用户的-k8s-配置文件)
+    * [5.3 其他节点加入集群](#53-其他节点加入集群)
+    * [5.4 集群就绪验证](#54-集群就绪验证)
+    * [5.5 安装第三方网络插件](#55-安装第三方网络插件)
+  * [6. 验证集群](#6-验证集群)
+<!-- TOC -->
 
 ## 1. 准备资源
 
@@ -27,9 +45,10 @@
 
 一台master，一台node。
 
->在实战中，master节点配置通常是较低配，不需要较多cpu核心和内存，也不会运行pod（自动调度到非master节点）。
-> 因为它的角色非常重要，在master上运行pod可能导致节点资源被耗尽进而导致集群不可用
-> 
+> 在实战中，master节点配置通常是较低配，不需要较多cpu核心和内存，也不会运行pod（自动调度到非master节点）。
+> 因为它的角色非常重要，在master上运行pod可能导致节点资源被耗尽进而导致集群不可用。但如果将node节点从集群中全部删除，
+> 那么pod会自动调度到master上。
+>
 > master的主要任务是作为管理者的角色来调度集群内的各项资源到其他工作节点上。
 
 ## 2. 安装容器运行时
@@ -45,10 +64,12 @@ k8s使用 Container Runtime Interface（CRI）来连接你选择的runtime。
 | Docker Engine (using cri-dockerd) | unix:///var/run/cri-dockerd.sock           |
 
 ### 2.2 安装Containerd
+
 kubernetes 1.24.x及以后版本默认CRI为containerd，cri称之为容器运行时插件。其中ctr是containerd自带的CLI命令行工具，
 crictl是k8s中CRI（容器运行时接口）的客户端，k8s使用该客户端和containerd进行交互。
 
 在所有机器上运行：
+
 ```shell
 # - 安装依赖
 yum install -y yum-utils device-mapper-persistent-data lvm2
@@ -65,9 +86,27 @@ systemctl daemon-reload
 systemctl enable containerd # 开机启动
 systemctl restart containerd
 systemctl status containerd
+
+# 配置容器运行时，以便后续通过crictl管理 集群内的容器和镜像
+crictl config runtime-endpoint unix:///var/run/containerd/containerd.sock
+# 查看集群目前所使用到的镜像
+$ crictl images                                                            
+IMAGE                                                             TAG                 IMAGE ID            SIZE
+docker.io/calico/cni                                              v3.26.1             9dee260ef7f59       93.4MB
+docker.io/calico/kube-controllers                                 v3.26.1             1919f2787fa70       32.8MB
+docker.io/calico/node                                             v3.26.1             8065b798a4d67       86.6MB
+registry.aliyuncs.com/google_containers/coredns                   v1.9.3              5185b96f0becf       14.8MB
+registry.aliyuncs.com/google_containers/etcd                      3.5.6-0             fce326961ae2d       103MB
+registry.aliyuncs.com/google_containers/kube-apiserver            v1.25.14            48f6f02f2e904       35.1MB
+registry.aliyuncs.com/google_containers/kube-controller-manager   v1.25.14            2fdc9124e4ab3       31.9MB
+registry.aliyuncs.com/google_containers/kube-proxy                v1.25.14            b2d7e01cd611a       20.5MB
+registry.aliyuncs.com/google_containers/kube-scheduler            v1.25.14            62a4b43588914       16.2MB
+registry.aliyuncs.com/google_containers/pause                     3.8                 4873874c08efc       311kB
+registry.cn-hangzhou.aliyuncs.com/google_containers/pause         3.6                 6270bb605e12e       302kB
 ```
 
 ## 3. 安装三大件
+
 即 kubeadm、kubelet 和 kubectl
 
 ```shell
@@ -124,16 +163,20 @@ https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/configure-cgroup-dri
 所以使用高于v1.22的版本，这步就不用配置。
 
 ## 5. 使用kubeadmin创建集群
+
 下面的命令需要在所有机器上执行。
 
 设置hosts
+
 ```shell
 cat <<EOF >> /etc/hosts
 10.0.2.2 k8s-master
 10.0.2.3 k8s-node1
 EOF
 ```
+
 设置每台机器的hostname
+
 ```shell
 # 在master节点执行
 hostnamectl set-hostname k8s-master
@@ -141,26 +184,34 @@ hostnamectl set-hostname k8s-master
 # 在node1节点执行
 hostnamectl set-hostname k8s-node1
 ```
+
 logout后再登录可见。
 
 关闭swap：
+
 ```shell
 swapoff -a # 临时关闭
 sed -ri 's/.*swap.*/#&/' /etc/fstab  #永久关闭
 ```
+
 关闭selinux
+
 ```shell
 sudo setenforce 0
 sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 ```
+
 关闭防火墙
+
 ```shell
 iptables -F
 iptables -X
 systemctl stop firewalld.service
 systemctl disable firewalld
 ```
+
 设置sysctl
+
 ```shell
 cat > /etc/sysctl.conf << EOF
 vm.swappiness=0
@@ -179,6 +230,8 @@ cat <<EOF | tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward                 = 1
 net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.conf.default.rp_filter=1
+net.ipv4.conf.all.rp_filter=1
 EOF
 
 sysctl --system # 生效
@@ -190,6 +243,7 @@ lsmod | grep -e br_netfilter -e overlay
 ```
 
 ### 5.1 在master上初始化集群
+
 ```shell
 # 先拉取需要的image
 kubeadm config images pull
@@ -214,9 +268,11 @@ $ kubeadm init \
 [preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
 ... 日志较长，建立复制保存这段日志，留作以后维护查看组件配置信息使用
 ```
+
 [k8s-cluster-init.log](k8s-cluster-init.log) 是一个k8s集群初始化日志实例。
 
 后面如果想要删除集群，在所有节点执行:
+
 ```shell
 kubeadm reset -f
 rm -rf /etc/kubernetes && rm -rf /etc/cni/net.d
@@ -226,6 +282,7 @@ reboot
 ```
 
 **再次执行初始化集群命令**
+
 ```shell
 [root@k8s-master ~]# kubeadm init --apiserver-advertise-address=10.0.2.2 --image-repository registry.aliyuncs.com/google_containers --kubernetes-version v1.25.14 --service-cidr=20.1.0.0/16 --pod-network-cidr=20.2.0.0/16
 [init] Using Kubernetes version: v1.25.14
@@ -244,6 +301,7 @@ source /etc/profile
 ```
 
 ### 5.2 准备用户的 k8s 配置文件
+
 以便用户可以使用 kubectl 工具与 Kubernetes 集群进行通信。
 
 ```shell
@@ -251,7 +309,9 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
+
 查看节点状态：
+
 ```shell
 [root@k8s-master calico]# kubectl get nodes
 NAME         STATUS   ROLES           AGE   VERSION
@@ -265,10 +325,13 @@ CoreDNS is running at https://10.0.2.2:6443/api/v1/namespaces/kube-system/servic
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 
 ```
+
 这里由于还未安装pod网络插件，所以是NotReady，后面步骤解决。
 
 ### 5.3 其他节点加入集群
+
 注意先参照上面报错解决里面的步骤安装containerd。
+
 ```shell
 # 在node1上执行
 # 注意使用初始化集群时输出的命令，确认token和sha正确
@@ -289,16 +352,20 @@ Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 ```
 
 ### 5.4 集群就绪验证
+
 ```shell
 [root@k8s-master ~]# kubectl get nodes
 NAME         STATUS     ROLES           AGE     VERSION
 k8s-master   NotReady   control-plane   3m48s   v1.25.14
 k8s-node1    NotReady   <none>          6s      v1.25.14
 ```
+
 下面解决状态是NotReady的问题。
 
 ### 5.5 安装第三方网络插件
+
 Kubernetes 需要网络插件(Container Network Interface: CNI)来提供集群内部和集群外部的网络通信。以下是一些常用的 k8s 网络插件：
+
 ```
 Flannel：Flannel 是最常用的 k8s 网络插件之一，它使用了虚拟网络技术来实现容器之间的通信，支持多种网络后端，如 VXLAN、UDP 和 Host-GW。
 Calico：Calico 是一种基于 BGP 的网络插件，它使用路由表来路由容器之间的流量，支持多种网络拓扑结构，并提供了安全性和网络策略功能。
@@ -312,7 +379,9 @@ Antrea：Antrea 是一种基于 OVS (Open vSwitch) 技术的网络插件，它�
 链接：https://juejin.cn/post/7236182358817800251
 来源：稀土掘金
 ```
+
 这里选择calico，安装步骤如下：
+
 ```shell
 mkdir -p ~/k8s/calico && cd ~/k8s/calico
 
@@ -341,12 +410,16 @@ kubectl describe pod -n kube-system calico-node-bsqtv
 # - 如果仍然是 ErrImagePull ，可以执行 kubectl delete pod -n kube-system calico-node-bsqtv （删除两个pod，会自动重跑）
 ctr image pull docker.io/calico/cni:v3.26.1
 
-# 如有需要，可在【所有节点】删除calico全部资源，再重新配置
+# 如有需要，在master节点删除calico全部资源，再重新配置
 kubectl delete -f calico.yaml && rm -rf /etc/cni/net.d
 service kubelet restart
+
+# 在其他节点：
+rm -rf /etc/cni/net.d && service kubelet restart
 ```
 
 安装calicoctl，方便观察calico的各种信息和状态：
+
 ```shell
 # 第1种安装方式（推荐）
 curl -o /usr/local/bin/calicoctl -O -L  "https://hub.gitmirror.com/https://github.com/projectcalico/calico/releases/download/v3.26.1/calicoctl-linux-amd64" 
@@ -382,6 +455,7 @@ k8s-node1
 ```
 
 现在再次查看集群状态，一切OK。
+
 ```shell
 [root@k8s-master ~]# kubectl get nodes
 NAME         STATUS   ROLES           AGE   VERSION
@@ -390,9 +464,11 @@ k8s-node1    Ready    <none>          61m   v1.25.14
 ```
 
 ## 6. 验证集群
+
 这一节通过在集群中快速部署nginx服务来验证集群是否正常工作。
 
 在master上执行下面的命令：
+
 ```shell
 # 创建pod
 kubectl create deployment nginx --image=nginx
@@ -412,6 +488,7 @@ service/nginx        NodePort    20.1.255.52   <none>        80:30447/TCP   7m
 ```
 
 测试在所有集群机器上的pod连通性（在master上执行）：
+
 ```shell
 $ curl http://10.0.2.2:30447
 <!DOCTYPE html>
@@ -430,10 +507,12 @@ $ curl http://10.0.2.3:30447
 ```
 
 删除部署
+
 ```shell
 kubectl delete deployment nginx 
 kubectl delete svc nginx
 ```
+
 是的，nginx服务在所有集群上的暴露端口都是30447。
 
 至此，使用Kubeadmin搭建结束。但是还有一些进阶话题需要讨论，比如k8s镜像清理、日志存储等，参考下一篇文档。
