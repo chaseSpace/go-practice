@@ -86,23 +86,6 @@ systemctl daemon-reload
 systemctl enable containerd # 开机启动
 systemctl restart containerd
 systemctl status containerd
-
-# 配置容器运行时，以便后续通过crictl管理 集群内的容器和镜像
-crictl config runtime-endpoint unix:///var/run/containerd/containerd.sock
-# 查看集群目前所使用到的镜像
-$ crictl images                                                            
-IMAGE                                                             TAG                 IMAGE ID            SIZE
-docker.io/calico/cni                                              v3.26.1             9dee260ef7f59       93.4MB
-docker.io/calico/kube-controllers                                 v3.26.1             1919f2787fa70       32.8MB
-docker.io/calico/node                                             v3.26.1             8065b798a4d67       86.6MB
-registry.aliyuncs.com/google_containers/coredns                   v1.9.3              5185b96f0becf       14.8MB
-registry.aliyuncs.com/google_containers/etcd                      3.5.6-0             fce326961ae2d       103MB
-registry.aliyuncs.com/google_containers/kube-apiserver            v1.25.14            48f6f02f2e904       35.1MB
-registry.aliyuncs.com/google_containers/kube-controller-manager   v1.25.14            2fdc9124e4ab3       31.9MB
-registry.aliyuncs.com/google_containers/kube-proxy                v1.25.14            b2d7e01cd611a       20.5MB
-registry.aliyuncs.com/google_containers/kube-scheduler            v1.25.14            62a4b43588914       16.2MB
-registry.aliyuncs.com/google_containers/pause                     3.8                 4873874c08efc       311kB
-registry.cn-hangzhou.aliyuncs.com/google_containers/pause         3.6                 6270bb605e12e       302kB
 ```
 
 ## 3. 安装三大件
@@ -148,6 +131,9 @@ sudo yum install -y kubelet-1.25.14 kubeadm-1.25.14 kubectl-1.25.14 --disableexc
 # 开机启动，且立即启动
 sudo systemctl enable --now kubelet
 
+# 配置容器运行时，以便后续通过crictl管理 集群内的容器和镜像
+crictl config runtime-endpoint unix:///var/run/containerd/containerd.sock
+
 # 准备工具
 sudo yum install wget -y
 ```
@@ -187,23 +173,17 @@ hostnamectl set-hostname k8s-node1
 
 logout后再登录可见。
 
-关闭swap：
 
 ```shell
+# 关闭swap：
 swapoff -a # 临时关闭
 sed -ri 's/.*swap.*/#&/' /etc/fstab  #永久关闭
-```
 
-关闭selinux
-
-```shell
+# 关闭selinux
 sudo setenforce 0
 sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
-```
 
-关闭防火墙
-
-```shell
+# 关闭防火墙
 iptables -F
 iptables -X
 systemctl stop firewalld.service
@@ -245,13 +225,26 @@ lsmod | grep -e br_netfilter -e overlay
 ### 5.1 在master上初始化集群
 
 ```shell
-# 先拉取需要的image
-kubeadm config images pull
+# 提前拉取需要的image
+kubeadm config images pull --image-repository registry.aliyuncs.com/google_containers
+
+# 查看拉取的镜像
+$ crictl images                                                            
+IMAGE                                                             TAG                 IMAGE ID            SIZE
+registry.aliyuncs.com/google_containers/coredns                   v1.9.3              5185b96f0becf       14.8MB
+registry.aliyuncs.com/google_containers/etcd                      3.5.6-0             fce326961ae2d       103MB
+registry.aliyuncs.com/google_containers/kube-apiserver            v1.25.14            48f6f02f2e904       35.1MB
+registry.aliyuncs.com/google_containers/kube-controller-manager   v1.25.14            2fdc9124e4ab3       31.9MB
+registry.aliyuncs.com/google_containers/kube-proxy                v1.25.14            b2d7e01cd611a       20.5MB
+registry.aliyuncs.com/google_containers/kube-scheduler            v1.25.14            62a4b43588914       16.2MB
+registry.aliyuncs.com/google_containers/pause                     3.8                 4873874c08efc       311kB
+registry.cn-hangzhou.aliyuncs.com/google_containers/pause         3.6                 6270bb605e12e       302kB
 
 # 初始化集群
 # --apiserver-advertise-address 指定 Kubernetes API Server 的宣告地址。这是 Master 节点上的 Kubernetes API Server 的网络地址，
 # 其他节点和客户端将使用此地址连接到 API Server
 # --image-repository 指定了 Docker 镜像的仓库地址，用于下载 Kubernetes 组件所需的容器镜像。在这里，使用了阿里云容器镜像地址，可以加速镜像的下载。
+#    注意：即使提取拉取了镜像，这里也要指定相同的仓库，否则还是会拉取官方镜像
 # --service-cidr 指定 Kubernetes 集群中 Service 的 IP 地址范围，Service IP 地址将分配给 Kubernetes Service，以允许它们在集群内通信
 # --pod-network-cidr 指定 Kubernetes 集群中 Pod 网络的 IP 地址范围。Pod IP 地址将分配给容器化的应用程序 Pod，以便它们可以相互通信。
 $ kubeadm init \
@@ -267,6 +260,14 @@ $ kubeadm init \
 [preflight] This might take a minute or two, depending on the speed of your internet connection
 [preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
 ... 日志较长，建立复制保存这段日志，留作以后维护查看组件配置信息使用
+
+
+
+
+# 配置文件生效
+# 一台机器只需执行一次
+echo export KUBECONFIG=/etc/kubernetes/admin.conf >> /etc/profile
+source /etc/profile
 ```
 
 [k8s-cluster-init.log](k8s-cluster-init.log) 是一个k8s集群初始化日志实例。
@@ -279,25 +280,6 @@ rm -rf /etc/kubernetes && rm -rf /etc/cni/net.d
 
 reboot
 # 然后可能需要重启master，否则其他节点无法加入新集群
-```
-
-**再次执行初始化集群命令**
-
-```shell
-[root@k8s-master ~]# kubeadm init --apiserver-advertise-address=10.0.2.2 --image-repository registry.aliyuncs.com/google_containers --kubernetes-version v1.25.14 --service-cidr=20.1.0.0/16 --pod-network-cidr=20.2.0.0/16
-[init] Using Kubernetes version: v1.25.14
-[preflight] Running pre-flight checks
-[preflight] Pulling images required for setting up a Kubernetes cluster
-[preflight] This might take a minute or two, depending on the speed of your internet connection
-[preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
-... 日志较长，建立复制保存这段日志，留作以后维护查看组件配置信息使用
-
-
-
-# 配置文件生效
-# 一台机器只需执行一次
-echo export KUBECONFIG=/etc/kubernetes/admin.conf >> /etc/profile
-source /etc/profile
 ```
 
 ### 5.2 准备用户的 k8s 配置文件
@@ -395,7 +377,7 @@ wget --no-check-certificate  https://raw.gitmirror.com/projectcalico/calico/v3.2
 kubectl apply -f calico.yaml
 
 # 观察calico 的几个 pod是否 running，这可能需要几分钟
-[root@k8s-master calico]# kubectl get pods -n kube-system
+[root@k8s-master calico]# kubectl get pods -n kube-system --watch
 NAME                                       READY   STATUS              RESTARTS      AGE
 calico-kube-controllers-74cfc9ffcc-85ng7   0/1     Pending             0             17s
 calico-node-bsqtv                          0/1     Init:ErrImagePull   0             17s
@@ -405,10 +387,19 @@ calico-node-xjwt8                          0/1     Init:ErrImagePull   0        
 # 观察到calico镜像拉取失败，查看pod日志
 kubectl describe pod -n kube-system calico-node-bsqtv
 # 从输出中可观察到是拉取 docker.io/calico/cni:v3.26.1 镜像失败，改为手动拉取
-# 注意这里使用的容器运行时是 containerd 不是docker，所以不是docker pull，而是ctr的命令
-# - 笔者安装时，在拉取镜像完成后，再次通过 kubectl get pods -n kube-system 查看calico pods状态已经正常
-# - 如果仍然是 ErrImagePull ，可以执行 kubectl delete pod -n kube-system calico-node-bsqtv （删除两个pod，会自动重跑）
 ctr image pull docker.io/calico/cni:v3.26.1
+ctr image pull docker.io/calico/node:v3.26.1
+ctr image pull docker.io/calico/kube-controllers:v3.26.1
+
+# 检查
+$ ctr image ls
+
+# 删除calico pod，让其重启
+kk delete pod -l k8s-app=calico-node -n kube-system
+kk delete pod -l k8s-app=calico-kube-controllers -n kube-system
+
+# 观察pod状态
+kk get pods -A --watch
 
 # 如有需要，在master节点删除calico全部资源，再重新配置
 kubectl delete -f calico.yaml && rm -rf /etc/cni/net.d
