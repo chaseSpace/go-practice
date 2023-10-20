@@ -1,6 +1,7 @@
 FROM golang:1.20-buster AS builder
 
 WORKDIR /project
+ADD . .
 
 # 实战中，如果有gomod文件，单独一行
 #RUN go mod tidy

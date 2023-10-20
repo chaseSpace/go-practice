@@ -401,6 +401,9 @@ kk delete pod -l k8s-app=calico-kube-controllers -n kube-system
 # 观察pod状态
 kk get pods -A --watch
 
+# ok后，重启一下网络（笔者出现集群正常后，无法连通外网，重启后可以）
+service network restart
+
 # 如有需要，在master节点删除calico全部资源，再重新配置
 kubectl delete -f calico.yaml && rm -rf /etc/cni/net.d
 service kubelet restart
