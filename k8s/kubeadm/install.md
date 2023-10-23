@@ -275,14 +275,30 @@ source /etc/profile
 后面如果想要删除集群，在所有节点执行:
 
 ```shell
+rm -rf /var/lib/kubelet # 删除核心组件目录
+rm -rf /etc/kubernetes # 删除集群配置 
+rm -rf /etc/cni/net.d # 删除容器网络配置
+rm -rf /var/log/pods && rm -rf /var/log/containers # 删除pod和容器日志
 kubeadm reset -f
-rm -rf /etc/kubernetes && rm -rf /etc/cni/net.d
-
+# 镜像我们仍然保留，/var/lib/containerd
+# crictl images 
 reboot
 # 然后可能需要重启master，否则其他节点无法加入新集群
 ```
 
+k8s组件的日志文件位置（当集群故障时查看）：
+```shell
+$ ls /var/log/containers/
+etcd-k8s-master_kube-system_etcd-64d58a06aaf9417d406fd335f26eec0f8c51ed9d10e3713c3b553977e4bc6b6e.log@                                      
+kube-apiserver-k8s-master_kube-system_kube-apiserver-f773c1b3959f7c9a1a25618a5dee2a36752e4f0b8a618902e9eedcdfba075cb5.log@                  
+kube-controller-manager-k8s-master_kube-system_kube-controller-manager-7ea76156361ce5a837fd7ac9e56afee04904f24c2e95f15950d2ac6347061370.log@
+kube-proxy-l9s4z_kube-system_kube-proxy-a25215f976bfab8762c877bd5ce90fdfe7f53c1c197887badb0ece5b0e13b683.log@                               
+kube-scheduler-k8s-master_kube-system_kube-scheduler-55ce404921d20a4a05c7dea80987969f3a141eeaf6d22d234df11cc32365e120.log@ 
+```
+
 ### 5.2 准备用户的 k8s 配置文件
+
+**若是root用户，请忽略这一步**。
 
 以便用户可以使用 kubectl 工具与 Kubernetes 集群进行通信。
 
@@ -311,8 +327,6 @@ To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 这里由于还未安装pod网络插件，所以是NotReady，后面步骤解决。
 
 ### 5.3 其他节点加入集群
-
-注意先参照上面报错解决里面的步骤安装containerd。
 
 ```shell
 # 在node1上执行
@@ -386,7 +400,7 @@ calico-node-xjwt8                          0/1     Init:ErrImagePull   0        
 
 # 观察到calico镜像拉取失败，查看pod日志
 kubectl describe pod -n kube-system calico-node-bsqtv
-# 从输出中可观察到是拉取 docker.io/calico/cni:v3.26.1 镜像失败，改为手动拉取
+# 从输出中可观察到是拉取 docker.io/calico/cni:v3.26.1 镜像失败，改为手动拉取（在所有节点都执行）
 ctr image pull docker.io/calico/cni:v3.26.1
 ctr image pull docker.io/calico/node:v3.26.1
 ctr image pull docker.io/calico/kube-controllers:v3.26.1
@@ -404,11 +418,10 @@ kk get pods -A --watch
 # ok后，重启一下网络（笔者出现集群正常后，无法连通外网，重启后可以）
 service network restart
 
-# 如有需要，在master节点删除calico全部资源，再重新配置
+# 当需要重置网络时，在master节点删除calico全部资源，再重新配置
 kubectl delete -f calico.yaml && rm -rf /etc/cni/net.d
 service kubelet restart
-
-# 在其他节点：
+# 当需要重置网络时，在其他节点：
 rm -rf /etc/cni/net.d && service kubelet restart
 ```
 
