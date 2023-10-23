@@ -1,8 +1,8 @@
-# 使用kubeadm搭建k8s集群
+# 使用kubeadm搭建k8s多节点集群
 
 **目录**
 <!-- TOC -->
-* [使用kubeadm搭建k8s集群](#使用kubeadm搭建k8s集群)
+* [使用kubeadm搭建k8s多节点集群](#使用kubeadm搭建k8s多节点集群)
   * [1. 准备资源](#1-准备资源)
   * [2. 安装容器运行时](#2-安装容器运行时)
     * [2.1 Linux支持的CRI的端点](#21-linux支持的cri的端点)
@@ -20,34 +20,19 @@
 
 ## 1. 准备资源
 
-- 至少2台linux机器，本文使用Centos7
-- 单机内存 2G+
-- 单机CPU 2核+
-- 单机空闲磁盘 20G+
-- 所有机器内网互通
-    - 通过子网ping
-- 不同的hostname，mac地址，product_uuid
-    - 检查mac地址：`ip link` or `ifconfig -a`
-    - 检查product_uuid：`sudo cat /sys/class/dmi/id/product_uuid`
+```
+10.0.2.2 k8s-master
+10.0.2.3 k8s-node1
+```
+两台机，最低配置如下：
+- cpu: 2c+
+- mem: 2g+
+- disk: 20g+
+- network: 同属一个子网
 
-- 内网开放k8s需要的端口（或直接关闭防火墙，下面有命令）：
-    - Control plane
-        - tcp：6443 all
-        - tcp：2379-2380 kube-apiserver, etcd
-        - tcp：10250 Self
-        - tcp：10259 Self
-        - tcp：10257 Self
-    - Worker node
-        - tcp：10250 Self, Control plane
-        - tcp：30000-32767 All
-
-    - 测试端口开放：`nc 127.0.0.1 6443`
-
-一台master，一台node。
-
-> 在实战中，master节点配置通常是较低配，不需要较多cpu核心和内存，也不会运行pod（自动调度到非master节点）。
-> 因为它的角色非常重要，在master上运行pod可能导致节点资源被耗尽进而导致集群不可用。但如果将node节点从集群中全部删除，
-> 那么pod会自动调度到master上。
+> 在实战中，master节点配置通常是较低配，不需要较多cpu核心和内存，因为k8s不会调度pod到master上运行。
+> 它的角色非常重要，在master上运行pod可能导致节点资源被耗尽进而导致集群不可用。但如果将node节点从集群中全部删除，
+> 则pod会自动调度到master上。
 >
 > master的主要任务是作为管理者的角色来调度集群内的各项资源到其他工作节点上。
 
