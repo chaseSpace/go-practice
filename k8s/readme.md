@@ -40,7 +40,7 @@
       * [6.3 开始测试](#63-开始测试)
       * [6.4 Ingress高可靠部署](#64-ingress高可靠部署)
       * [6.5 Ingress部署方案推荐](#65-ingress部署方案推荐)
-    * [7. Namespace](#7-namespace)
+    * [7. 使用Namespace](#7-使用namespace)
     * [8. 使用ConfigMap](#8-使用configmap)
     * [参考](#参考)
     * [资源索引](#资源索引)
@@ -1164,7 +1164,7 @@ $ kk apply -f deploy.yaml # 更新部署
 然后可以直接将Ingress节点IP填到域名CNAME记录中。
 
 
-### 7. Namespace
+### 7. 使用Namespace
 
 Namespace（命名空间）用来隔离集群内不同环境下的资源。仅同一namespace下的资源命名需要唯一，它的作用域仅针对带有名字空间的对象，例如 Deployment、Service 等。
 
