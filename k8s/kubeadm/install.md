@@ -316,7 +316,8 @@ To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ```shell
 # 在node1上执行
 # 注意使用初始化集群时输出的命令，确认token和sha正确
-[root@k8s-node1 ~]# kubeadm join 10.0.2.2:6443 --token ihde1u.chb9igowre1btgpt --discovery-token-ca-cert-hash sha256:fcbe96b444325ab7c854feeae7014097b6840329a608415b08c3af8e8e513573
+# 若忘记这个参数，在master执行：kubeadm token create --print-join-command 获取
+$ kubeadm join 10.0.2.2:6443 --token ihde1u.chb9igowre1btgpt --discovery-token-ca-cert-hash sha256:fcbe96b444325ab7c854feeae7014097b6840329a608415b08c3af8e8e513573
 [preflight] Running pre-flight checks
 [preflight] Reading configuration from the cluster...
 [preflight] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'

@@ -318,7 +318,7 @@ kubectl logs -f nginx-pod  # 查看日志（stdout/stderr）
 在这些场景中使用 pod 管理多个 container 就非常的推荐。而这，也是 k8s 如何处理服务之间复杂关系的第一个例子。
 
 **Pod定义**  
-Pod 是 Kubernetes 最小的可部署单元，通常包含一个或多个容器。它们可以容纳紧密耦合的容器，例如运行在同一主机上的应用程序和其辅助进程。但是，在生产环境中，通常使用其他资源来更好地管理和扩展服务。
+Pod 是 Kubernetes 最小的可部署/调度单元，通常包含一个或多个容器。它们可以容纳紧密耦合的容器，例如运行在同一主机上的应用程序和其辅助进程。但是，在生产环境中，通常使用其他资源来更好地管理和扩展服务。
 
 #### 3.6 创建go程序的pod
 
@@ -352,12 +352,30 @@ $ curl http://localhost:3000
 
 #### 3.7 pod有哪些状态
 
-- Pending（挂起）： Pod 正在等待调度。
+- Pending（挂起）： Pod 正在调度中（包含镜像拉取、容器创建和启动）。
 - ContainerCreating（容器创建中）： Pod 已经被调度，但其中的容器尚未完全创建和启动。
 - Running（运行中）： Pod 中的容器已经在运行。
 - Succeeded（已成功）： 所有容器都成功终止，任务或工作完成，特指那些批处理任务而不是常驻容器。
 - Failed（已失败）： 至少一个容器以非零退出码终止。
-- Unknown（未知）： 无法获取 Pod 的状态。
+- Unknown（未知）： 无法获取 Pod 的状态，通常是宿主机通信问题导致。
+
+**关于Pod的重启策略**  
+即`restartPolicy`字段，可选值为Always、OnFailure和Never。此策略对Pod内所有容器有效，
+由Pod所在Node上的kubelet执行判断和重启。由kubelet重启的已退出容器将会以递增延迟的方式（10s，20s，40s...）
+尝试重启，上限5min。成功运行10min后这个时间会重置。**一旦Pod绑定到某个节点上，除非节点自身问题或手动调整，
+否则不会再调度到其他节点**。
+
+**Pod的销毁过程**  
+当Pod需要销毁时，kubelet会先向API Server发送删除请求，然后等待Pod中所有容器停止，包含以下过程:
+1. 用户发送Pod删除命令
+2. API Server更新Pod：开始销毁，并设定宽限时间（默认30s，可通过--grace-period=n指定，为0时需要追加--force），超时强制Kill 
+3. 同时触发：
+   - Pod 标记为 Terminating
+   - kubelet监听到 Terminating 状态，开始终止Pod
+   - Endpoint控制器监控到Pod即将删除，将移除所有Service对象中与此Pod关联的Endpoint对象
+4. 如Pod定义了prepStop回调，则会在Pod中执行，并再次执行步骤2，且增加宽限时间2s
+5. Pod进程收到SIGTERM信号
+6. 到达宽限时间还在运行，kubelet发送SIGKILL信号，设置宽限时间0s，直接删除Pod
 
 ### 4. 使用Deployment
 
