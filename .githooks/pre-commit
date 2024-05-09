@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-commit".
+
+# 获取所有变化的go文件
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep .go$)
+
+if [ "$STAGED_GO_FILES" = "" ]; then
+    exit 0
+fi
+
+echo "check gofmt ..."
+CHECK_FMT=$(gofmt -s -w -l $STAGED_GO_FILES)
+if [ -n "${CHECK_FMT##* }" ]; then
+    echo
+    echo -e "these files will be\033[32m gofmt\033[0m formatted:"
+    for file in ${CHECK_FMT[*]}; do
+        echo -e "\033[36m\t$file\033[0m"
+    done
+    git add ${CHECK_FMT//\/n/ }
+    echo
+fi
+
+echo "check goimports ..."
+CHECK_GOPLS=$(goimports -l -w $STAGED_GO_FILES)
+if [ -n "${CHECK_GOPLS##* }" ]; then
+    echo
+    echo -e "these files will be\033[32m goimports\033[0m formatted:"
+    for file in ${CHECK_GOPLS[*]}; do
+        echo -e "\033[36m\t$file\033[0m"
+    done
+    git add ${CHECK_GOPLS//\/n/ }
+    echo
+fi
+
+printf "\033[32m COMMIT SUCCEEDED \033[0m\n"
+echo
+
+exit 0

@@ -14,3 +14,18 @@ sh build.sh
 
 - 每个目录都是不同的主题，目录中会包含 `xxx_test.go` 来执行目录下的示例代码。
 - 根目录的`main.go`作用不大。
+
+### CI
+
+ci相关文件
+
+```
+├── .githooks
+│   ├── pre-commit
+│   └── pre-push
+├── .golangci.yml
+├── golangci-lint.sh
+└── init.sh
+```
+
+拉取项目后，先执行`init.sh`配置环境，然后可以使用。
