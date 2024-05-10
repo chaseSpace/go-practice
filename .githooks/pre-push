@@ -21,19 +21,19 @@
 
 #remote="$1"
 #url="$2"
-printf "\033[32m 推送前需要检查当前项目可以 go build 通过 \033[0m\n"
+#printf "\033[32m 推送前需要检查当前项目可以 go build 通过 \033[0m\n"
 
-echo "run golangci-lint..."
+echo "→run golangci-lint..."
 echo
 
 # 运行 golangci-lint 检查工具
-golangci-lint run ./...
+golangci-lint run ./... -c .golangci.yml
 if [ $? -ne 0 ]; then
-    printf "\033[31m PUSH FAILED \033[0m\n"
+    printf "\033[31mPUSH FAILED \033[0m\n"
     exit 1
 fi
 
-printf "\033[32m PUSH SUCCEEDED \033[0m\n"
+printf "\033[32mPUSH SUCCEEDED \033[0m\n"
 echo
 
 exit 0

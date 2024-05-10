@@ -3,3 +3,4 @@ _ignore/  # 各种本地配置
 dist/
 node_modules/
 zzz/
+http-client.env.json
