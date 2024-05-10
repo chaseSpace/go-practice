@@ -4,3 +4,4 @@ dist/
 node_modules/
 zzz/
 http-client.env.json
+temp.http
