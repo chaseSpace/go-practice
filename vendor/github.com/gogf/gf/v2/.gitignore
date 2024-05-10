@@ -1,0 +1,24 @@
+.buildpath
+.hgignore.swp
+.project
+.orig
+.swp
+.idea/
+.settings/
+.vscode/
+vendor/
+pkg/
+bin/
+**/.DS_Store
+.test/
+cmd/gf/main
+cmd/gf/gf
+temp/
+go.work
+go.work.sum
+!cmd/gf/go.work
+
+# Ignore for docs
+node_modules
+.docusaurus
+output

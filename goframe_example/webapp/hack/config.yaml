@@ -1,0 +1,51 @@
+# CLI tool, only in development environment.
+# https://goframe.org/pages/viewpage.action?pageId=3673173
+gfcli:
+  docker:
+    build: "-a amd64 -s linux -p temp -ew"
+    tagPrefixes:
+      - my.image.pub/my-app
+  build: # https://goframe.org/pages/viewpage.action?pageId=1115788
+    name: "webapp"
+    path: "./temp"  # name & path => ./temp/webapp.exe
+    arch: "amd64" # 386,amd64,arm
+    system: "linux" # linux,darwin,windows
+    mod: "none"
+    extra: -ldflags="-s -w"
+    cgo: false
+    varMap: # 代码中通过 gbuild包获取
+      k1: v1
+      k2: v2
+    packSrc: ""
+    packDst: ""
+    version: ""
+    exitWhenError: true
+    dumpEnv: false
+
+  run: # 没生效！！！
+    path: "manifest/output"
+    extra: -ldflags="-s -w"
+    args: "all"
+
+  # gen dao参数配置
+  gen:
+    dao:
+      - link: "mysql:root:123@tcp(127.0.0.1:3306)/test"
+        tables: "users" # 指定当前数据库中需要执行代码生成的数据表。如果为空，表示数据库的所有表都会生成!!!
+        jsonCase: "CamelLower" # 指定model中生成的数据实体对象中json标签名称规则，还支持 Snake 等
+        group: default
+        stdTime: true  # 当数据表字段类型为时间类型时，代码生成的属性类型使用标准库的time.Time而不是框架的*gtime.Time类型。
+        withTime: true # 为每个自动生成的代码文件增加生成时间注释
+        gJsonSupport: true # 当数据表字段类型为JSON类型时，代码生成的属性类型使用*gjson.Json类型。
+        importPrefix: "" # 用于指定生成Go文件的import路径前缀
+        descriptionTag: false # 用于指定是否为数据模型结构体属性增加desription的标签，内容为对应的数据表字段注释。一般不需要开，因为有注释了。
+        typeMapping: # 自定义类型映射，从版本v2.5开始支持。
+          decimal:
+            type: float64
+
+    pbentity:
+      - link: "mysql:root:123@tcp(127.0.0.1:3306)/test"
+        path: "manifest/protobuf/pbentity"
+        tables: "users"
+        package: "pbentity"
+
