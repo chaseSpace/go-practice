@@ -1,0 +1,6 @@
+GET https://r.applovin.com/max/userAdRevenueReport?api_key={{k1}}&date=2024-05-09&platform=android&application={{appid_love8}}&aggregated=true
+
+https://applovin-externalreports.s3.amazonaws.com/mediation_reports/report_date%3D2024-05-09/pub_id%3D1954623559/mediation_app_id%3D1795389/user_report_v2.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240510T075908Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIAI4TT67Y4PHKK37YQ%2F20240510%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4e2fcec2f37cd32b3c915a9ac4c480f97d28317d9036ad1db6f7fd309c75f286
+
+
+https://applovin-externalreports.s3.amazonaws.com/mediation_reports/report_date%3D2024-05-09/pub_id%3D1954623559/mediation_app_id%3D1795389/user_report.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240510T075908Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIAI4TT67Y4PHKK37YQ%2F20240510%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=48c47a9dde9507da2879ec08974732f8d93c3938f4a3b24b853197f88dfee12a
