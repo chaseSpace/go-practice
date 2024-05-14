@@ -1,29 +1,31 @@
-## GoFrame 框架使用
+## GoFrame 框架入门
 
 > [!TIP]
 > 点击网页右侧的目录按钮查看大纲，支持跳转。
 
-这是一款功能相当大而全的Go基础开发框架，包含web开发以及微服务开发所需的各种组件/工具，基本不需要再去寻找或引入其他单个仓库，
-在笔者的工作生涯中遇到过企业使用，所以在此记录。
+这是一款功能相当大而全的 Go 基础开发框架，包含 web 开发以及微服务开发所需的各种组件/工具，基本不需要再去寻找或引入其他单个仓库。GoFrame
+官方文档大而全，
+第一次看可能会阅读困难，本文档将带你快速入门 GoFrame，部分主题提供官文链接，待你用到时再去了解。
 
 显著特点：
 
 - 丰富的开发组件
 - 简单易用，详细的文档
 - 跟踪和错误堆栈功能
-- ORM组件
+- ORM 组件
 - 工程设计规范
-- CLI工具
-- OpenTelemetry、OpenAPIV3等。
+- CLI 工具
+- 支持 protobuf
+- OpenTelemetry、OpenAPIV3 等
 
 资料索引：
 
 - Github：https://github.com/gogf/gf
 - 快速开始：https://goframe.org/pages/viewpage.action?pageId=57183742
 
-### 基本使用
+### 准备工作
 
-gf 最新版本 2.7.0 要求Go >= 1.18.0。
+GoFrame 官方缩写`gf`，最新版本 v2.7.0，于 2024-4-8 发布，要求 Go >= 1.18.0。开始前，先创建一个 Go 项目（略），然后安装它：
 
 ```shell
 # 安装主库
@@ -36,7 +38,7 @@ go install github.com/gogf/gf/cmd/gf/v2@latest
 gf gen -h
 ```
 
-[工具介绍](https://goframe.org/pages/viewpage.action?pageId=1114260&src=contextnavpagetreemode)：
+工具基本使用：
 
 ```shell
 gf -v  # 会自动检测当前项目使用的GoFrame版本（解析go.mod）
@@ -45,30 +47,37 @@ gf init webapp # 创建一个项目，使用gf推荐的目录结构
 gf init mymono -m # 创建一个微服务大仓
 
 # 代码生成*  v2.5+
-
 ```
+
+**Windows安装Make工具**
+
+gf
+为项目提供了Makefile来管理开发过程中的各种脚本命令，比单独使用gf命令要更高效。Windows下载[make安装程序](../bin/win/make-3.81.exe)，
+其他系统自行搜索。
+
+- [工具完整介绍](https://goframe.org/pages/viewpage.action?pageId=1114260&src=contextnavpagetreemode)
 
 ### 代码结构分层
 
 不管是单服务还是微服务，都是五层架构，api/controller/logic/dao/model。
 
 - api: 请求和响应定义。
-- controller：业务接口定义，入参解析验证后传递给service，以及对出参的维护。
-    - 可以直接调用dao层实现业务逻辑，当认为逻辑可能会被多个接口复用时，再将逻辑下放到service层。
-    - 可以调用一个或多个service方法来得到结果。
-- logic（service）：业务逻辑实现，会通过gf工具生成service包。
-    - logic层的实现可以调用其他service包来完成逻辑。
-    - service包是根据logic层定义的方法生成对应的接口（interface）。
-    - 若涉及多表访问（事务），则通过tx传参调用dao层不同方法。
+- controller：业务接口定义，入参解析验证后传递给 service，以及对出参的维护。
+  - 可以直接调用 dao 层实现业务逻辑，当认为逻辑可能会被多个接口复用时，再将逻辑下放到 service 层。
+  - 可以调用一个或多个 service 方法来得到结果。
+- logic（service）：业务逻辑实现，会通过 gf 工具生成 service 包。
+  - logic 层的实现可以调用其他 service 包来完成逻辑。
+  - service 包是根据 logic 层定义的方法生成对应的接口（interface）。
+  - 若涉及多表访问（事务），则通过 tx 传参调用 dao 层不同方法。
 - dao：数据库访问。
-    - gf工具为dao层生成一个个以表名命名的go文件（用到的表名在config中配置），开发者在每个文件中定义表相关的dao方法。
-    - 方法实现应尽量简洁，让service层来多次调用不同dao方法得到结果，以避免对dao层的频繁修改。
+  - gf 工具为 dao 层生成一个个以表名命名的 go 文件（用到的表名在 config 中配置），开发者在每个文件中定义表相关的 dao 方法。
+  - 方法实现应尽量简洁，让 service 层来多次调用不同 dao 方法得到结果，以避免对 dao 层的频繁修改。
 - model：数据库表实体，但也可以是接口需要的其他结构体。
-    - 包含`do`和`entity`两个gf工具维护的子目录，其中存放与实际数据表一致的代码结构体。
-    - 在model层则存放人工定义的业务需要的模型结构。
-    - model层的实体可以在上面几层之间共享（除了api层），而非每一层定义不同的结构体。
+  - 包含`do`和`entity`两个 gf 工具维护的子目录，其中存放与实际数据表一致的代码结构体。
+  - 在 model 层则存放人工定义的业务需要的模型结构。
+  - model 层的实体可以在上面几层之间共享（除了 api 层），而非每一层定义不同的结构体。
 
-请求入口为controller，然后内部再调用logic/dao/model。
+请求入口为 controller，然后内部再依次调用 logic/dao/model。
 
 ### 工程目录设计
 
@@ -92,7 +101,7 @@ gf 规范了工程目录结构。
 ├── manifest # 包含程序编译、部署、运行、配置的文件
 │   ├── config # 配置文件存放目录。
 │   ├── docker # Docker镜像相关依赖文件，脚本文件等等。
-│   ├── deploy # 部署相关的文件。默认提供了Kubernetes集群化部署的Yaml模板，通过kustomize管理。
+│   ├── deploy # 部署相关的文件。默认提供了Kubernetes集群化部署的Yaml模板，通过 kustomize 管理。
 │   └── protobuf # GRPC协议时使用的protobuf协议定义文件，协议文件编译后生成go文件到api目录。
 ├── resource # 静态资源文件。这些文件往往可以通过 资源打包/镜像编译 的形式注入到发布文件中。
 ├── utility
@@ -100,65 +109,63 @@ gf 规范了工程目录结构。
 └── main.go # 程序入口文件。
 ```
 
-问题：api层到底能否引用model内的模型，在 [工程目录设计](https://goframe.org/pages/viewpage.action?pageId=30740166)
-页面中存在两处相互矛盾的描述：
-
-- 描述一：“这里的model不仅负责维护数据实体对象（entity）结构定义，也包括所有的输入/输出数据结构定义，被api/dao/service共同引用。”
-- 描述二：“注意model中的数据结构不应该直接暴露给外部使用，并且在框架的工程设计中刻意将model目录放到了internal目录下。也不应该在api层中对model中的数据结构进行别名类型定义供外部访问”
-    - 在[数据模型与业务模型](https://goframe.org/pages/viewpage.action?pageId=7295964)页面中再次强调了这一点。
-    - 即“例如controller, logic, model中均可以调用api层的输入输出模型，但是api层仅用于与外部服务的接口交互，该模型中不能调用或者引用内部的模型如model模型”
-
 #### 请求流转
 
-- cmd：负责引导程序启动，显著的工作是初始化逻辑、注册路由对象、启动server监听、阻塞运行程序直至server退出。
-- controller：接收Req请求对象后做一些业务逻辑校验，可以直接在controller中实现业务逻辑，或者调用一个或多个service实现业务逻辑，将执行结果封装为约定的Res数据结构对象返回。
-- model：管理了所有的业务模型，service资源的Input/Output输入输出数据结构都由model层来维护。
-- service：接口层，用于解耦业务模块，service没有具体的业务逻辑实现，具体的业务实现是依靠logic层注入的。
-- logic：业务逻辑实现，需要通过调用dao来实现数据的操作，调用dao时需要传递do数据结构对象，用于传递查询条件、输入数据。dao执行完毕后通过Entity数据模型将数据结果返回给service层。
-- dao：通过框架的ORM抽象层组件与底层真实的数据库交互。
+- cmd：负责引导程序启动，显著的工作是初始化逻辑、注册路由对象、启动 server 监听、阻塞运行程序直至 server 退出。
+- controller：接收 Req 请求对象后做一些业务逻辑校验，可以直接在 controller 中实现业务逻辑，或者调用一个或多个 service
+  实现业务逻辑，将执行结果封装为约定的 Res 数据结构对象返回。
+- model：管理了所有的业务模型，service 资源的 Input/Output 输入输出数据结构都由 model 层来维护。
+- service：接口层，用于解耦业务模块，service 没有具体的业务逻辑实现，具体的业务实现是依靠 logic 层注入的。
+- logic：业务逻辑实现，需要通过调用 dao 来实现数据的操作，调用 dao 时需要传递 do 数据结构对象，用于传递查询条件、输入数据。dao
+  执行完毕后通过 Entity 数据模型将数据结果返回给 service 层。
+- dao：通过框架的 ORM 抽象层组件与底层真实的数据库交互。
 
-#### dao层大改进
+#### dao 层大改进
 
 ![](../img/gf_dao.png)
 
-其中的`dao.DoctorUser`对象是`gf gen dao`自动生成的表访问对象，工具还会生成具体的表结构体（`model/entity`
-），无需人工维护，保障了代码数据结构体与表模型的强一致性。
+其中的`dao.DoctorUser`对象是`gf gen dao`自动生成的单表访问对象，工具还会生成具体的表结构体，位于`model/entity/`
+，无需人工维护，保障了代码数据结构体与表模型的强一致性。
 
-#### 关于model
+#### 关于 model
 
-model分为两种，一种是**数据模型**，是数据库表中的结构，另一种是**业务模型**，具体又包含**接口输入/输出模型** 与 **业务输入/输出模型
-**。
+model 分为两种，一种是**数据模型**，是数据库表中的结构；另一种是**业务模型**，具体又分为**接口输入/输出模型** 与
+**业务输入/输出模型**。
 
 **数据模型**
-它由gf自动生成到`internal/model/entity`。
+
+它由 gf 工具自动生成到`internal/model/entity`。
 
 **接口出入模型**
 
-定义在api接口层中，供工程项目所有的层级调用，例如controller, logic,
-model中均可以调用api层的输入输出模型。在GoFrame框架规范中，这部分输出输出模型名称以`XxxReq`和`XxxRes`格式命名。
+定义在 api 接口层中，供工程项目所有的层级调用，例如 controller, logic,
+model 中均可以调用 api 层的输入输出模型。在 GoFrame 框架规范中，这部分输出输出模型名称以`XxxReq`和`XxxRes`格式命名。
 
 **业务输入/输出模型**
 
-用于服务内部模块/组件之间的方法调用交互，特别是controller->service或者service->service之间的调用。这部分模型定义在model模型层中,
+用于服务内部模块/组件之间的方法调用交互，特别是 controller->service 或者 service->service 之间的调用。这部分模型定义在
+model 模型层中,
 如`internal/model/some_biz.go`，这部分输入输出模型名称通常以`XxxInput`和`XxxOutput`格式命名。
 
 ### 微服务大仓管理
 
-当微服务数量少于50个时（符合大部分情况），建议采用单仓库管理所有代码。代码结构设计上也是利用go的**internal特性**
-来避免不同服务之间的代码引用，**服务之间仅允许api包的引用**。
+官方建议当微服务数量少于 50 个时（匹配大部分项目），建议采用单仓库管理所有代码。代码结构设计上也是利用 go 的**internal 特性
+**
+来避免不同服务之间的代码引用，**服务之间仅允许 api 包的引用**。
 参考[微服务大仓管理模式](https://goframe.org/pages/viewpage.action?pageId=87246764)。
 
 ### 接口化与泛型设计
 
-GoFrame框架的核心组件均采用了接口化设计，比如gcfg/gcache/gredis/gsession/gdb，它们都是以接口形式提供服务，并且每个方法返回的对象都是一个泛型`gvar.Var`
+GoFrame 框架的核心组件均采用了接口化设计，比如
+gcfg/gcache/gredis/gsession/gdb，它们都是以接口形式提供服务，并且每个方法返回的对象都是一个泛型`gvar.Var`
 ，可以随意转换为其他类型，对于一些自定义类型，可以通过泛型对象的`Scan`方法转换为具体类型。
 
 ### 隐式与显式初始化
 
-GoFrame框架的很多模块都采用了隐式初始化。但对于业务代码，应该避免使用隐式查询，以免无法直观的了解项目的启动顺序。正确示例：
+GoFrame 框架的很多模块都采用了隐式初始化。但对于业务代码，应该避免使用隐式查询，以免无法直观的了解项目的启动顺序。正确示例：
 
 ```shell
-# main.go
+# go伪代码
 
 function initBasis() {
   initConf()
@@ -186,30 +193,36 @@ gf init webapp
 cd webapp
 ```
 
-#### 定义api
+#### 定义 api
 
 在`/api/模块/版本/定义文件.go`中定义具体的请求响应体，例如默认的`HelloReq`和`HelloRes`，
 比如按照此范式定义，才能生成控制器代码。
 
-请求/响应体可以通过tag定义字段注释，校验规则。具体参考[数据校验-校验规则](https://goframe.org/pages/viewpage.action?pageId=1114367)。
+请求/响应体可以通过 tag
+定义字段注释，校验规则。具体参考[数据校验-校验规则](https://goframe.org/pages/viewpage.action?pageId=1114367)。
 
 #### 生成控制器代码
 
 ```shell
-# -merge是将 hello.go 中的多个 req&res 合并存放到 controller/ 的单个文件中，否则是一个req对应一个文件，不合理。
-gf gen ctrl -merge # or `make ctrl`，但make不支持参数输入，只能修改一下makefile
+# -merge是将 hello.go 中的多个 req&res 合并存放到 controller/ 的单个文件中，否则是一个req对应一个文件，不推荐。
+gf gen ctrl -merge # or `make ctrl`，但make不支持参数输入，只能修改一下makefile，示例项目已修改
 ```
 
 生成 `api/hello/hello.go`
 的控制器接口代码，以及对应的控制器实现`controller/hello/hello.go| hello_new.go| hello_v1_hello.go`。
-**其中的`hello.go`是一个空文件**，用于存放controller内部使用的变量、常量、数据结构定义，或者init方法定义等，官方建议用不到也留着先。。
+**其中的`hello.go`是一个空文件**，用于存放 controller 内部使用的变量、常量、数据结构定义，或者 init 方法定义等，官方建议用不到也留着先。。
+
+注意：api目录中定义的 `req&res` 必须符合命名规范，否则生成的控制器代码会报红！
 
 > [!IMPORTANT]
-> 有bug！概率性出现生成的controller代码没有import对应api结构体，需要手动处理。导致报红！v2.7.0
+> 有 bug！概率性出现生成的 controller 代码没有 import 对应 api 结构体，需要手动处理。导致报红！v2.7.0
 
-#### 生成dao代码
+> [!IMPORTANT]
+> v2.7.0版本的gf工具，对于api目录下已经注释掉的请求/响应结构体，也会生成控制器代码，已告知官方，回复说在 v2.7.1 修复。
 
-`gen dao`命令是CLI中最频繁使用的命令。但是这个命令的参数很多，一般通过`hack/config.yml`管理。参考：
+#### 生成 dao 代码
+
+`gen dao`命令是 CLI 中最频繁使用的命令。但是这个命令的参数很多，一般通过`hack/config.yml`管理。参考：
 
 ```yaml
 gfcli:
@@ -244,65 +257,67 @@ gfcli:
 #        tablesEx: "order" # 指定当前数据库中需要排除代码生成的数据表
 ```
 
-生成路径：
+生成代码：
 
 ```shell
 model/do/users.go  # 不关心
-model/entity/users.go # 自动生成的 users表结构体，可以被 controller/logic/dao 层引用
+model/entity/users.go # 自动生成的 users 表结构体，可以被 controller/logic/dao 层引用
 
 dao/users.go   # 用于crud users表的DAO对象
 dao/internal/user.go
 ```
 
-参考[数据规范-gen dao](https://goframe.org/pages/viewpage.action?pageId=3673173)。
+参考 [数据规范-gen dao](https://goframe.org/pages/viewpage.action?pageId=3673173)。
 
-#### 生成service代码
+#### 生成 service 代码
 
-service代码是一层接口抽象，从logic抽象而来。操作顺序是先写logic代码，然后生成service代码，然后controller和其他service可以调用它。
+service 代码是一层接口抽象，从 logic 抽象而来。操作顺序是先写 logic 代码，然后生成 service 代码，然后 controller 和其他
+service 可以调用它。
 
-定义logic层方法需要满足范式`logic/xxx/*.go`，即只能有一个二级目录，否则gf无法解析。
+定义 logic 层方法需要满足范式`logic/xxx/*.go`，即只能有一个二级目录，否则 gf 无法解析。
 
 步骤：
 
 - 定义`internal/logic/menu/user.go`
-    - 可能需要定义每个方法的`*Input`和`*Output`结构体。
-- 生成service方法：`gf gen service` 或 `make service`
-    - 生成文件：`service/menu.go`
-- 在logic代码中编写init函数将方法实现注册到service，参考[logic/menu/user.go](webapp/internal/logic/menu/user.go)
-    - 生成的`logic/logic.go`会自动引入`logic/menu`包，确保service接口的注册，而logic包又会被main文件引入。
+  - 可能需要定义每个方法的`*Input`和`*Output`结构体。
+- 生成 service 方法：`gf gen service` 或 `make service`
+  - 生成文件：`service/menu.go`
+- 在 logic 代码中编写 init 函数将方法实现注册到 service，参考[logic/menu/user.go](webapp/internal/logic/menu/user.go)
+  - 生成的`logic/logic.go`会自动引入`logic/menu`包，确保 service 接口的注册，而 logic 包又会被 main 文件引入。
 
-然后就可以在controller通过service包来调用logic代码了，例如：`service.User().GetUser(ctx, &menu.GetUserInput{})`
-，当然，其他service包也可根据需要调用。
+然后就可以在 controller 通过 service 包来调用 logic 代码了，例如：`service.User().GetUser(ctx, &menu.GetUserInput{})`
+，当然，其他 service 包也可根据需要调用。
 
 参考[数据规范-gen service](https://goframe.org/pages/viewpage.action?pageId=49770772)。
 
-#### 生成enums
+#### 生成 enums
 
-gf工具扫描api目录中的请求/响应结构体中使用的全部枚举，然后生成swagger文档所需的go文件，在项目启动后的swagger文档中可以看到字段枚举值。
+gf 工具扫描 api 目录中的请求/响应结构体中使用的全部枚举，然后生成 swagger 文档所需的 go 文件，在项目启动后的 swagger
+文档中可以看到字段枚举值。
 
 步骤如下：
 
-- 定义一个api请求&响应，其中包含const枚举，参考[hello.go](webapp/api/hello/v1/hello.go)中的`Hello3Req`；
+- 定义一个 api 请求&响应，其中包含 const 枚举，参考[hello.go](webapp/api/hello/v1/hello.go)中的`Hello3Req`；
 - 然后执行`gf gen enums` 或 `make enums`，生成`internal/boot/enums.go`；
-- 首次生成boot目录时，将其添加到main.go中初始化即可。
+- 首次生成 boot 目录时，将其添加到 main.go 中初始化即可。
 
-然后`gf run main.go`启动项目，访问输出中的swagger地址，在web端可以看到接口`Hello3Req`中的字段PodState列出了枚举值。
+然后`gf run main.go`启动项目，访问输出中的 swagger 地址，在 web 端可以看到接口`Hello3Req`中的字段 PodState 列出了枚举值。
 
-#### 生成pb
+#### 生成 pb
 
-如果你的项目用不到protobuf，忽略此章节。
+如果你的项目用不到 protobuf，忽略此章节。
 
-识别proto文件，生成对应的pb Go文件。这个功能建议不要用gf提供的`gen pb`
-命令，因为它没有集成protoc执行文件，需要自行下载，而这就会产生两者版本的兼容性问题（`gf gen pb`命令执行报错）。
+识别 proto 文件，生成对应的 pb Go 文件。这个功能建议不要用 gf 提供的`gen pb`
+命令，因为它没有集成 protoc 执行文件，需要自行下载，而这就会产生两者版本的兼容性问题（`gf gen pb`命令执行报错）。
 
 步骤如下：
 
-- 下载protoc文件，并安装插件：protoc-gen-go, protoc-gen-go-grpc；
-    - 可直接在[这个页面](https://github.com/chaseSpace/go-microsvc-template/tree/main/tool_win/protoc_v24)下载全部。
+- 下载 protoc 文件，并安装插件：protoc-gen-go, protoc-gen-go-grpc；
+  - 可直接在[这个页面](https://github.com/chaseSpace/go-microsvc-template/tree/main/tool_win/protoc_v24)下载全部。
 - 定义`manifest/protobuf/svc_a/a.proto`文件；
-- 使用protoc命令生成代码到指定位置；
+- 使用 protoc 命令生成代码到指定位置；
 
-protoc命令如下：
+protoc 命令如下：
 
 ```shell
 mkdir -p ./api/pb
@@ -314,50 +329,53 @@ protoc -I ./manifest/protobuf \
       $SRC/*/*.proto $SRC/*.proto
 ```
 
-pb文件中引入了protobuf库，记得拉取：`go get -u google.golang.org/protobuf`
-。笔者修改了Makefile文件，用以上命令替换了原来的`gen pb`脚本，参考 [makefile引用的hack.mk](webapp/hack/hack.mk) 中的`pb`部分。
+pb 文件中引入了 protobuf 库，记得拉取：`go get -u google.golang.org/protobuf`
+。笔者修改了 Makefile 文件，用以上命令替换了原来的`gen pb`脚本，参考 [makefile 引用的 hack.mk](webapp/hack/hack.mk)
+中的`pb`部分。
 
 > [!IMPORTANT]
-> 当然还剩下一个问题，由于是使用原生protoc命令生成代码，所以控制器的代码需要自己写。
+> 还剩下一个问题，由于是使用原生 protoc 命令生成代码，所以控制器的代码需要自己写。
 
-#### 生成pbentity
+#### 生成 pbentity
 
-之前的dao生成只是将数据库中的表模型生成go代码结构体，即`model/entity`
-，它主要是给Go程序使用，但在异构服务或前后端使用pb协作的场景中，则需要通过proto文件来共享数据模型。这时候
-go代码的entity就没法使用了，所以pbentity就派上用场。
+之前的 dao 生成只是将数据库中的表模型生成 go 代码结构体，即`model/entity`
+，它主要是给 Go 程序使用，但在异构服务或前后端使用 pb 协作的场景中，则需要通过 proto 文件来共享数据模型。这时候
+go 代码的 entity 就没法使用了，所以 pbentity 就派上用场。
 
 步骤：
 
 - 在`hack/config.yaml`中加入`gfcli.gen.pbentity`配置，其中包含数据库连接信息、生成目标位置等；
-    - 确保数据库表存在，能连接。
-- 执行：`gf gen pbentity` 或 `make pbentity`，然后可以观察到目标位置`manifest/protobuf/pbentity`包含新的proto文件，其中包含表模型。
+  - 确保数据库表存在，能连接。
+- 执行：`gf gen pbentity` 或 `make pbentity`，然后可以观察到目标位置`manifest/protobuf/pbentity`包含新的 proto 文件，其中包含表模型。
 
 #### 运行
 
 ```shell
-gf run main.go
+gf run main.go # 或make all
 ```
 
-使用**gf**工具启动的好处是会自动监控项目中所有go文件变化，然后进行自动编译重启。同时可以在 `hack/config.yaml`
-中加入`gfcli.run`配置，其中可以包含二进制存放位置、go编译参数等。
+使用**gf**工具启动的好处是会自动监控项目中所有 go 文件变化，然后进行自动编译重启。同时可以在 `hack/config.yaml`
+中加入`gfcli.run`配置，其中可以包含二进制存放位置、go 编译参数等。
 
 #### Build
 
-编译Go程序。
+编译 Go 程序。
 
 - 在`hack/config.yaml`中加入`gfcli.build`配置；
 - 执行`gf build` 或 `make build`；
 
 #### 打包镜像
 
-`gf docker`命令默认使用`manifest/docker/Dockerfile`将已经编译好的二进制打包到alpine镜像。相关参数通过 `hack/config.yaml`
+`gf docker`命令默认使用`manifest/docker/Dockerfile`将已经编译好的二进制打包到 alpine
+镜像。相关参数通过 `hack/config.yaml`
 中的`gfcli.docker`配置。
 
 `make image`是对该命令的封装，自动上传是`make image.push`。
 
 ### 资源管理
 
-这个功能不是常用的，只有在项目运行用到非go静态文件时（比如ip2region文件等）才可能用到，它只是一种将静态文件打包到go执行文件中的方法。
+这个功能不是常用的，只有在项目运行用到非 go 静态文件时（比如 ip2region 文件等）才可能用到，它只是一种将静态文件打包到 go
+执行文件中的方法。
 
 参考[这个页面](https://goframe.org/pages/viewpage.action?pageId=1114671)。
 
@@ -367,22 +385,22 @@ gf run main.go
 
 ### 其他工具
 
-GoFrame提供了极其丰富的日常工具使用，包括但不限于数据结构、定时器、锁、上下文、日志管理、时间转换、缓存、类型转换、编码和加密等。
+GoFrame 提供了极其丰富的日常工具使用，包括但不限于数据结构、定时器、锁、上下文、日志管理、时间转换、缓存、类型转换、编码和加密等。
 
-在[这个页面](https://goframe.org/pages/viewpage.action?pageId=1114411)搜索。
+需要时在[这个页面](https://goframe.org/pages/viewpage.action?pageId=1114411)搜索。
 
 ### 微服务开发
 
 [这个页面](https://goframe.org/pages/viewpage.action?pageId=77852968)。
 
-### Web开发
+### Web 开发
 
-Demo项目是一个HTTP服务，在[cmd.go](webapp/internal/cmd/cmd.go)中启动了一个HTTP服务器，其中使用了gf提供的HTTP框架。
+Demo 项目是一个 HTTP 服务，在[cmd.go](webapp/internal/cmd/cmd.go)中启动了一个 HTTP 服务器，其中使用了 gf 提供的 HTTP 框架。
 由`ghttp`模块实现。实现了丰富完善的相关组件，例如：Router、Cookie、Session、路由注册、配置管理、模板引擎、缓存控制等等，
-支持热重启、热更新、多域名、多端口、多实例、HTTPS、Rewrite、PProf等等特性。
+支持热重启、热更新、多域名、多端口、多实例、HTTPS、Rewrite、PProf 等等特性。
 
-参考[Web框架文档](https://goframe.org/pages/viewpage.action?pageId=1114405&src=contextnavpagetreemode)。
+参考[Web 框架文档](https://goframe.org/pages/viewpage.action?pageId=1114405&src=contextnavpagetreemode)。
 
 ### 其他
 
-GoFrame还提供了TCP/UDP、Websocket协议组件、可观测性，根据实际需求探索使用。
+GoFrame 还提供了 TCP/UDP、Websocket 协议组件、可观测性，根据实际需求探索使用。
