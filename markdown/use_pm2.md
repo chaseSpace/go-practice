@@ -1,5 +1,9 @@
 # 使用 pm2 管理服务
 
+## 安装
+
+参考[NPM安装pm2](https://developer.aliyun.com/article/906699)。
+
 ## 使用步骤
 
 使用 pm2 工具管理服务，[常用命令](https://blog.csdn.net/weixin_42658813/article/details/127283913)
