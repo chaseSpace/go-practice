@@ -1,6 +1,6 @@
-# 实施 Git 提交规范
+# 实施 Git 提交消息规范
 
-实施 Git 提交规范具有多方面的好处，特别是对于团队合作和项目管理。以下是一些关键的好处：
+实施 Git 提交消息规范具有多方面的好处，特别是对于团队合作和项目管理。以下是一些关键的好处：
 
 - 提高代码可维护性
 - 增强团队协作
@@ -61,14 +61,16 @@ chore(editor): 更新编辑器配置
 ### 2.1 软拦截
 
 指的是通过项目根目录下的`.git`目录中添加 git hooks 文件，来在客户端本地提交时做检查和**拦截**。
-客户端 hook 有 pre-commit、prepare-commit-msg、commit-msg、post-commit 等，服务端有 pre-receive、post-receive、update，具体参考[自定义 Git - Git 钩子][0]。
+客户端 hook 有 pre-commit、prepare-commit-msg、commit-msg、post-commit 等，每个 git hook 是一个 shell 脚本，由Git负责在对应时机调用执行，如果
+exit code 非 0，则终止下一步。具体参考本项目的[.githooks](../.githooks)。
 
-每个 git hook 是一个 shell 脚本，在对应时机执行，如果 exit
-code 非 0，则终止下一步。所以原则上在客户端使用 hook 也能达到规范目的。参考本项目的[.githooks](../.githooks)。
+> [!NOTE]
+> 由于客户端钩子脚本可以被开发者临时修改而绕过，所以叫做软拦截。
 
 ### 2.2 硬拦截
 
-在 git 服务端执行才是真正做到强制实施，因为开发者可以临时修改客户端 hook 以允许不规范的 Commit。主要使用`pre-receive`这个 hook 来拦截。
+在 git 服务端拦截才是真正做到强制实施，服务端有 pre-receive、post-receive、update，具体参考[自定义 Git - Git 钩子][0]。
+因为开发者可以临时修改客户端 hook 以允许不规范的 Commit message。主要使用`pre-receive`这个 hook 来拦截。
 
 ## 3. 插件推荐
 
