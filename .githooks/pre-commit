@@ -16,6 +16,8 @@ if [ "$STAGED_GO_FILES" = "" ]; then
     exit 0
 fi
 
+lint-md ./markdown/* -f
+
 echo "→check gofmt"
 CHECK_FMT=$(gofmt -s -w -l $STAGED_GO_FILES)
 if [ $? -ne 0 ]; then

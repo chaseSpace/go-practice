@@ -1,8 +1,11 @@
-## 部署
+# 使用 pm2 管理服务
 
-使用 pm2 工具管理进程，[常用命令](https://blog.csdn.net/weixin_42658813/article/details/127283913)
+## 使用步骤
+
+使用 pm2 工具管理服务，[常用命令](https://blog.csdn.net/weixin_42658813/article/details/127283913)
 
 查看进程状态：
+
 ```shell
 [root@VM-0-13-centos like]# pm2 ls
 ┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
@@ -14,21 +17,25 @@
 ```
 
 查看进程日志，以 admin 为例：
+
 - pm2 默认为进程创建 2 个日志文件：
-    - /root/.pm2/logs/admin-out.log   正常日志
-    - /root/.pm2/logs/admin-err.log   错误日志
+    - /root/.pm2/logs/admin-out.log 正常日志
+    - /root/.pm2/logs/admin-err.log 错误日志
+
 ```shell
 # --lines 20 查看最新20行，这会输出上述2个文件的最新20行，并且是实时打印
 pm2 logs admin --lines 20
 ```
 
 启动进程
+
 ```shell
 # -time 让log带上时间
 pm2 start admin --time
 ```
 
 更新服务，以 admin 为例：
+
 ```shell
 # 1. 备份现在的bin文件
 $ cd /service/like
@@ -41,6 +48,7 @@ $ chmod +x admin && pm2 reload admin
 ```
 
 其他命令：
+
 ```shell
 pm2 reload all # 热重启全部
 pm2 restart all # 重启全部
@@ -53,6 +61,7 @@ pm2 save # 冻结当前应用列表，以便在开机时快速恢复
 ```
 
 配置日志分割：
+
 ```shell
 $ pm2 install pm2-logrotate
 
@@ -70,5 +79,7 @@ pm2 set pm2-logrotate:max_size 30M  # 单文件最大30M
 pm2 set pm2-logrotate:retain 5 # 保留5个文件
 pm2 reload all # 重启生效
 ```
+
 其他：
+
 - 进程崩溃时会自动重启，但频繁多次重启失败时会停止尝试
