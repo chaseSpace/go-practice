@@ -1,4 +1,4 @@
-## Openssl使用
+## Openssl 使用
 
 
 ### 生成私钥和公钥
@@ -9,7 +9,7 @@ OpenSSL> openssl pkcs8 -topk8 -inform PEM -in rsa_private_key.pem -outform PEM -
 OpenSSL> rsa -in rsa_private_key.pem -pubout -out rsa_public_key.pem # 生成对应公钥
 ```
 
-生成两个文件 `rsa_private_key.pem`, `rsa_public_key.pem`，都是PKCS1格式（带头尾），如下：
+生成两个文件 `rsa_private_key.pem`, `rsa_public_key.pem`，都是 PKCS1 格式（带头尾），如下：
 ```shell
 -----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqx/yNundmEO646WHZ/BbxmUJt
@@ -19,7 +19,7 @@ HQ9i5hczwtLA6lYixc8D8MEZZQ+Ch7PI7lr2zy7hUcaDEpMIlStTJ7IZworHiER6
 -----END PUBLIC KEY-----
 ```
 
-去掉头尾就是PKCS8格式：
+去掉头尾就是 PKCS8 格式：
 ```shell
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqx/yNundmEO646WHZ/BbxmUJt
 2eLTq4DtrGfPRioEYGuCinlsdR7MtRYwY/lGe1qQpI75hi7RKlfpzuZ3FNmRe0tb

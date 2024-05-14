@@ -1,11 +1,11 @@
-## 安装clash linux版
+## 安装 clash linux 版
 
-目的，为了国内Centos主机能够畅通世界互联网。
+目的，为了国内 Centos 主机能够畅通世界互联网。
 
 准备：
-- 一个可使用clash连接的订阅链接
-- 一台国内Centos服务器
-- 暴露外网9090端口，之后可关闭
+- 一个可使用 clash 连接的订阅链接
+- 一台国内 Centos 服务器
+- 暴露外网 9090 端口，之后可关闭
 
 ```shell
 cd ~
@@ -60,4 +60,4 @@ vi /etc/profile.d/proxy.sh # 写入下面内容
 source /etc/profile
 ```
 
-然后服务器开放外网9090，访问：[razord控制面板](http://clash.razord.top)，输入服务器IP和刚才的密码，enjoy~
+然后服务器开放外网 9090，访问：[razord 控制面板](http://clash.razord.top)，输入服务器 IP 和刚才的密码，enjoy~

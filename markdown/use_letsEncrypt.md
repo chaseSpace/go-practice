@@ -1,6 +1,6 @@
-## Lets Encrypt免费证书
+## Lets Encrypt 免费证书
 
-本文档记录在Centos上使用certbot来完成证书的申请和自动续期。
+本文档记录在 Centos 上使用 certbot 来完成证书的申请和自动续期。
 
 
 ```shell
@@ -9,9 +9,9 @@
 # 2. 通过以下命令生成 DNS TXT 记录
 sudo certbot certonly --manual --preferred-challenges dns -d example.com -d www.example.com
 ```
-使用DNS txt验证域名所有权的优势是**支持颁发通配符证书**。
+使用 DNS txt 验证域名所有权的优势是**支持颁发通配符证书**。
 
-下面是一个实际的申请案例【域名：gamii.me】（Yes/No的输入直接参照即可）：
+下面是一个实际的申请案例【域名：gamii.me】（Yes/No 的输入直接参照即可）：
 ```shell
 [centos@ip-172-31-42-96 ~]$ sudo certbot certonly --manual --preferred-challenges dns -d gamii.me
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
@@ -77,7 +77,7 @@ IMPORTANT NOTES:
 - 证书全链文件（可导出证书以及公钥）：`/etc/letsencrypt/live/gamii.me/fullchain.pem`
 - 证书私钥：`/etc/letsencrypt/live/gamii.me/privkey.pem`
 
->fullchain.pem相当于是证书，私钥则是单独一个文件，一般不会合并到一个文件中。
+> fullchain.pem 相当于是证书，私钥则是单独一个文件，一般不会合并到一个文件中。
 
 下面是导出步骤：
 ```shell
@@ -132,8 +132,8 @@ Certificate:
 ```
 
 
-### 配置到Nginx
-注意其中 root的路径设置为你原本的路径。
+### 配置到 Nginx
+注意其中 root 的路径设置为你原本的路径。
 ```shell
    server {
         listen       80 default_server;
@@ -179,7 +179,7 @@ Certificate:
 
 ## 自动续期
 
-### 1. 先修改初次申请证书时生成的conf文件
+### 1. 先修改初次申请证书时生成的 conf 文件
 ```shell
 vi /etc/letsencrypt/renewal/gamii.me.conf
 
@@ -212,7 +212,7 @@ Congratulations, all renewals succeeded:
   /etc/letsencrypt/live/gamii.me/fullchain.pem (success)
 ```
 
-### 2. 设定cron定时任务
+### 2. 设定 cron 定时任务
 ```shell
 # 每周一0点执行（sleep一个5min内的时间）
 echo "0 0 * * 1 root python -c 'import random; import time; time.sleep(random.random() * 300)' && certbot renew  --force-renew" | sudo tee -a /var/spool/cron/root > /dev/null
@@ -221,7 +221,7 @@ echo "0 0 * * 1 root python -c 'import random; import time; time.sleep(random.ra
 0 0 * * 1 root python -c 'import random; import time; time.sleep(random.random() * 300)' && certbot renew  --force-renew
 ```
 
-[关于LetsEncrypt免费证书的频率限制](https://letsencrypt.org/zh-cn/docs/rate-limits/)
+[关于 LetsEncrypt 免费证书的频率限制](https://letsencrypt.org/zh-cn/docs/rate-limits/)
 
 #### 查看执行情况
 首先查看是否执行：`sudo cat /var/log/cron`

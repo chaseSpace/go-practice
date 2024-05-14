@@ -1,6 +1,6 @@
 ## 部署
 
-使用pm2工具管理进程，[常用命令](https://blog.csdn.net/weixin_42658813/article/details/127283913)
+使用 pm2 工具管理进程，[常用命令](https://blog.csdn.net/weixin_42658813/article/details/127283913)
 
 查看进程状态：
 ```shell
@@ -13,8 +13,8 @@
 └────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
 ```
 
-查看进程日志，以admin为例：
-- pm2默认为进程创建2个日志文件：
+查看进程日志，以 admin 为例：
+- pm2 默认为进程创建 2 个日志文件：
     - /root/.pm2/logs/admin-out.log   正常日志
     - /root/.pm2/logs/admin-err.log   错误日志
 ```shell
@@ -28,7 +28,7 @@ pm2 logs admin --lines 20
 pm2 start admin --time
 ```
 
-更新服务，以admin为例：
+更新服务，以 admin 为例：
 ```shell
 # 1. 备份现在的bin文件
 $ cd /service/like

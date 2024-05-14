@@ -1,6 +1,6 @@
-## 使用Iptables(未跑通)
+## 使用 Iptables(未跑通)
 
-[科普：关于SNAT与MASQUERADE的区别](https://blog.51cto.com/dengaosky/2129665)
+[科普：关于 SNAT 与 MASQUERADE 的区别](https://blog.51cto.com/dengaosky/2129665)
 
 ### 开启内核转发
 ```shell
@@ -34,7 +34,7 @@ service iptables save && service iptables restart
 iptables -t nat -D PREROUTING/POSTROUTING/INPUT/OUTPUT（其中之一） int（第几条）
 ```
 
-清空iptables：
+清空 iptables：
 ```shell
 # 清空全部
 iptables -F
@@ -49,7 +49,7 @@ iptables -t nat -F
 ```
 
 
-## 使用Firewalld（更简单，但不支持域名）
+## 使用 Firewalld（更简单，但不支持域名）
 ```shell
 firewall-cmd --zone=public --permanent --add-masquerade # 开启nat
 firewall-cmd --add-port=9050/tcp --permanent #　放开端口
@@ -94,7 +94,7 @@ firewall-cmd --zone=<zone_name> --remove-<rule_type>=<rule>
 firewall-cmd --zone=public --remove-port=80/tcp
 ```
 
-## 使用socat（使用简单且支持域名）
+## 使用 socat（使用简单且支持域名）
 **严重问题**：启动进程一段时间后，由于未知原因会挂掉，未查出原因！
 ```shell
 yum install -y socat
@@ -103,7 +103,7 @@ nohup socat TCP4-LISTEN:8000,reuseaddr,fork TCP4:testapi.aklivechat.com:8000>> s
 ```
 
 
-### 扩展：使用NC命令测试端口
+### 扩展：使用 NC 命令测试端口
 ```shell
 # 安装nc
 wget http://vault.centos.org/6.6/os/x86_64/Packages/nc-1.84-22.el6.x86_64.rpm
@@ -117,7 +117,7 @@ nc -l 8888
 nc [ip] 8888
 ```
 
-快速启动http服务器：
+快速启动 http 服务器：
 ```shell
 python2 -m SimpleHTTPServer 8888
 ```
