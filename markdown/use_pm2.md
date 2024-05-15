@@ -2,7 +2,7 @@
 
 ## 安装
 
-参考[NPM安装pm2](https://developer.aliyun.com/article/906699)。
+参考[NPM 安装 pm2](https://developer.aliyun.com/article/906699)。
 
 ## 使用步骤
 

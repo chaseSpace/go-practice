@@ -61,7 +61,7 @@ chore(editor): 更新编辑器配置
 ### 2.1 软拦截
 
 指的是通过项目根目录下的`.git`目录中添加 git hooks 文件，来在客户端本地提交时做检查和**拦截**。
-客户端 hook 有 pre-commit、prepare-commit-msg、commit-msg、post-commit 等，每个 git hook 是一个 shell 脚本，由Git负责在对应时机调用执行，如果
+客户端 hook 有 pre-commit、prepare-commit-msg、commit-msg、post-commit 等，每个 git hook 是一个 shell 脚本，由 Git 负责在对应时机调用执行，如果
 exit code 非 0，则终止下一步。具体参考本项目的[.githooks](../.githooks)。
 
 > [!NOTE]
