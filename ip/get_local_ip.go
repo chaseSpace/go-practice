@@ -2,7 +2,7 @@ package ip
 
 import "net"
 
-func GetLocalPrivateIPs(v4 bool, netCard string) (ips []net.IP, err error) {
+func getLocalPrivateIPs(v4 bool, netCard string) (ips []net.IP, err error) {
 	// 获取所有网络接口
 	interfaces, err := net.Interfaces()
 	if err != nil {

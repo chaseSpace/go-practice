@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetLocalIPs(t *testing.T) {
-	ips, err := GetLocalPrivateIPs(true, "")
+	ips, err := getLocalPrivateIPs(true, "")
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(1)
