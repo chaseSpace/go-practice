@@ -20,7 +20,7 @@ issues:
   exclude-files: # example,  / 会被纠正
     - ".*\\.my\\.go$"
     - lib/bad.go
-    - "vendor/*.go$"
+    - vendor/*
   exclude-generated-strict: true  # 排除生成的代码
   new-from-rev: HEAD # 只显示指定的 Git 提交版本之后创建的问题
   fix: false # 让linter自动修复问题（若linter支持）
