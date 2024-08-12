@@ -19,15 +19,26 @@ func TestIp2region(t *testing.T) {
 		return
 	}
 
-	var ip = "123.144.103.155"
-	var tStart = time.Now()
-
-	// 单次查询效率在微秒级别，searcher可以并发使用
-	region, err := searcher.SearchByStr(ip)
-	if err != nil {
-		fmt.Printf("failed to SearchIP(%s): %s\n", ip, err)
-		return
+	var ips = []string{
+		"123.144.103.155",
+		"123.144.51.35",
+		"1.66.5.142",
 	}
 
-	fmt.Printf("{region: %s, took: %d}\n", region, time.Since(tStart).Nanoseconds())
+	for _, ip := range ips {
+		var tStart = time.Now()
+
+		// 单次查询效率在微秒级别，searcher可以并发使用
+		region, err := searcher.SearchByStr(ip)
+		if err != nil {
+			fmt.Printf("failed to SearchIP(%s): %s\n", ip, err)
+			return
+		}
+		/*
+			region: 中国|0|重庆|重庆市|联通, took: 0ns
+			region: 中国|0|重庆|重庆市|联通, took: 0ns
+			region: 日本|0|0|0|0, took: 0ns
+		*/
+		fmt.Printf("region: %s, took: %dns\n", region, time.Since(tStart).Nanoseconds())
+	}
 }
