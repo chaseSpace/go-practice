@@ -1,0 +1,42 @@
+# https://docs.gitlab.cn/jh/ci/yaml/index.html
+default:
+  timeout: 2 minutes
+  tags: # 关联runner，否则不会运行流水线
+    - go
+
+variables:
+  GIT_STRATEGY: fetch   # https://docs.gitlab.cn/jh/ci/runners/configure_runners.html#git-strategy
+  GIT_DEPTH: "1"
+#  CI_DEBUG_TRACE: "true"
+
+# 定义要执行的阶段
+stages:
+  - build
+  - deploy
+
+# 定义通用脚本
+.common_script:
+  only_cond: &only_cond # job通用触发条件
+    #  when: manual
+    only:
+      refs:
+        - main
+      changes: # 触发job的变更文件
+        - '**/*.go'
+        - deploy/*
+
+build-job:
+  stage: build
+  <<: *only_cond
+  script:
+    - git log -1
+    - go version
+    - gf -V
+    - make build
+
+deploy-job:
+  stage: deploy
+  environment: test
+  <<: *only_cond
+  script:
+    - echo "deploy-job is started..."
