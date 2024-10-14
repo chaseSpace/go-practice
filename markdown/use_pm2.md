@@ -4,6 +4,32 @@
 
 参考[NPM 安装 pm2](https://developer.aliyun.com/article/906699)。
 
+```shell
+wget https://nodejs.org/dist/v12.18.3/node-v12.18.3-linux-x64.tar.xz
+tar xf node-v12.18.3-linux-x64.tar.xz -C /usr
+cd /usr
+mv node-v12.18.3-linux-x64 node
+ln -s /usr/node/bin/node /usr/local/bin/
+ln -s /usr/node/bin/npm /usr/local/bin/
+
+npm install pm2 -g
+ln -sf /usr/node/bin/pm2 /usr/local/bin/
+```
+
+In Mac:
+
+```shell
+wget https://nodejs.org/dist/v12.18.3/node-v12.18.3-linux-x64.tar.xz
+tar xf node-v12.18.3-linux-x64.tar.xz -C ~
+cd ~
+mv node-v12.18.3-linux-x64 nodejs
+ln -s nodejs/bin/node ~/bin/
+ln -s nodejs/bin/npm ~/bin/
+
+npm install pm2 -g
+ln -sf nodejs/pm2 ~/bin/
+```
+
 ## 使用步骤
 
 使用 pm2 工具管理服务，[常用命令](https://blog.csdn.net/weixin_42658813/article/details/127283913)
@@ -67,16 +93,16 @@ pm2 save # 冻结当前应用列表，以便在开机时快速恢复
 配置日志分割：
 
 ```shell
-$ pm2 install pm2-logrotate
+pm2 install pm2-logrotate
 
 # 支持下面配置
-$ pm2 set pm2-logrotate:max_size 10M
-$ pm2 set pm2-logrotate:retain 30
-$ pm2 set pm2-logrotate:compress false
-$ pm2 set pm2-logrotate:dateFormat YYYY-MM-DD_HH-mm-ss
-$ pm2 set pm2-logrotate:workerInterval 30
-$ pm2 set pm2-logrotate:rotateInterval 0 0 * * *
-$ pm2 set pm2-logrotate:rotateModule true
+pm2 set pm2-logrotate:max_size 30M
+pm2 set pm2-logrotate:retain 5
+pm2 set pm2-logrotate:compress false
+pm2 set pm2-logrotate:dateFormat YYYY-MM-DD_HH-mm-ss
+pm2 set pm2-logrotate:workerInterval 30 # 30s检查一次大小
+pm2 set pm2-logrotate:rotateInterval 0 0 * * * # 同时在0点执行检查
+pm2 set pm2-logrotate:rotateModule true
 
 # 修改配置
 pm2 set pm2-logrotate:max_size 30M  # 单文件最大30M
