@@ -18,6 +18,8 @@ go env -w GONOSUMDB="coding.xxx.cn"
 // - 例如
 git config --global url."http://lilei:123@coding.xxx.cn".insteadOf "http://coding.xxx.cn"
 
+// 删除配置
+#git config --global --unset url."http://lilei:123@coding.xxx.cn".insteadOf
 
 // 检查配置
 git config --global -l
