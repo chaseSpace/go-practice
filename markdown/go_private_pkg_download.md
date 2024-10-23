@@ -13,8 +13,8 @@ go env -w GONOPROXY="coding.xxx.cn"
 go env -w GONOSUMDB="coding.xxx.cn"
 
 
-// 在请求URL中嵌入认证信息
-git config --global url."http://${user}:${password}@coding.xxx.cn".insteadOf "http://coding.xxx.cn"
+// 在git请求URL中嵌入认证信息
+#git config --global url."http://${user}:${password}@coding.xxx.cn".insteadOf "http://coding.xxx.cn"
 // - 例如
 git config --global url."http://lilei:123@coding.xxx.cn".insteadOf "http://coding.xxx.cn"
 
@@ -24,5 +24,5 @@ git config --global -l
 
 
 // 执行拉取（也是更新命令）
-go get coding.xxx.cn:lilei/sdk
+go get coding.xxx.cn/lilei/something
 ```
