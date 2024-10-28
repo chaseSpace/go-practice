@@ -25,7 +25,6 @@ require (
 )
 
 require (
-	coding.nineton.cn/lilei/zhongtaisdk v0.0.2 // indirect
 	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/antchfx/xpath v1.2.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
