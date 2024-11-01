@@ -12,6 +12,7 @@ aim=$version.linux-amd64.tar.gz
 GOPATH='/usr/local/gopath'
 GO_INSTALL='/usr/local'
 BASHRC='/root/.bashrc'
+ZSHRC='/root/.zshrc'
 
 if [ `uname` == "Darwin" ]; then
   echo "This is macOS"
@@ -37,3 +38,12 @@ echo "export GO111module=on" >> $BASHRC  && \
 echo "export GOROOT=$GO_INSTALL/go" >> $BASHRC  && \
 source $BASHRC && \
 cd $now && go version
+
+
+if [ -f $ZSHRC ]; then
+  echo "export PATH=$PATH:/usr/local/go/bin:/usr/local/gopath/bin" >> $ZSHRC
+  echo "export GOPATH=/usr/local/gopath" >> $ZSHRC
+  echo "export GOPROXY=https://goproxy.cn" >> $ZSHRC
+  echo "export GO111module=on" >> $ZSHRC
+  echo "export GOROOT=/usr/local/go" >> $ZSHRC
+fi

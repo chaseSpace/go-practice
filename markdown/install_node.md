@@ -23,7 +23,7 @@ npm install -g cnpm
 
 ## NVM 安装
 
-https://juejin.cn/post/7000652162950758431
+https://juejin.cn/post/70brew install nvm00652162950758431
 
 ```shell
 # 不要随意安装较新版本，系统可能不支持！
