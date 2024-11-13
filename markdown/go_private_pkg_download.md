@@ -17,6 +17,15 @@ go env -w GONOSUMDB="coding.xxx.cn"
 #git config --global url."http://${user}:${password}@coding.xxx.cn".insteadOf "http://coding.xxx.cn"
 // - 例如
 git config --global url."http://lilei:123@coding.xxx.cn".insteadOf "http://coding.xxx.cn"
+// - 如果密码中包含被URL保留的字符，例如`!@#$%^&+-`等，参照下面步骤进行转义
+# 原始密码
+password='1234!@#$'
+# url转义（需要已安装python）
+password=$(echo -n $password | python -c "import sys, urllib.parse; print(urllib.parse.quote(sys.stdin.read()))")
+git config --global url."http://lilei:${password}@coding.xxx.cn".insteadOf "http://coding.xxx.cn"
+
+# 若环境不支持python命令，请使用以下网站进行在线转换，将**密码**进行转换后再粘贴到命令中
+# https://www.urlencoder.org/
 
 // 删除配置
 #git config --global --unset url."http://lilei:123@coding.xxx.cn".insteadOf
