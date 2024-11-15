@@ -25,12 +25,23 @@ npm install -g cnpm
 
 https://juejin.cn/post/7394823316584972325
 
+### Linux 安装
+
+```shell
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+# 或者
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+```
+
 根据项目要求按照指定版本：
 
 ```shell
 nvm install v16.20.0
 
 nvm install v18.20.0
+
+npm config set registry https://registry.npmmirror.com
+npm config get registry
 ```
 
 ## windows 安装 v18
