@@ -7,7 +7,7 @@
 
 version=go1.21.12
 
-aim=$version.linux-amd64.tar.gz
+target=$version.linux-amd64.tar.gz
 
 GOPATH='/usr/local/gopath'
 GO_INSTALL='/usr/local'
@@ -19,7 +19,7 @@ if [ `uname` == "Darwin" ]; then
   GOPATH=$HOME/gopath
   GO_INSTALL=$HOME
   BASHRC=$HOME/.bash_profile
-  aim=$version.darwin-amd64.tar.gz
+  target=$version.darwin-amd64.tar.gz
 fi
 
 
@@ -27,9 +27,9 @@ PATH=$(echo $PATH | sed 's/ /\\ /g')  # 将PATH中的空格转义，否则source
 
 # mac遇到 wget 无法建立SSL连接，请修改代理为直连。
 now=$(pwd) && cd $GO_INSTALL && \
-wget https://studygolang.com/dl/golang/$aim && \
-tar xzf $aim && \
-rm -rf $aim && \
+wget https://studygolang.com/dl/golang/$target && \
+tar xzf $target && \
+rm -rf $target && \
 mkdir -p $GOPATH && mkdir -p $GOPATH/bin && \
 echo "export PATH=$PATH:$GO_INSTALL/go/bin:$GOPATH/bin" >> $BASHRC && \
 echo "export GOPATH=$GOPATH" >> $BASHRC && \
@@ -41,9 +41,11 @@ cd $now && go version
 
 
 if [ -f $ZSHRC ]; then
-  echo "export PATH=$PATH:/usr/local/go/bin:/usr/local/gopath/bin" >> $ZSHRC
-  echo "export GOPATH=/usr/local/gopath" >> $ZSHRC
-  echo "export GOPROXY=https://goproxy.cn" >> $ZSHRC
-  echo "export GO111module=on" >> $ZSHRC
-  echo "export GOROOT=/usr/local/go" >> $ZSHRC
+  {
+    echo "export PATH=$PATH:/usr/local/go/bin:/usr/local/gopath/bin"
+    echo "export GOPATH=/usr/local/gopath"
+    echo "export GOPROXY=https://goproxy.cn"
+    echo "export GO111module=on"
+    echo "export GOROOT=/usr/local/go"
+    }   >> $ZSHRC
 fi
