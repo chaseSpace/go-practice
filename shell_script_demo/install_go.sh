@@ -30,22 +30,24 @@ now=$(pwd) && cd $GO_INSTALL && \
 wget https://studygolang.com/dl/golang/$target && \
 tar xzf $target && \
 rm -rf $target && \
-mkdir -p $GOPATH && mkdir -p $GOPATH/bin && \
-echo "export PATH=$PATH:$GO_INSTALL/go/bin:$GOPATH/bin" >> $BASHRC && \
-echo "export GOPATH=$GOPATH" >> $BASHRC && \
-echo "export GOPROXY=https://goproxy.cn" >> $BASHRC && \
-echo "export GO111module=on" >> $BASHRC  && \
-echo "export GOROOT=$GO_INSTALL/go" >> $BASHRC  && \
-source $BASHRC && \
+mkdir -p $GOPATH && mkdir -p $GOPATH/bin
 cd $now && go version
+
+{
+  echo "export PATH=$PATH:$GO_INSTALL/go/bin:$GOPATH/bin"
+  echo "export GOPATH=$GOPATH"
+  echo "export GOPROXY=https://goproxy.cn"
+  echo "export GO111module=on"
+  echo "export GOROOT=$GO_INSTALL/go"
+}   >> $BASHRC
 
 
 if [ -f $ZSHRC ]; then
   {
-    echo "export PATH=$PATH:/usr/local/go/bin:/usr/local/gopath/bin"
-    echo "export GOPATH=/usr/local/gopath"
+    echo "export PATH=$PATH:$GO_INSTALL/go/bin:$GOPATH/bin"
+    echo "export GOPATH=$GOPATH"
     echo "export GOPROXY=https://goproxy.cn"
     echo "export GO111module=on"
-    echo "export GOROOT=/usr/local/go"
-    }   >> $ZSHRC
+    echo "export GOROOT=$GO_INSTALL/go"
+  }   >> $ZSHRC
 fi

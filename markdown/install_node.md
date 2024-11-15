@@ -42,6 +42,12 @@ nvm install v18.20.0
 
 npm config set registry https://registry.npmmirror.com
 npm config get registry
+
+{
+  echo "export NVM_DIR="$HOME/.nvm""
+  echo "[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh""  # This loads nvm
+  echo "[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion""  # This loads nvm bash_completion
+} >> ~/.zshrc
 ```
 
 ## windows 安装 v18
