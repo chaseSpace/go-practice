@@ -30,6 +30,7 @@ sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting
 # 设置别名
 echo 'alias kk="kubectl"' >> ~/.zshrc
 echo 'alias m="minikube"' >> ~/.zshrc # 如果安装了minikube
+echo 'DISABLE_AUTO_UPDATE=true' >> ~/.zshrc
 
 # 生效
 source ~/.zshrc
