@@ -15,6 +15,17 @@ npm config set registry https://registry.npmmirror.com
 npm config set bin-links false # 避免共享文件夹导致安装失败
 ```
 
+Centos 7 安装 node v18（使用glibc兼容的版本）：
+
+```shell
+nvm unload # 卸载nvm
+
+# https://unofficial-builds.nodejs.org/download/release/v18.20.4/
+wget https://unofficial-builds.nodejs.org/download/release/v18.20.4/node-v18.20.4-linux-x64-glibc-217.tar.gz
+tar -xzf node-v18.20.4-linux-x64-glibc-217.tar.gz -C node-v18.20.4
+cp node-v18.20.4/bin/* /usr/local/bin/
+```
+
 其他：
 
 ```shell
