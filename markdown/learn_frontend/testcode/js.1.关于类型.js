@@ -126,6 +126,35 @@ function test_type_conversion_num2string() {
     assert.equal((123).toPrecision(4), "123.0") // 指定小数点前后的总位数
 }
 
+function test_symbol_boxing() {
+    // Symbol 函数无法使用 new 来调用，但我们仍可以利用装箱机制来得到一个 Symbol 对象
+    // 方式：我们可以利用一个函数的 call 方法来强迫产生装箱
+
+    var symbolObject = (function () {
+        return this;
+    }).call(Symbol("a"));
+
+    assert.equal(typeof symbolObject, 'object')
+    assert.equal(symbolObject.constructor, Symbol)
+    assert.ok(symbolObject instanceof Object)
+
+    // 获取任意实例的构造函数名
+    assert.equal(Object.getPrototypeOf(symbolObject).constructor.name, 'Symbol')
+    assert.equal(Object.getPrototypeOf(Number(1)).constructor.name, 'Number')
+    assert.equal(Object.getPrototypeOf(Boolean(true)).constructor.name, 'Boolean')
+    assert.equal(Object.getPrototypeOf(String("")).constructor.name, 'String')
+
+    // 每一类装箱对象都有一个原型名称（也可以叫类名），不可更改
+    // call方法会产生装箱行为，有性能开销！
+    assert.equal(Object.prototype.toString.call(symbolObject), '[object Symbol]')
+    assert.equal(Object.prototype.toString.call(Number(1)), "[object Number]")
+}
+
+function test_object_unboxing() {
+    // 拆箱
+    // 在 JavaScript 标准中，规定了 ToPrimitive 函数，它是对象类型到基本类型的转换（即，拆箱转换）
+}
+
 function main() {
     test_js_undefined_null()
     test_js_number()
@@ -133,6 +162,7 @@ function main() {
     test_js_fuzziness()
     test_type_conversion_string2num()
     test_type_conversion_num2string()
+    test_symbol_boxing()
 }
 
 main()
