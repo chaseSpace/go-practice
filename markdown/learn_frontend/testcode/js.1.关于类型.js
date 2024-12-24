@@ -153,6 +153,51 @@ function test_symbol_boxing() {
 function test_object_unboxing() {
     // 拆箱
     // 在 JavaScript 标准中，规定了 ToPrimitive 函数，它是对象类型到基本类型的转换（即，拆箱转换）
+    // -拆箱转换会尝试调用 valueOf 和 toString 来获得拆箱后的基本类型
+    // -如果 valueOf 和 toString 都不存在，或者没有返回基本类型，则会产生类型错误 TypeError
+    // -对象到 String 和 Number 的转换都遵循“先拆箱再转换”的规则
+
+    // 实验，定义对象o，拥有方法valueOf 和 toString
+    const o = {
+        valueOf: () => {
+            console.log("valueOf");
+            return {}
+        },
+        toString: () => {
+            console.log("toString");
+            return {}
+        }
+    };
+
+    // 在进行算数运算时，由于o不是number，所以会转换
+    // 因为是对象，所以是进行拆箱转换，先调用 valueOf，再调用 toString
+    try {
+        const _ = o * 2
+    } catch (e) {
+        console.log(e.toString()) // TypeError: Cannot convert object to primitive value
+    }
+
+    // valueOf
+    // toString
+    // TypeError: Cannot convert object to primitive value
+
+    // 若是将o转string，则先执行 toString，再执行 valueOf
+
+    // 在 ES6 之后，还允许对象通过显式指定 @toPrimitive Symbol 来覆盖原有的行为。
+    o[Symbol.toPrimitive] = () => {
+        // console.log("toPrimitive");
+        return "call-toPrimitive"
+    }
+    console.log(String(o)) // call-toPrimitive
+}
+
+// 两个类型特例
+function test_special_case() {
+    // (-- 注意 typeof 的结果都是小写)
+    // 1. null的type是object，但js的规范中 null 的类型行为是 Null
+    // 2. function的type是function，但js的规范中 function 的类型行为是 Object
+    console.assert(typeof null === 'object',)
+    console.assert(typeof function (){} === 'function')
 }
 
 function main() {
@@ -163,6 +208,8 @@ function main() {
     test_type_conversion_string2num()
     test_type_conversion_num2string()
     test_symbol_boxing()
+    test_object_unboxing()
+    test_special_case()
 }
 
 main()
