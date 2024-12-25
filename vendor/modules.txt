@@ -1,7 +1,5 @@
 # github.com/BurntSushi/toml v1.2.0
 ## explicit; go 1.16
-github.com/BurntSushi/toml
-github.com/BurntSushi/toml/internal
 # github.com/antchfx/htmlquery v1.3.0
 ## explicit; go 1.14
 github.com/antchfx/htmlquery
@@ -16,121 +14,37 @@ github.com/beorn7/perks/quantile
 github.com/cespare/xxhash/v2
 # github.com/clbanning/mxj/v2 v2.7.0
 ## explicit; go 1.15
-github.com/clbanning/mxj/v2
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
+github.com/davecgh/go-spew/spew
 # github.com/elazarl/goproxy v0.0.0-20231117061959-7cc037d33fb5
 ## explicit
 # github.com/fatih/color v1.15.0
 ## explicit; go 1.17
-github.com/fatih/color
 # github.com/fsnotify/fsnotify v1.7.0
 ## explicit; go 1.17
-github.com/fsnotify/fsnotify
-# github.com/go-logr/logr v1.2.3
+# github.com/go-logr/logr v1.2.4
 ## explicit; go 1.16
-github.com/go-logr/logr
-github.com/go-logr/logr/funcr
 # github.com/go-logr/stdr v1.2.2
 ## explicit; go 1.16
-github.com/go-logr/stdr
+# github.com/go-rod/rod v0.116.2
+## explicit; go 1.21
+github.com/go-rod/rod
+github.com/go-rod/rod/lib/assets
+github.com/go-rod/rod/lib/cdp
+github.com/go-rod/rod/lib/defaults
+github.com/go-rod/rod/lib/devices
+github.com/go-rod/rod/lib/input
+github.com/go-rod/rod/lib/js
+github.com/go-rod/rod/lib/launcher
+github.com/go-rod/rod/lib/launcher/flags
+github.com/go-rod/rod/lib/proto
+github.com/go-rod/rod/lib/utils
 # github.com/go-sql-driver/mysql v1.7.1
 ## explicit; go 1.13
 github.com/go-sql-driver/mysql
 # github.com/gogf/gf/v2 v2.7.0
 ## explicit; go 1.18
-github.com/gogf/gf/v2
-github.com/gogf/gf/v2/container/garray
-github.com/gogf/gf/v2/container/glist
-github.com/gogf/gf/v2/container/gmap
-github.com/gogf/gf/v2/container/gpool
-github.com/gogf/gf/v2/container/gqueue
-github.com/gogf/gf/v2/container/gset
-github.com/gogf/gf/v2/container/gtree
-github.com/gogf/gf/v2/container/gtype
-github.com/gogf/gf/v2/container/gvar
-github.com/gogf/gf/v2/crypto/gaes
-github.com/gogf/gf/v2/crypto/gmd5
-github.com/gogf/gf/v2/database/gdb
-github.com/gogf/gf/v2/database/gredis
-github.com/gogf/gf/v2/debug/gdebug
-github.com/gogf/gf/v2/encoding/gbase64
-github.com/gogf/gf/v2/encoding/gbinary
-github.com/gogf/gf/v2/encoding/gcharset
-github.com/gogf/gf/v2/encoding/gcompress
-github.com/gogf/gf/v2/encoding/ghash
-github.com/gogf/gf/v2/encoding/ghtml
-github.com/gogf/gf/v2/encoding/gini
-github.com/gogf/gf/v2/encoding/gjson
-github.com/gogf/gf/v2/encoding/gproperties
-github.com/gogf/gf/v2/encoding/gtoml
-github.com/gogf/gf/v2/encoding/gurl
-github.com/gogf/gf/v2/encoding/gxml
-github.com/gogf/gf/v2/encoding/gyaml
-github.com/gogf/gf/v2/errors/gcode
-github.com/gogf/gf/v2/errors/gerror
-github.com/gogf/gf/v2/frame/g
-github.com/gogf/gf/v2/frame/gins
-github.com/gogf/gf/v2/i18n/gi18n
-github.com/gogf/gf/v2/internal/command
-github.com/gogf/gf/v2/internal/consts
-github.com/gogf/gf/v2/internal/deepcopy
-github.com/gogf/gf/v2/internal/empty
-github.com/gogf/gf/v2/internal/errors
-github.com/gogf/gf/v2/internal/fileinfo
-github.com/gogf/gf/v2/internal/httputil
-github.com/gogf/gf/v2/internal/instance
-github.com/gogf/gf/v2/internal/intlog
-github.com/gogf/gf/v2/internal/json
-github.com/gogf/gf/v2/internal/reflection
-github.com/gogf/gf/v2/internal/rwmutex
-github.com/gogf/gf/v2/internal/tracing
-github.com/gogf/gf/v2/internal/utils
-github.com/gogf/gf/v2/net/gclient
-github.com/gogf/gf/v2/net/ghttp
-github.com/gogf/gf/v2/net/ghttp/internal/response
-github.com/gogf/gf/v2/net/ghttp/internal/swaggerui
-github.com/gogf/gf/v2/net/gipv4
-github.com/gogf/gf/v2/net/gipv6
-github.com/gogf/gf/v2/net/goai
-github.com/gogf/gf/v2/net/gsel
-github.com/gogf/gf/v2/net/gsvc
-github.com/gogf/gf/v2/net/gtcp
-github.com/gogf/gf/v2/net/gtrace
-github.com/gogf/gf/v2/net/gtrace/internal/provider
-github.com/gogf/gf/v2/net/gudp
-github.com/gogf/gf/v2/os/gcache
-github.com/gogf/gf/v2/os/gcfg
-github.com/gogf/gf/v2/os/gcmd
-github.com/gogf/gf/v2/os/gctx
-github.com/gogf/gf/v2/os/genv
-github.com/gogf/gf/v2/os/gfile
-github.com/gogf/gf/v2/os/gfpool
-github.com/gogf/gf/v2/os/gfsnotify
-github.com/gogf/gf/v2/os/glog
-github.com/gogf/gf/v2/os/gmetric
-github.com/gogf/gf/v2/os/gmlock
-github.com/gogf/gf/v2/os/gproc
-github.com/gogf/gf/v2/os/gres
-github.com/gogf/gf/v2/os/grpool
-github.com/gogf/gf/v2/os/gsession
-github.com/gogf/gf/v2/os/gspath
-github.com/gogf/gf/v2/os/gstructs
-github.com/gogf/gf/v2/os/gtime
-github.com/gogf/gf/v2/os/gtimer
-github.com/gogf/gf/v2/os/gview
-github.com/gogf/gf/v2/text/gregex
-github.com/gogf/gf/v2/text/gstr
-github.com/gogf/gf/v2/util/gconv
-github.com/gogf/gf/v2/util/gmeta
-github.com/gogf/gf/v2/util/gmode
-github.com/gogf/gf/v2/util/gpage
-github.com/gogf/gf/v2/util/grand
-github.com/gogf/gf/v2/util/gtag
-github.com/gogf/gf/v2/util/guid
-github.com/gogf/gf/v2/util/gutil
-github.com/gogf/gf/v2/util/gvalid
-github.com/gogf/gf/v2/util/gvalid/internal/builtin
 # github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 ## explicit
 github.com/golang/groupcache/lru
@@ -138,15 +52,11 @@ github.com/golang/groupcache/lru
 ## explicit; go 1.9
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/ptypes/timestamp
-# github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1
-## explicit
+# github.com/gopherjs/gopherjs v1.17.2
+## explicit; go 1.17
 github.com/gopherjs/gopherjs/js
 # github.com/gorilla/websocket v1.5.0
 ## explicit; go 1.12
-github.com/gorilla/websocket
-# github.com/grokify/html-strip-tags-go v0.0.1
-## explicit; go 1.13
-github.com/grokify/html-strip-tags-go
 # github.com/jinzhu/inflection v1.0.0
 ## explicit
 github.com/jinzhu/inflection
@@ -159,12 +69,14 @@ github.com/josharian/intern
 # github.com/jtolds/gls v4.20.0+incompatible
 ## explicit
 github.com/jtolds/gls
+# github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20241220152942-06eb5c6e8230
+## explicit; go 1.17
+github.com/lionsoul2014/ip2region/binding/golang/xdb
 # github.com/lyuangg/mr v1.0.0
 ## explicit; go 1.20
 github.com/lyuangg/mr
 # github.com/magiconair/properties v1.8.6
 ## explicit; go 1.13
-github.com/magiconair/properties
 # github.com/mailru/easyjson v0.7.7
 ## explicit; go 1.12
 github.com/mailru/easyjson
@@ -173,22 +85,22 @@ github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
 # github.com/mattn/go-colorable v0.1.13
 ## explicit; go 1.15
-github.com/mattn/go-colorable
-# github.com/mattn/go-isatty v0.0.17
+# github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
-github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.9
 ## explicit; go 1.9
-github.com/mattn/go-runewidth
 # github.com/matttproud/golang_protobuf_extensions v1.0.4
 ## explicit; go 1.9
 github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/moul/http2curl v1.0.0
 ## explicit
 github.com/moul/http2curl
-# github.com/olekukonko/tablewriter v0.0.5
-## explicit; go 1.12
-github.com/olekukonko/tablewriter
+# github.com/natefinch/lumberjack v2.0.0+incompatible
+## explicit
+# github.com/panjf2000/ants/v2 v2.10.0
+## explicit; go 1.13
+github.com/panjf2000/ants/v2
+github.com/panjf2000/ants/v2/internal/sync
 # github.com/parnurzeal/gorequest v0.3.0
 ## explicit
 github.com/parnurzeal/gorequest
@@ -197,6 +109,7 @@ github.com/parnurzeal/gorequest
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 ## explicit
+github.com/pmezard/go-difflib/difflib
 # github.com/prometheus/client_golang v1.15.1
 ## explicit; go 1.17
 github.com/prometheus/client_golang/prometheus
@@ -215,8 +128,6 @@ github.com/prometheus/common/model
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
-# github.com/rogpeppe/go-internal v1.12.0
-## explicit; go 1.20
 # github.com/samber/lo v1.38.1
 ## explicit; go 1.18
 github.com/samber/lo
@@ -224,80 +135,74 @@ github.com/samber/lo
 ## explicit; go 1.12
 github.com/smartwalle/crypto4go
 github.com/smartwalle/crypto4go/pbkdf2
+# github.com/smarty/assertions v1.15.0
+## explicit; go 1.18
+github.com/smarty/assertions
+github.com/smarty/assertions/internal/go-diff/diffmatchpatch
+github.com/smarty/assertions/internal/go-render/render
+github.com/smarty/assertions/internal/oglematchers
 # github.com/smartystreets/assertions v1.2.0
 ## explicit; go 1.13
-github.com/smartystreets/assertions
-github.com/smartystreets/assertions/internal/go-diff/diffmatchpatch
-github.com/smartystreets/assertions/internal/go-render/render
-github.com/smartystreets/assertions/internal/oglematchers
-# github.com/smartystreets/goconvey v1.7.2
-## explicit; go 1.16
+# github.com/smartystreets/goconvey v1.8.1
+## explicit; go 1.18
 github.com/smartystreets/goconvey/convey
 github.com/smartystreets/goconvey/convey/gotest
 github.com/smartystreets/goconvey/convey/reporting
+# github.com/stretchr/testify v1.10.0
+## explicit; go 1.17
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/assert/yaml
 # github.com/tencentyun/tls-sig-api-v2-golang v1.3.0
 ## explicit; go 1.16
 github.com/tencentyun/tls-sig-api-v2-golang/tencentyun
+# github.com/ysmood/fetchup v0.2.3
+## explicit; go 1.20
+github.com/ysmood/fetchup
+# github.com/ysmood/goob v0.4.0
+## explicit; go 1.15
+github.com/ysmood/goob
+# github.com/ysmood/got v0.40.0
+## explicit; go 1.21
+github.com/ysmood/got/lib/lcs
+# github.com/ysmood/gson v0.7.3
+## explicit; go 1.15
+github.com/ysmood/gson
+# github.com/ysmood/leakless v0.9.0
+## explicit; go 1.15
+github.com/ysmood/leakless
+github.com/ysmood/leakless/pkg/shared
+github.com/ysmood/leakless/pkg/utils
 # go.opentelemetry.io/otel v1.14.0
 ## explicit; go 1.18
-go.opentelemetry.io/otel
-go.opentelemetry.io/otel/attribute
-go.opentelemetry.io/otel/baggage
-go.opentelemetry.io/otel/codes
-go.opentelemetry.io/otel/internal
-go.opentelemetry.io/otel/internal/attribute
-go.opentelemetry.io/otel/internal/baggage
-go.opentelemetry.io/otel/internal/global
-go.opentelemetry.io/otel/propagation
-go.opentelemetry.io/otel/semconv/v1.17.0
-go.opentelemetry.io/otel/semconv/v1.18.0
 # go.opentelemetry.io/otel/sdk v1.14.0
 ## explicit; go 1.18
-go.opentelemetry.io/otel/sdk/instrumentation
-go.opentelemetry.io/otel/sdk/internal
-go.opentelemetry.io/otel/sdk/internal/env
-go.opentelemetry.io/otel/sdk/resource
-go.opentelemetry.io/otel/sdk/trace
 # go.opentelemetry.io/otel/trace v1.14.0
 ## explicit; go 1.18
-go.opentelemetry.io/otel/trace
-# go.uber.org/multierr v1.10.0
+# go.uber.org/multierr v1.11.0
 ## explicit; go 1.19
-go.uber.org/multierr
 # go.uber.org/zap v1.27.0
 ## explicit; go 1.19
-go.uber.org/zap
-go.uber.org/zap/buffer
-go.uber.org/zap/internal
-go.uber.org/zap/internal/bufferpool
-go.uber.org/zap/internal/color
-go.uber.org/zap/internal/exit
-go.uber.org/zap/internal/pool
-go.uber.org/zap/internal/stacktrace
-go.uber.org/zap/zapcore
 # golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 # golang.org/x/net v0.17.0
 ## explicit; go 1.17
-golang.org/x/net/context
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
-golang.org/x/net/internal/socks
-golang.org/x/net/proxy
 golang.org/x/net/publicsuffix
+# golang.org/x/sync v0.3.0
+## explicit; go 1.17
+golang.org/x/sync/errgroup
 # golang.org/x/sys v0.13.0
 ## explicit; go 1.17
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-golang.org/x/sys/windows/registry
 # golang.org/x/text v0.13.0
 ## explicit; go 1.17
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
-golang.org/x/text/encoding/ianaindex
 golang.org/x/text/encoding/internal
 golang.org/x/text/encoding/internal/identifier
 golang.org/x/text/encoding/japanese
