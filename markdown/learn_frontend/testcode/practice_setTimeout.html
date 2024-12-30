@@ -1,0 +1,29 @@
+<div id="trafficLight" style="width: 100px; height: 100px; border-radius: 50%;"></div>
+<p id="app"></p>
+
+<script>
+
+let light = document.getElementById('trafficLight');
+
+
+lastTs = Date.now();
+
+function changeColor(color) {
+    document.getElementById('app').innerText = color + " " + (Date.now() - lastTs)/1000;
+    light.style.backgroundColor = color;
+    lastTs = Date.now();
+}
+
+function trafficLight() {
+    changeColor('green');  // 绿色
+    setTimeout(() => {
+        changeColor('yellow');  // 黄色
+        setTimeout(() => {
+            changeColor('red');  // 红色
+            setTimeout(trafficLight, 2000);  // 2秒后再次调用trafficLight
+        }, 1000);
+    }, 3000);
+}
+
+trafficLight();  // 初始化红绿灯
+</script>
