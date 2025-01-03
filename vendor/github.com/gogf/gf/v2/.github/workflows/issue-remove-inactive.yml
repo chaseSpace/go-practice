@@ -1,0 +1,29 @@
+# 规则描述：在 issue 没有活跃且尚未被关闭期间，若 issue 作者更新或评论该 ISSUE，则移除其 inactive 标签
+name: Issue Remove Inactive
+
+on:
+  issues:
+    types: [edited]
+  issue_comment:
+    types: [created, edited]
+
+env: # 设置环境变量
+  TZ: Asia/Shanghai #时区（设置时区可使页面中的`最近更新时间`使用时区时间）
+
+permissions:
+  contents: read
+
+jobs:
+  issue-remove-inactive:
+    permissions:
+      issues: write  # for actions-cool/issues-helper to update issues
+     # pull-requests: write # for actions-cool/issues-helper to update PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: remove inactive
+        if: github.event.issue.state == 'open'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'remove-labels'
+          issue-number: ${{ github.event.issue.number }}
+          labels: 'inactive'
