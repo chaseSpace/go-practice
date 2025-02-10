@@ -3,10 +3,12 @@ function test_promise() {
         console.log("a"); // 同步执行
         resolve() // 异步
     });
-    r.then(() => console.log("c")); // promise.then是异步执行
+    r.then(() => console.log("c")); // promise.then是(resolve, reject)的回调函数，所以是最后执行
     console.log("b") // 先于 c 输出
 }
 
+// setTimeout、setInterval是浏览器提供的宏任务函数，优先级低于Promise产生的微任务
+// 即使Promise.then延时1s添加异步任务，也是优先于 setTimeout
 function test_setTimeout_priority_lower_promise() {
     setTimeout(() => {
         console.log("setTimeout")
@@ -18,8 +20,6 @@ function test_setTimeout_priority_lower_promise() {
         while (Date.now() - begin < 1000) ; // sleep 1s
         console.log("Promise")
     })
-    // setTimeout 是宿主（浏览器/Nodejs）产生的宏任务，优先级低于JS引擎 API Promise 产生的微任务
-    // 所以即使Promise.then延时1s添加异步任务，也是优先于 setTimeout
 }
 
 function test_wrap_sleep() {
