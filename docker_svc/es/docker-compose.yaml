@@ -1,0 +1,48 @@
+# 使用说明
+# 1. 根据需要调整下面提供标记 @@ 的位置！
+# 2. 每个服务的配置文件需要从临时启动的容器内复制出来！
+#version: "3" # 新版已废弃
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+
+services:
+  es:
+    image: elasticsearch:8.15.3
+    container_name: es
+    command:
+    environment:
+      TZ: "Asia/Shanghai" # @@
+      discovery.type: "single-node"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m #@@
+    volumes:
+      # 宿主目录：容器目录
+      - ~/docker/es/data:/usr/share/elasticsearch/data #@@
+      - ~/docker/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml #@@，提取配置时注释此行
+    hostname: elasticsearch
+    restart: always
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  kibana:
+    image: kibana:8.15.3
+    container_name: kibana
+    environment:
+      TZ: "Asia/Shanghai"
+      elasticsearch.hosts: http://es:9200
+      elasticsearch.username: "" # 首次安装的es是无账号密码的，留空
+      elasticsearch.password: ""
+      I18N_LOCALE: "zh-CN"
+    volumes:
+      # 宿主目录：容器目录
+      - ~/docker/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml #@@，提取配置时注释此行（以及volumes）
+    hostname: kibana
+    depends_on:
+      - es
+    restart: always
+    ports:
+      - "5601:5601"
