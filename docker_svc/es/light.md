@@ -89,3 +89,5 @@ kibana的访问端口是`5601`，注意在虚拟机或防火墙中放行。浏�
 > 若kibana无法链接es（一般是kibana.yaml中配置的密码错误），则这里会显示“Kibana服务器尚未就绪”。
 
 在输入框内添加用户名`elastic`和密码（刚刚重置时由es生成的一串密文，复制即可）。
+
+更多关于ES和Kibana使用，参考[Kibana使用](usage.md)。
