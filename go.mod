@@ -1,8 +1,6 @@
 module go-practice
 
-go 1.23
-
-toolchain go1.23.0
+go 1.22
 
 require (
 	github.com/antchfx/htmlquery v1.3.0
@@ -19,7 +17,7 @@ require (
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/stretchr/testify v1.10.0
 	github.com/tencentyun/tls-sig-api-v2-golang v1.3.0
-	golang.org/x/sync v0.10.0
+	golang.org/x/sync v0.3.0
 	google.golang.org/protobuf v1.30.0
 	gorm.io/driver/mysql v1.3.0
 	gorm.io/gorm v1.22.5
@@ -29,7 +27,7 @@ require (
 	github.com/antchfx/xpath v1.2.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/chaseSpace/bear v0.0.1-alpha1 // indirect
+	github.com/chaseSpace/bear v0.0.1-alpha5 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/elazarl/goproxy v0.0.0-20231117061959-7cc037d33fb5 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
@@ -54,7 +52,7 @@ require (
 	github.com/ysmood/got v0.40.0 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
-	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.13.0 // indirect

@@ -3,7 +3,6 @@ package main_test
 import (
 	"fmt"
 	"github.com/chaseSpace/bear"
-	"github.com/lyuangg/mr"
 	"testing"
 )
 
@@ -14,38 +13,15 @@ type Person struct {
 }
 
 func TestMapReduce(t *testing.T) {
-	bear.NewSlice(1)
-	// Reduce
-	numbers := []int{1, 2, 3, 4, 5}
-	sum := mr.Reduce(numbers, func(a, b int) int {
-		return a + b
-	}, 0)
-	fmt.Println("Sum:", sum)
+	var s1 = bear.NewSlice("1", "2", "2", "3")
+	s1.Unique().Reverse().Map(func(i string) string { return i + "x" })
+	fmt.Println(s1.Slice()) // 3x 2x 1x
 
-	// Contains
-	names := []string{"Alice", "Bob", "Charlie"}
-	contains := mr.Contains(names, "Bob", func(a string) string { return a })
-	fmt.Println("Contains Bob:", contains)
+	var s2 = bear.NewOrderedSlice(1, 2, 2, 3)
+	var joined = s2.Unique().Sort(true).Join(".")
+	fmt.Println(joined) // 3.2.1
 
-	// Map
-	squares := mr.Map(numbers, func(n int) int {
-		return n * n
-	})
-	fmt.Println("Squares:", squares)
-
-	// ToMap
-	persons := []Person{
-		{ID: 1, Name: "Alice"},
-		{ID: 2, Name: "Bob"},
-	}
-	personsMap := mr.ToMap(persons, func(p Person) int {
-		return p.ID
-	})
-	fmt.Println("Persons Map:", personsMap)
-
-	// Filter
-	adults := mr.Filter(persons, func(p Person) bool {
-		return p.Age >= 18
-	})
-	fmt.Println("Adults:", adults)
+	var s3 = bear.NewComputableSlice(2.0, 3.0, 4.2)
+	var sum = s3.Append(5.0).PopLeft().Append(6.0).Avg()
+	fmt.Println("Sum:", sum) // 4.55
 }
