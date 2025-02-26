@@ -2,6 +2,8 @@
 
 ## 更新源
 
+仅国内机器需要。
+
 ```shell
 cd /etc/yum.repos.d/
 wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo

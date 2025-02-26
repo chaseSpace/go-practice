@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"fmt"
+	"github.com/chaseSpace/bear"
 	"github.com/lyuangg/mr"
 	"testing"
 )
@@ -13,6 +14,7 @@ type Person struct {
 }
 
 func TestMapReduce(t *testing.T) {
+	bear.NewSlice(1)
 	// Reduce
 	numbers := []int{1, 2, 3, 4, 5}
 	sum := mr.Reduce(numbers, func(a, b int) int {

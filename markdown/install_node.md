@@ -1,5 +1,7 @@
 # Install Node.js
 
+安装node v16：
+
 ```shell
 # centos 7 不要安装 v18+, 肯定失败！
 yum install -y gcc openssl-devel gcc-c++
@@ -22,14 +24,14 @@ nvm unload # 卸载nvm
 
 # https://unofficial-builds.nodejs.org/download/release/v18.20.4/
 wget https://unofficial-builds.nodejs.org/download/release/v18.20.4/node-v18.20.4-linux-x64-glibc-217.tar.gz
-tar -xzf node-v18.20.4-linux-x64-glibc-217.tar.gz -C node-v18.20.4
-cp node-v18.20.4/bin/* /usr/local/bin/
+mkdir -p node-v18.20.4 && tar -xzf node-v18.20.4-linux-x64-glibc-217.tar.gz -C node-v18.20.4 --strip-components=1
+ln -sf ~/node-v18.20.4/bin/* /usr/local/bin/  # -force 注意源不要使用相对路径，npm安装bin包后再次执行此命令
 ```
 
 其他：
 
 ```shell
-npm install -g cnpm
+npm install -g cnpm pnpm
 ```
 
 ## NVM 安装

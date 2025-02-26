@@ -13,6 +13,7 @@ ln -s /usr/node/bin/node /usr/local/bin/
 ln -s /usr/node/bin/npm /usr/local/bin/
 
 npm install pm2 -g
+# 源是 $NODE_INSTALL/bin/pm2，请确认node安装目录
 ln -sf /usr/node/bin/pm2 /usr/local/bin/
 ```
 

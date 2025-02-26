@@ -31,7 +31,7 @@ wget https://studygolang.com/dl/golang/$target && \
 tar xzf $target && \
 rm -rf $target && \
 mkdir -p $GOPATH && mkdir -p $GOPATH/bin
-cd $now && go version
+
 
 {
   echo "export PATH=$PATH:$GO_INSTALL/go/bin:$GOPATH/bin"
@@ -40,6 +40,8 @@ cd $now && go version
   echo "export GO111module=on"
   echo "export GOROOT=$GO_INSTALL/go"
 }   >> $BASHRC
+# shellcheck disable=SC1090
+source $BASHRC
 
 
 if [ -f $ZSHRC ]; then
@@ -50,4 +52,8 @@ if [ -f $ZSHRC ]; then
     echo "export GO111module=on"
     echo "export GOROOT=$GO_INSTALL/go"
   }   >> $ZSHRC
+  # shellcheck disable=SC1090
+  source $ZSHRC
 fi
+
+cd $now && go version
