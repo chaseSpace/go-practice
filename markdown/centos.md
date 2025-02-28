@@ -41,3 +41,22 @@ yum erase docker \
 ```
 
 来自 https://blog.csdn.net/wade3015/article/details/94494929
+
+## 安装Nginx
+
+不建议也不需要docker安装nginx。
+
+```shell
+sudo yum install -y epel-release
+sudo yum install -y nginx
+
+#安装成功后，默认的网站目录为： /usr/share/nginx/html
+#默认的配置文件为：/etc/nginx/nginx.conf
+#自定义配置文件目录为: /etc/nginx/conf.d/
+
+systemctl start nginx && systemctl enable nginx
+```
+
+### 使用acme.sh申请免费证书
+
+https://github.com/acmesh-official/acme.sh/wiki/说明

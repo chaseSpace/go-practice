@@ -20,10 +20,10 @@ Centos 7 安装 node v18（使用glibc兼容的版本）：
 ```shell
 nvm unload # 卸载nvm
 
-# https://unofficial-builds.nodejs.org/download/release/v18.20.4/
-wget https://unofficial-builds.nodejs.org/download/release/v18.20.4/node-v18.20.4-linux-x64-glibc-217.tar.gz
-tar -xzf node-v18.20.4-linux-x64-glibc-217.tar.gz -C node-v18.20.4
-cp node-v18.20.4/bin/* /usr/local/bin/
+# https://unofficial-builds.nodejs.org/download/release/v18.20.7/    18.20.7是V18最后一个版本
+wget https://unofficial-builds.nodejs.org/download/release/v18.20.7/node-v18.20.7-linux-x64-glibc-217.tar.gz
+tar -xzf node-v18.20.7-linux-x64-glibc-217.tar.gz -C node-v18.20.7
+cp node-v18.20.7/bin/* /usr/local/bin/
 ```
 
 其他：
