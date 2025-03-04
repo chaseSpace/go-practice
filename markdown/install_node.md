@@ -69,3 +69,14 @@ https://nodejs.org/en/download/package-manager
 
 FNM是win10的包管理器，默认安装：C:\Users{your user name}\AppData\Roaming\fnm，安装完node后需要设置env。
 Win + R 输入：`%APPDATA%/fnm/node-versions`，找到node bin目录，然后把bin目录添加到path中。
+
+## windows 使用nvm
+
+https://github.com/coreybutler/nvm-windows/releases
+
+## windows 配置yarn代理
+
+```shell
+yarn config delete proxy
+yarn config set https-proxy http://127.0.0.1:7890
+```
