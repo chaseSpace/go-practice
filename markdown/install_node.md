@@ -1,20 +1,5 @@
 # Install Node.js
 
-```shell
-# centos 7 不要安装 v18+, 肯定失败！
-yum install -y gcc openssl-devel gcc-c++
-wget https://nodejs.org/download/release/v16.20.0/node-v16.20.0-linux-x64.tar.xz
-
-tar xf node-v16.20.0-linux-x64.tar.xz -C /usr/local/
-mv /usr/local/node-v16.20.0-linux-x64 /usr/local/node
-ln -s /usr/local/node/bin/node /usr/local/bin/node
-ln -s /usr/local/node/bin/npm /usr/local/bin/npm
-
-
-npm config set registry https://registry.npmmirror.com
-npm config set bin-links false # 避免共享文件夹导致安装失败
-```
-
 Centos 7 安装 node v18（使用glibc兼容的版本）：
 
 ```shell
@@ -25,7 +10,7 @@ nvm unload # 卸载nvm
 VER=v20.9.0
 wget https://unofficial-builds.nodejs.org/download/release/$VER/node-$VER-linux-x64-glibc-217.tar.gz
 mkdir -p node-$VER && tar -xzf node-$VER-linux-x64-glibc-217.tar.gz -C node-$VER --strip-components 1
-ln -f node-$VER/bin/* /usr/local/bin/
+ln -sf node-$VER/bin/* /usr/local/bin/
 ```
 
 其他：
