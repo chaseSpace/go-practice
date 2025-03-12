@@ -29,7 +29,7 @@ git clone https://gitee.com/jsharkc/zsh-syntax-highlighting.git $ZSH_CUSTOM/plug
 sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' ~/.zshrc
 # 设置别名
 echo 'alias kk="kubectl"' >> ~/.zshrc
-echo 'alias m="minikube"' >> ~/.zshrc # 如果安装了minikube
+#echo 'alias m="minikube"' >> ~/.zshrc # 如果安装了minikube
 echo 'DISABLE_AUTO_UPDATE=true' >> ~/.zshrc
 
 # 生效
