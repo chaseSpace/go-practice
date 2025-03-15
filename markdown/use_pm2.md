@@ -5,30 +5,10 @@
 参考[NPM 安装 pm2](https://developer.aliyun.com/article/906699)。
 
 ```shell
-wget https://nodejs.org/dist/v12.18.3/node-v12.18.3-linux-x64.tar.xz
-tar xf node-v12.18.3-linux-x64.tar.xz -C /usr
-cd /usr
-mv node-v12.18.3-linux-x64 node
-ln -s /usr/node/bin/node /usr/local/bin/
-ln -s /usr/node/bin/npm /usr/local/bin/
-
+# 安装node略
 npm install pm2 -g
 # 源是 $NODE_INSTALL/bin/pm2，请确认node安装目录
 ln -sf /usr/node/bin/pm2 /usr/local/bin/
-```
-
-In Mac:
-
-```shell
-wget https://nodejs.org/dist/v12.18.3/node-v12.18.3-linux-x64.tar.xz
-tar xf node-v12.18.3-linux-x64.tar.xz -C ~
-cd ~
-mv node-v12.18.3-linux-x64 nodejs
-ln -s nodejs/bin/node ~/bin/
-ln -s nodejs/bin/npm ~/bin/
-
-npm install pm2 -g
-ln -sf nodejs/pm2 ~/bin/
 ```
 
 ## 使用步骤
@@ -78,7 +58,11 @@ $ cp admin admin-old
 $ chmod +x admin && pm2 reload admin 
 ```
 
-其他命令：
+### 使用配置文件编排服务
+
+参考 [pm2.config.js]()[pm2.config.js](assets/pm2.config.js)。
+
+### 其他命令
 
 ```shell
 pm2 reload all # 热重启全部
