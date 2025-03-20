@@ -7,10 +7,10 @@ nvm unload # 卸载nvm
 
 # https://unofficial-builds.nodejs.org/download/release/$VER/    18.20.7是V18最后一个版本
 
-VER=v20.9.0
+VER=v20.17.0
 wget https://unofficial-builds.nodejs.org/download/release/$VER/node-$VER-linux-x64-glibc-217.tar.gz
 mkdir -p node-$VER && tar -xzf node-$VER-linux-x64-glibc-217.tar.gz -C node-$VER --strip-components 1
-ln -sf node-$VER/bin/* /usr/local/bin/
+ln -sf ~/node-$VER/bin/* /usr/local/bin/
 ```
 
 其他：
