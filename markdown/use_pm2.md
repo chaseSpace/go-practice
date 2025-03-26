@@ -7,6 +7,7 @@
 ```shell
 # 安装node略
 npm install pm2 -g
+# 源是 $NODE_INSTALL/bin/pm2，请确认node安装目录
 ln -sf /usr/node/bin/pm2 /usr/local/bin/
 ```
 
