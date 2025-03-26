@@ -5,8 +5,11 @@
 ```shell
 yum install -y git zsh wget
 
+# hk主机
+wget -qO- https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh | bash
+
 wget https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh -O install_onymzsh.sh
-vi install.sh
+vi install_onymzsh.sh
 # 修改下面两行
 # REPO=${REPO:-ohmyzsh/ohmyzsh}
 # REMOTE=${REMOTE:-https://github.com/${REPO}.git}
@@ -14,7 +17,7 @@ vi install.sh
 # REPO=${REPO:-mirrors/oh-my-zsh}
 # REMOTE=${REMOTE:-https://gitee.com/${REPO}.git}
 # 保存 并 执行
-chmod +x install.sh && ./install.sh
+chmod +x install_onymzsh.sh && ./install_onymzsh.sh
 
 # 修改主题
 ls ~/.oh-my-zsh/themes

@@ -88,9 +88,6 @@ pm2 set pm2-logrotate:workerInterval 30 # 30s检查一次大小
 pm2 set pm2-logrotate:rotateInterval 0 0 * * * # 同时在0点执行检查
 pm2 set pm2-logrotate:rotateModule true
 
-# 修改配置
-pm2 set pm2-logrotate:max_size 30M  # 单文件最大30M
-pm2 set pm2-logrotate:retain 5 # 保留5个文件
 pm2 reload all # 重启生效
 ```
 

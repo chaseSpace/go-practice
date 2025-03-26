@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/os/grpool"
 	"reflect"
 	"testing"
 )
@@ -34,9 +36,11 @@ func PrintReadableTypeValue(value interface{}) string {
 }
 
 func TestX(t *testing.T) {
-	g := func() int { return 10 }
-
-	for i := 0; i < g(); i++ {
-		t.Log(i)
-	}
+	var gp = grpool.New()
+	gp.AddWithRecover(context.TODO(), func(ctx context.Context) {
+		panic(111)
+	}, func(ctx context.Context, exception error) {
+		fmt.Println(exception)
+	})
+	select {}
 }
