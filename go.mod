@@ -9,6 +9,7 @@ require (
 	github.com/antchfx/htmlquery v1.3.0
 	github.com/chaseSpace/bear v0.0.1-alpha5
 	github.com/go-rod/rod v0.116.2
+	github.com/gogf/gf/v2 v2.9.0
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.136
 	github.com/k0kubun/pp/v3 v3.4.1
 	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20241220152942-06eb5c6e8230
@@ -20,10 +21,10 @@ require (
 	github.com/samber/lo v1.38.1
 	github.com/smartwalle/crypto4go v1.0.3
 	github.com/smartystreets/goconvey v1.8.1
-	github.com/stretchr/testify v1.10.0
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/billing v1.0.1100
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1100
 	github.com/tencentyun/tls-sig-api-v2-golang v1.3.0
+	github.com/volcengine/volcengine-go-sdk v1.0.183
 	golang.org/x/sync v0.10.0
 	google.golang.org/protobuf v1.30.0
 	gorm.io/driver/mysql v1.3.0
@@ -45,7 +46,6 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/elazarl/goproxy v0.0.0-20231117061959-7cc037d33fb5 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
-	github.com/gogf/gf/v2 v2.9.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -67,12 +67,10 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
-	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/smarty/assertions v1.15.0 // indirect
 	github.com/tjfoc/gmsm v1.4.1 // indirect
 	github.com/volcengine/volc-sdk-golang v1.0.23 // indirect
-	github.com/volcengine/volcengine-go-sdk v1.0.183 // indirect
 	github.com/ysmood/fetchup v0.2.3 // indirect
 	github.com/ysmood/goob v0.4.0 // indirect
 	github.com/ysmood/got v0.40.0 // indirect

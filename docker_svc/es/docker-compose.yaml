@@ -46,3 +46,17 @@ services:
     restart: always
     ports:
       - "5601:5601"
+
+  # 用于同步mysql（需要去kibana UI创建连接器，将配置填入本文件同级的connector.yml，重启此容器）
+#  connector:
+#    image: docker.elastic.co/enterprise-search/elastic-connectors:8.15.3.0 # 版本要和es一致
+#    container_name: connector
+#    environment:
+#      TZ: "Asia/Shanghai"
+#    volumes:
+#      - ~/docker/es/connectors:/config
+#    hostname: connector
+#    depends_on:
+#      - es
+#    restart: always
+#    command: [ '/app/bin/elastic-ingest', '-c', '/config/config.yml' ]

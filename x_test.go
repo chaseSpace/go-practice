@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"github.com/gogf/gf/v2/os/grpool"
 	"reflect"
 	"testing"
 )
@@ -36,11 +34,18 @@ func PrintReadableTypeValue(value interface{}) string {
 }
 
 func TestX(t *testing.T) {
-	var gp = grpool.New()
-	gp.AddWithRecover(context.TODO(), func(ctx context.Context) {
-		panic(111)
-	}, func(ctx context.Context, exception error) {
-		fmt.Println(exception)
-	})
-	select {}
+	type X struct {
+		name string
+	}
+	var x X
+	var xs []*X
+	for i := 0; i < 10; i++ {
+		x := x
+		x.name = fmt.Sprintf("%d", i)
+		xs = append(xs, &x)
+	}
+
+	for _, x := range xs {
+		fmt.Println(x.name)
+	}
 }
