@@ -128,7 +128,7 @@ POST /t2/_search # 查全部
         "order": "desc"
       }
     }
-  ]
+  ] 
 }
 
 ###### match分词（常见）
