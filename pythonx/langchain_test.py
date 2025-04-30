@@ -3,18 +3,18 @@ import time
 from pprint import pprint
 
 from langchain_community.llms import Tongyi
-from langchain_community.llms.moonshot import Moonshot
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from zzz.gpt import KIMI_APIKEY,TONGYI_APIKEY
+from zzz.gpt import TONGYI_APIKEY
 
 # Generate your api key from: https://platform.moonshot.cn/console/api-keys
-os.environ["MOONSHOT_API_KEY"] = KIMI_APIKEY
-model = Moonshot(model="moonshot-v1-128k")
+# os.environ["MOONSHOT_API_KEY"] = KIMI_APIKEY
+# model = Moonshot(model="moonshot-v1-128k")
 
 
-# os.environ["DASHSCOPE_API_KEY"] = TONGYI_APIKEY
-# model = Tongyi(model='qwq-plus')
+# qwen-max（推荐） > qwen-plus(勿用)
+os.environ["DASHSCOPE_API_KEY"] = TONGYI_APIKEY
+model = Tongyi(model='qwen-max')
 
 # or use a specific model
 # Available models: https://platform.moonshot.cn/docs
@@ -83,10 +83,52 @@ class Work(BaseModel):
 
 parser = JsonOutputParser(pydantic_object=Work)
 prompt = PromptTemplate(
-    template="使用中文列举3部{author}的作品。\n{format_instructions}",
+    template="使用中文列举3部{author}的作品，将description固定到200字左右。\n{format_instructions}",
     input_variables=["author"],
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
 chain = prompt | model | parser
-result = chain.invoke({"author": "老舍"})
+# result = chain.invoke({"author": "老舍"})
+# pprint(result)
+
+### 3.2 OutputParser：JSON (图片解析)
+from langchain_community.chat_models import ChatTongyi
+import base64
+
+model = ChatTongyi(model_name='qwen-vl-max')
+
+
+# from langchain_community.chat_models import ChatTongyi
+
+
+class BarEvent(BaseModel):
+    title: str = Field(description="Title of the bar event")
+    description: str = Field(description="Description of the bar event")
+    date: str = Field(description="Date of the bar event")
+    hour: str = Field(description="Detail time of the bar event")
+
+
+image_url = "../img/bar_event.jpg"
+
+# 打开图片文件
+with open(image_url, "rb") as image_file:
+    # 将图片读取为二进制数据
+    image_data = image_file.read()
+    # 将二进制数据编码为Base64字符串
+    img_base64 = base64.b64encode(image_data).decode('utf-8')
+
+prompt = ChatPromptTemplate(
+    messages=[
+        ("system", "Extracting bar event info the image provided."),
+        (
+            "user",
+            [
+                {"image": "data:image/jpeg;base64,{image_data}"}
+            ],
+        ),
+    ],
+)
+model = model.with_structured_output(BarEvent)
+chain = prompt | model
+result = chain.invoke({"image_data": img_base64})
 pprint(result)
