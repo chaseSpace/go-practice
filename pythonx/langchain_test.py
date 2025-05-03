@@ -2,6 +2,7 @@ import os
 import time
 from pprint import pprint
 
+# ChatModel 可以替代 llm，llm是文字到文字，前者带来更丰富的模式
 from langchain_community.llms import Tongyi
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -96,9 +97,6 @@ from langchain_community.chat_models import ChatTongyi
 import base64
 
 model = ChatTongyi(model_name='qwen-vl-max')
-
-
-# from langchain_community.chat_models import ChatTongyi
 
 
 class BarEvent(BaseModel):
