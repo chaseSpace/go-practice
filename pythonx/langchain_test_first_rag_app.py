@@ -80,7 +80,7 @@ prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            """You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
+            """你是一个借助上下文回答问题的助手，如果上下文未提供相关信息，直接回答不知道即可，保持回答的简洁。
             Context: {context}""",
         ),
         MessagesPlaceholder(variable_name="history"),
