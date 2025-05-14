@@ -34,18 +34,8 @@ func PrintReadableTypeValue(value interface{}) string {
 }
 
 func TestX(t *testing.T) {
-	type X struct {
-		name string
+	if 1 == 1 {
+		defer println(111)
 	}
-	var x X
-	var xs []*X
-	for i := 0; i < 10; i++ {
-		x := x
-		x.name = fmt.Sprintf("%d", i)
-		xs = append(xs, &x)
-	}
-
-	for _, x := range xs {
-		fmt.Println(x.name)
-	}
+	println(222)
 }
