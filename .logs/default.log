@@ -1,0 +1,7 @@
+2025-05-14 16:01:21.911 MainThread [32mINFO[0m:      Started server process [[36m116732[0m]
+2025-05-14 16:01:21.912 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 16:01:21.912 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 16:01:58.227 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 16:01:58.338 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 16:01:58.339 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 16:01:58.340 MainThread [32mINFO[0m:      Finished server process [[36m116732[0m]

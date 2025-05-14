@@ -76,6 +76,7 @@ class BarEvent(BaseModel):
     title: str = Field(description="Title of the bar event")
     description: str = Field(description="Description of the bar event")
     date: str = Field(description="Date of the bar event, use `yyyy-mm-dd` format")
+    location: str = Field(description="Location of the bar event")
     hour_start: str = Field(
         description="Start hour of the bar event, use `h:i` format in 24H pattern. Keep empty if not provided.")
     hour_end: str = Field(
@@ -106,7 +107,9 @@ prompt = ChatPromptTemplate(
 )
 
 chain = prompt | llm | parser
-base64_image = convert_image_to_webp_base64("./assets/event1.jpg")
+base64_image = convert_image_to_webp_base64("./assets/chinese_event2.jpg")
+if not base64_image:
+    raise None
 
 result = chain.invoke({"base64_image": base64_image})
 pprint(result)

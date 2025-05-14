@@ -1,0 +1,249 @@
+2025-05-14 15:22:13,451 MainThread INFO:      Shutting down
+2025-05-14 15:22:13,560 MainThread INFO:      Waiting for application shutdown.
+2025-05-14 15:22:13,560 MainThread INFO:      Application shutdown complete.
+2025-05-14 15:22:13,560 MainThread INFO:      Finished server process [114000]
+2025-05-14 15:22:14,247 MainThread INFO:      Started server process [114700]
+2025-05-14 15:22:14,247 MainThread INFO:      Waiting for application startup.
+2025-05-14 15:22:14,247 MainThread INFO:      Application startup complete.
+WARNING:  2025-05-14 15:22:51 - uvicorn.error - WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:24:13,028 MainThread INFO:      Shutting down
+2025-05-14 15:24:13,137 MainThread INFO:      Waiting for application shutdown.
+2025-05-14 15:24:13,137 MainThread INFO:      Application shutdown complete.
+2025-05-14 15:24:13,138 MainThread INFO:      Finished server process [114700]
+WARNING:  2025-05-14 15:24:13 - uvicorn.error - WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:24:14,506 MainThread INFO:      Started server process [115828]
+2025-05-14 15:24:14,506 MainThread INFO:      Waiting for application startup.
+2025-05-14 15:24:14,506 MainThread INFO:      Application startup complete.
+WARNING:  2025-05-14 15:24:22 - uvicorn.error - WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:24:26,331 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:24:26,332 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:24:26,332 MainThread [32mINFO[0m:      Started reloader process [[36m[1m108204[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:24:26,932 MainThread [32mINFO[0m:      Started server process [[36m103436[0m]
+2025-05-14 15:24:26,932 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:24:26,933 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:24:43,348 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:24:53,195 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:24:53,304 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:24:53,305 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:24:53,305 MainThread [32mINFO[0m:      Finished server process [[36m103436[0m]
+2025-05-14 15:24:54,025 MainThread [32mINFO[0m:      Started server process [[36m107256[0m]
+2025-05-14 15:24:54,025 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:24:54,025 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:27:55,637 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:28:43,232 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:28:43,342 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:28:43,342 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:28:43,342 MainThread [32mINFO[0m:      Finished server process [[36m107256[0m]
+2025-05-14 15:28:43,757 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:28:44.427 MainThread [32mINFO[0m:      Started server process [[36m106648[0m]
+2025-05-14 15:28:44.427 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:28:44.427 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:29:23.471 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:29:23.471 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:29:23.472 MainThread [32mINFO[0m:      Started reloader process [[36m[1m116208[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:29:23.919 MainThread [32mINFO[0m:      Started server process [[36m116648[0m]
+2025-05-14 15:29:23.919 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:29:23.919 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:32:14.312 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 15:32:26.619 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:32:26.729 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:32:26.729 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:32:26.729 MainThread [32mINFO[0m:      Finished server process [[36m116648[0m]
+2025-05-14 15:32:27.255 MainThread [32mINFO[0m:      Started server process [[36m8268[0m]
+2025-05-14 15:32:27.255 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:32:27.256 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:32:36.893 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:32:36.894 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:32:36.894 MainThread [32mINFO[0m:      Started reloader process [[36m[1m116356[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:32:37.431 MainThread [32mINFO[0m:      Started server process [[36m114172[0m]
+2025-05-14 15:32:37.431 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:32:37.431 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:32:40.099 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:32:40.208 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:32:40.208 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:32:40.208 MainThread [32mINFO[0m:      Finished server process [[36m114172[0m]
+2025-05-14 15:32:40.257 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m116356[0m]
+2025-05-14 15:32:40.903 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:32:40.904 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:32:40.904 MainThread [32mINFO[0m:      Started reloader process [[36m[1m109872[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:32:41.368 MainThread [32mINFO[0m:      Started server process [[36m110580[0m]
+2025-05-14 15:32:41.368 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:32:41.369 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:32:42.829 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:32:42.940 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:32:42.940 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:32:42.940 MainThread [32mINFO[0m:      Finished server process [[36m110580[0m]
+2025-05-14 15:32:42.986 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m109872[0m]
+2025-05-14 15:32:43.666 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:32:43.666 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:32:43.667 MainThread [32mINFO[0m:      Started reloader process [[36m[1m112100[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:32:44.257 MainThread [32mINFO[0m:      Started server process [[36m116624[0m]
+2025-05-14 15:32:44.257 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:32:44.257 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:32:47.991 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:32:48.102 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:32:48.102 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:32:48.102 MainThread [32mINFO[0m:      Finished server process [[36m116624[0m]
+2025-05-14 15:32:48.150 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m112100[0m]
+2025-05-14 15:32:48.881 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:32:48.881 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:32:48.882 MainThread [32mINFO[0m:      Started reloader process [[36m[1m106488[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:32:49.429 MainThread [32mINFO[0m:      Started server process [[36m114996[0m]
+2025-05-14 15:32:49.429 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:32:49.429 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:32:55.546 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:32:55.656 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:32:55.657 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:32:55.657 MainThread [32mINFO[0m:      Finished server process [[36m114996[0m]
+2025-05-14 15:32:55.704 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m106488[0m]
+2025-05-14 15:32:56.487 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:32:56.487 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:32:56.487 MainThread [32mINFO[0m:      Started reloader process [[36m[1m109792[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:32:57.050 MainThread [32mINFO[0m:      Started server process [[36m115276[0m]
+2025-05-14 15:32:57.050 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:32:57.050 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:35:39.821 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:37:55.955 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:37:56.065 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:37:56.065 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:37:56.065 MainThread [32mINFO[0m:      Finished server process [[36m115276[0m]
+2025-05-14 15:37:56.493 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:37:57.130 MainThread [32mINFO[0m:      Started server process [[36m12956[0m]
+2025-05-14 15:37:57.130 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:37:57.130 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:37:59.982 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:42:56.551 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:42:56.659 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:42:56.660 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:42:56.660 MainThread [32mINFO[0m:      Finished server process [[36m12956[0m]
+2025-05-14 15:42:57.072 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'utils\logging\__init__.py'. Reloading...
+2025-05-14 15:46:08.313 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'utils\logging\__init__.py', 'main.py'. Reloading...
+2025-05-14 15:46:08.805 MainThread [32mINFO[0m:      Started server process [[36m115980[0m]
+2025-05-14 15:46:08.805 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:46:08.805 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:47:11.731 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 15:49:48.551 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:49:48.660 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:49:48.661 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:49:48.661 MainThread [32mINFO[0m:      Finished server process [[36m115980[0m]
+2025-05-14 15:49:49.090 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 15:49:49.822 MainThread [32mINFO[0m:      Started server process [[36m116312[0m]
+2025-05-14 15:49:49.822 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:49:49.823 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:54:31.569 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 15:54:49.441 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:54:49.552 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:54:49.552 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:54:49.554 MainThread [32mINFO[0m:      Finished server process [[36m116312[0m]
+2025-05-14 15:54:49.963 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 15:54:50.530 MainThread [32mINFO[0m:      Started server process [[36m115924[0m]
+2025-05-14 15:54:50.530 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:54:50.531 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:55:06.463 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:55:06.573 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:55:06.573 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:55:06.573 MainThread [32mINFO[0m:      Finished server process [[36m115924[0m]
+2025-05-14 15:55:10.884 MainThread [33mWARNING[0m:   Current configuration will not reload as not all conditions are met, please refer to documentation.
+2025-05-14 15:55:10.884 MainThread [33mWARNING[0m:   You must pass the application as an import string to enable 'reload' or 'workers'.
+2025-05-14 15:55:43.426 MainThread [33mWARNING[0m:   Current configuration will not reload as not all conditions are met, please refer to documentation.
+2025-05-14 15:55:43.426 MainThread [33mWARNING[0m:   You must pass the application as an import string to enable 'reload' or 'workers'.
+2025-05-14 15:57:56.341 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:57:56.341 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:57:56.342 MainThread [32mINFO[0m:      Started reloader process [[36m[1m116424[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:57:56.787 MainThread [32mINFO[0m:      Started server process [[36m109196[0m]
+2025-05-14 15:57:56.787 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:57:56.788 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:58:06.311 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 15:58:31.827 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:58:31.936 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:58:31.936 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:58:31.936 MainThread [32mINFO[0m:      Finished server process [[36m109196[0m]
+2025-05-14 15:58:32.479 MainThread [32mINFO[0m:      Started server process [[36m115836[0m]
+2025-05-14 15:58:32.480 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:58:32.480 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:58:35.095 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 15:58:48.298 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:58:48.407 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:58:48.407 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:58:48.408 MainThread [32mINFO[0m:      Finished server process [[36m115836[0m]
+2025-05-14 15:58:49.162 MainThread [32mINFO[0m:      Started server process [[36m117644[0m]
+2025-05-14 15:58:49.162 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:58:49.162 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:59:09.862 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:59:09.863 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:59:09.863 MainThread [32mINFO[0m:      Started reloader process [[36m[1m106352[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:59:10.416 MainThread [32mINFO[0m:      Started server process [[36m116088[0m]
+2025-05-14 15:59:10.416 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:59:10.418 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:59:16.660 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:59:16.770 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:59:16.771 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:59:16.771 MainThread [32mINFO[0m:      Finished server process [[36m116088[0m]
+2025-05-14 15:59:18.918 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m106352[0m]
+2025-05-14 15:59:19.618 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:59:19.619 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:59:19.619 MainThread [32mINFO[0m:      Started reloader process [[36m[1m107960[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:59:20.083 MainThread [32mINFO[0m:      Started server process [[36m109576[0m]
+2025-05-14 15:59:20.083 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:59:20.083 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:59:27.885 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 15:59:27.994 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 15:59:27.994 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 15:59:27.994 MainThread [32mINFO[0m:      Finished server process [[36m109576[0m]
+2025-05-14 15:59:29.862 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m107960[0m]
+2025-05-14 15:59:30.540 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 15:59:30.540 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 15:59:30.541 MainThread [32mINFO[0m:      Started reloader process [[36m[1m117708[0m] using [36m[1mWatchFiles[0m
+2025-05-14 15:59:31.034 MainThread [32mINFO[0m:      Started server process [[36m117612[0m]
+2025-05-14 15:59:31.035 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 15:59:31.035 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 15:59:43.409 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 16:00:10.469 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 16:00:10.578 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 16:00:10.578 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 16:00:10.579 MainThread [32mINFO[0m:      Finished server process [[36m117612[0m]
+2025-05-14 16:00:11.489 MainThread [32mINFO[0m:      Started server process [[36m117660[0m]
+2025-05-14 16:00:11.489 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 16:00:11.489 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 16:00:13.799 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 16:00:20.036 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 16:00:20.146 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 16:00:20.147 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 16:00:20.147 MainThread [32mINFO[0m:      Finished server process [[36m117660[0m]
+2025-05-14 16:00:20.732 MainThread [32mINFO[0m:      Started server process [[36m115932[0m]
+2025-05-14 16:00:20.732 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 16:00:20.733 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 16:00:26.572 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 16:00:26.681 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 16:00:26.681 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 16:00:26.681 MainThread [32mINFO[0m:      Finished server process [[36m115932[0m]
+2025-05-14 16:00:26.724 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m117708[0m]
+2025-05-14 16:00:28.422 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 16:00:28.423 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 16:00:28.423 MainThread [32mINFO[0m:      Started reloader process [[36m[1m114488[0m] using [36m[1mWatchFiles[0m
+2025-05-14 16:00:28.858 MainThread [32mINFO[0m:      Started server process [[36m111320[0m]
+2025-05-14 16:00:28.858 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 16:00:28.858 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 16:00:33.364 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 16:00:33.476 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 16:00:33.476 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 16:00:33.476 MainThread [32mINFO[0m:      Finished server process [[36m111320[0m]
+2025-05-14 16:00:35.617 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m114488[0m]
+2025-05-14 16:00:36.314 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 16:00:36.314 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 16:00:36.315 MainThread [32mINFO[0m:      Started reloader process [[36m[1m108428[0m] using [36m[1mWatchFiles[0m
+2025-05-14 16:00:36.911 MainThread [32mINFO[0m:      Started server process [[36m117100[0m]
+2025-05-14 16:00:36.912 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 16:00:36.912 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 16:01:28.137 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 16:01:28.248 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 16:01:28.248 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 16:01:28.248 MainThread [32mINFO[0m:      Finished server process [[36m117100[0m]
+2025-05-14 16:01:28.297 MainThread [32mINFO[0m:      Stopping reloader process [[36m[1m108428[0m]
+2025-05-14 16:01:39.745 MainThread [32mINFO[0m:      Will watch for changes in these directories: ['C:\\Users\\Administrator\\GolandProjects\\go-practice\\fastapi_demo']
+2025-05-14 16:01:39.746 MainThread [32mINFO[0m:      Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+2025-05-14 16:01:39.746 MainThread [32mINFO[0m:      Started reloader process [[36m[1m102368[0m] using [36m[1mWatchFiles[0m
+2025-05-14 16:01:40.185 MainThread [32mINFO[0m:      Started server process [[36m114788[0m]
+2025-05-14 16:01:40.185 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 16:01:40.186 MainThread [32mINFO[0m:      Application startup complete.
+2025-05-14 16:02:25.863 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...

@@ -1,0 +1,4 @@
+2025-05-14 16:01:32.460 MainThread [32mINFO[0m:     127.0.0.1:58510 - '[1mGET / HTTP/1.1[0m' [32m200 OK[0m
+2025-05-14 16:01:42.630 MainThread [32mINFO[0m:     127.0.0.1:58527 - '[1mGET /redoc HTTP/1.1[0m' [32m200 OK[0m
+2025-05-14 16:01:43.092 MainThread [32mINFO[0m:     127.0.0.1:58527 - '[1mGET /openapi.json HTTP/1.1[0m' [32m200 OK[0m
+2025-05-14 16:01:43.360 MainThread [32mINFO[0m:     127.0.0.1:58527 - '[1mGET /9e68c24da9f5fd56991c.worker.js.map HTTP/1.1[0m' [31m404 Not Found[0m
