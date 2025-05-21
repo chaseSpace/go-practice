@@ -247,3 +247,10 @@ WARNING:  2025-05-14 15:24:22 - uvicorn.error - WatchFiles detected changes in '
 2025-05-14 16:01:40.185 MainThread [32mINFO[0m:      Waiting for application startup.
 2025-05-14 16:01:40.186 MainThread [32mINFO[0m:      Application startup complete.
 2025-05-14 16:02:25.863 MainThread [33mWARNING[0m:   WatchFiles detected changes in 'main.py'. Reloading...
+2025-05-14 16:03:57.601 MainThread [32mINFO[0m:      Shutting down
+2025-05-14 16:03:57.709 MainThread [32mINFO[0m:      Waiting for application shutdown.
+2025-05-14 16:03:57.709 MainThread [32mINFO[0m:      Application shutdown complete.
+2025-05-14 16:03:57.709 MainThread [32mINFO[0m:      Finished server process [[36m114788[0m]
+2025-05-14 16:03:58.352 MainThread [32mINFO[0m:      Started server process [[36m117244[0m]
+2025-05-14 16:03:58.352 MainThread [32mINFO[0m:      Waiting for application startup.
+2025-05-14 16:03:58.352 MainThread [32mINFO[0m:      Application startup complete.
