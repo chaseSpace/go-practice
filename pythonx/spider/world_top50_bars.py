@@ -9,6 +9,7 @@ from model import WorldTopBars
 count = 0
 
 
+# 当前任务的运行入口
 async def run():
     entry_urls = [
         'https://www.theworlds50best.com/bars/list/1-50',
