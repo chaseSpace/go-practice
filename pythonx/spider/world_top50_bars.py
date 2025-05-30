@@ -122,4 +122,4 @@ async def download_img(base_url, tree):
 
 
 # 运行
-asyncio.run(run())
+# asyncio.run(run())
