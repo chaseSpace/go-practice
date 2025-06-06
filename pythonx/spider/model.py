@@ -7,8 +7,6 @@ import peewee
 
 db = peewee.SqliteDatabase('jump_jump_tiger.db')
 
-db.connect()
-
 
 # 定义数据库模型
 class WorldTopBars(peewee.Model):
@@ -33,6 +31,8 @@ class WorldTopBars(peewee.Model):
 
     class Meta:
         database = db
-        db_table = 'world_top_bars'
+        db_table = 'world_top_bars_top500bars'
+        primary_key = peewee.CompositeKey('src', 'area', 'rank_no', 'name', 'city')
 
-# WorldTopBars.create_table()
+
+WorldTopBars.create_table()
