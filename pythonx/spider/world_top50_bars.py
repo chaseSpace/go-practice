@@ -17,11 +17,7 @@ async def run():
         'https://www.theworlds50best.com/bars/asia/list/1-50'
     ]
 
-    tasks = []
-    for entry_url in entry_urls:
-        tasks.append(asyncio.create_task(start_scrape(entry_url)))
-    url = 'https://www.theworlds50best.com/bars/list/1-50'
-    tasks = [asyncio.create_task(start_scrape(url))]
+    tasks = [asyncio.create_task(start_scrape(url)) for url in entry_urls]
 
     init_session()
     await asyncio.gather(*tasks)
