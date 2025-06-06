@@ -1,7 +1,7 @@
-import asyncio
+import asyncio, aiometer
 from urllib.parse import urljoin
-
-from lxml import html
+from functools import partial
+from lxml import html, etree
 
 from infra import send_request, remove_path_simple, save_html, init_session, close_session
 from model import WorldTopBars
@@ -20,6 +20,8 @@ async def run():
     tasks = []
     for entry_url in entry_urls:
         tasks.append(asyncio.create_task(start_scrape(entry_url)))
+    url = 'https://www.theworlds50best.com/bars/list/1-50'
+    tasks = [asyncio.create_task(start_scrape(url))]
 
     init_session()
     await asyncio.gather(*tasks)
@@ -39,17 +41,15 @@ async def start_scrape(entry_url):
 
     # 从入口地址中得到基础url
     base_url = remove_path_simple(entry_url)
-    # 开启并发 max=3
-    semaphore = asyncio.Semaphore(3)
 
-    # 定义一个协程来包装parse_detail_page函数，增加Semaphore的 acquire 和 release 调用
-    async def wrapped_parse_detail_page(href):
-        async with semaphore:
-            await parse_detail_page(base_url, href)
+    # 并发执行：抓取1-50个酒吧（含详情页）
+    tasks = [partial(parse_detail_page, base_url, href) for href in hrefs]
+    await aiometer.run_all(tasks, max_at_once=3)  # 并发数限制为3
 
-    # 创建并启动并发任务
-    tasks = [wrapped_parse_detail_page(href) for href in hrefs]
-    await asyncio.gather(*tasks)
+    # 并发执行：抓取51-100个酒吧（不含详情页）
+    tasks = [partial(parse_51_100, base_url, i, div) for i, div in
+             enumerate(tree.xpath('//div[@data-list="51-100"]/div'))]
+    await aiometer.run_all(tasks, max_at_once=3)  # 并发数限制为3
 
 
 # 解析详情页
@@ -111,6 +111,21 @@ async def parse_detail_page(base_url, url):
     print(f'数据入库 - 数量：{count} - bar_name：{bar_name[0]} - rank_no：{rank_no} - city：{city}')
 
 
+async def parse_51_100(baseurl, i, div: etree._ElementTree):
+    rank_no = int(div.xpath('.//p[@class="position "]/text()')[0])
+    img_src = div.xpath('.//img/@src')[0]
+    bar_name = div.xpath('.//h2/text()')[0]
+    city = div.xpath('.//p[2]/text()')[0]
+    # print(rank_no, img_src, bar_name, city)
+    WorldTopBars.insert(
+        rank_no=rank_no,
+        name=bar_name,
+        city=city,
+        img_cover=await download_img_from_url(urljoin(baseurl, img_src)),
+    ).on_conflict(action='IGNORE').execute()
+    print(f'(51-100)数据入库 - 数量：{i + 1} - bar_name：{bar_name} - rank_no：{rank_no} - city：{city}')
+
+
 # 下载图片
 async def download_img(base_url, tree):
     urls = tree.xpath('//div[@class="swiper-wrapper"]//img/@src')
@@ -126,6 +141,12 @@ async def download_img(base_url, tree):
         img_blobs.append(None)
     return img_blobs
 
+
+async def download_img_from_url(url):
+    r = await send_request('download_img', url, 'GET')
+    if r.status != 200:
+        raise Exception('Failed to fetch img url: ' + url)
+    return r.content
 
 # 运行
 # asyncio.run(run())

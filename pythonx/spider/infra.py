@@ -1,4 +1,4 @@
-import time
+import time, asyncio
 from urllib.parse import urlparse
 
 from aiohttp import ClientSession
@@ -65,3 +65,6 @@ def remove_path_simple(url):
 def save_html(url, text):
     with open('exception.html', 'w', encoding='utf-8') as f:
         f.write(url + "\n\n" + text)
+
+async def concurrency(max:int, *couroutines):
+    semaphore = asyncio.Semaphore(3)
