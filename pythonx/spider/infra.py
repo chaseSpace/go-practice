@@ -44,14 +44,15 @@ async def close_session():
 
 # 异步请求
 async def core_req(url, method, body):
-    if method == 'GET':
-        async with session.get(url, params=body) as response:
-            return await response.read(), response.status
-    elif method == 'POST':
-        async with session.post(url, params=body) as response:
-            return await response.read(), response.status
-    else:
-        raise ValueError('Invalid method')
+    try:
+        if method == 'GET':
+            async with session.get(url, params=body) as response:
+                return await response.read(), response.status
+        elif method == 'POST':
+            async with session.post(url, params=body) as response:
+                return await response.read(), response.status
+    except Exception as e:
+        raise Exception(f'core_req - {e} - {url}')
 
 
 def remove_path_simple(url):

@@ -7,12 +7,17 @@ import peewee
 
 db = peewee.SqliteDatabase('jump_jump_tiger.db')
 
+db.connect()
+
 
 # 定义数据库模型
 class WorldTopBars(peewee.Model):
-    rank_no = peewee.IntegerField(null=True, unique=True)  # 为0表示 individual award bar
+    rank_no = peewee.IntegerField(null=True)  # 为0表示 individual award bar
     name = peewee.CharField(null=True)
     city = peewee.CharField(null=True)
+    year = peewee.IntegerField(null=True)
+    area = peewee.CharField(null=True)
+    src = peewee.CharField(null=True)
     honor_desc = peewee.CharField(null=True)
     location = peewee.CharField(null=True)
     site_url = peewee.CharField(null=True)
@@ -30,5 +35,4 @@ class WorldTopBars(peewee.Model):
         database = db
         db_table = 'world_top_bars'
 
-
-WorldTopBars.create_table()
+# WorldTopBars.create_table()

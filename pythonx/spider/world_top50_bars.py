@@ -12,7 +12,9 @@ count = 0
 # 当前任务的运行入口
 async def run():
     entry_urls = [
-        'https://www.theworlds50best.com/bars/list/1-50',
+        # 'https://www.theworlds50best.com/bars/list/1-50',
+        # 'https://www.theworlds50best.com/bars/northamerica/list/1-50',
+        'https://www.theworlds50best.com/bars/asia/list/1-50'
     ]
 
     tasks = []
@@ -84,10 +86,13 @@ async def parse_detail_page(base_url, url):
     img_blobs = await download_img(base_url, tree)
 
     # 入库
-    WorldTopBars.insert(
+    WorldTopBars(
         rank_no=rank_no,
         name=bar_name[0],
         city=city,
+        year=2024,
+        area='Asia',
+        src='theworlds50best.com',
         honor_desc=honor_desc,
         location=location,
         site_url=site_url,
@@ -99,7 +104,7 @@ async def parse_detail_page(base_url, url):
         img_cover2=img_blobs[1],
         img_cover3=img_blobs[2],
         intro=intro,
-    ).on_conflict(action='IGNORE').execute()
+    ).save()
 
     global count
     count = count + 1
