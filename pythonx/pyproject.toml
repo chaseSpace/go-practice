@@ -6,9 +6,11 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "requests>=2.32.3",
+    "twine>=6.1.0",
 ]
 
 [tool.uv.workspace]
 members = [
     "spider",
+    "mcp_weather",
 ]

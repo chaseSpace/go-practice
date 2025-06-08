@@ -17,6 +17,14 @@ uv init my_project # 也可以进入已存在的项目下执行，此时不加�
 
 uv venv --python 3.10 # 创建虚拟环境，依赖库默认安装在虚拟环境下，而不是全局缓存目录
 
+# 激活虚拟环境
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\activate     # Windows
+
+# 退出虚拟环境
+source .venv/bin/deactivate # Linux/macOS
+.venv\Scripts\deactivate # Windows
+
 # 不常见的操作
 uv venv p313 --python 3.13 # 指定虚拟环境目录名称，默认为 .venv; 删除目录即可删除环境
 ```
