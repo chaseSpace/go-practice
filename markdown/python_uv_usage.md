@@ -1,5 +1,7 @@
 ## uv使用
 
+官方文档：https://docs.astral.sh/uv/concepts/projects/init/
+
 常用命令：
 
 ```shell

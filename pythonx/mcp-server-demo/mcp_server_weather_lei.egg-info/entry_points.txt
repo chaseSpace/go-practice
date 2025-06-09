@@ -1,0 +1,2 @@
+[console_scripts]
+mcp-server-weather-lei = mcp_server_weather_lei:main

@@ -13,4 +13,5 @@ dependencies = [
 members = [
     "spider",
     "mcp_weather",
+    "mcp-server-demo",
 ]

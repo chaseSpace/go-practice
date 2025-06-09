@@ -86,6 +86,10 @@ async def query_weather(city: str) -> str:
     return format_weather(data)
 
 
-if __name__ == "__main__":
-    # 以标准 I/O 方式运行 MCP 服务器
+def main():
+    print('以标准 I/O 方式运行 MCP 服务器...')
     mcp.run(transport='stdio')
+
+
+if __name__ == '__main__':
+    main()

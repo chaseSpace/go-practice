@@ -1,0 +1,9 @@
+README.md
+main.py
+pyproject.toml
+mcp_server_weather_lei.egg-info/PKG-INFO
+mcp_server_weather_lei.egg-info/SOURCES.txt
+mcp_server_weather_lei.egg-info/dependency_links.txt
+mcp_server_weather_lei.egg-info/entry_points.txt
+mcp_server_weather_lei.egg-info/requires.txt
+mcp_server_weather_lei.egg-info/top_level.txt
