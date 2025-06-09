@@ -1,0 +1,21 @@
+[project]
+name = "zt-query-table"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "chasespace", email = "no@ex.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "mcp>=1.9.3",
+    "peewee>=3.18.1",
+    "pymysql>=1.1.1",
+]
+
+[project.scripts]
+zt-query-table = "zt_query_table:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
