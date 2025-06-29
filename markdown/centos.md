@@ -62,3 +62,25 @@ systemctl start nginx && systemctl enable nginx
 ### 使用acme.sh申请免费证书
 
 https://github.com/acmesh-official/acme.sh/wiki/说明
+
+## 安装chrome
+
+```shell
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+
+yum install libX11 libXcursor libXdamage libXext libXcomposite libXi libXrandr gtk3 libappindicator-gtk3 xdg-utils \
+libXScrnSaver liberation-fonts \
+alsa-lib liberation-fonts libgbm xdg-utils
+
+rpm -ivh google-chrome-stable_current_x86_64.rpm
+
+google-chrome --version
+
+
+# 卸载
+yum remove google-chrome-stable
+
+# cli调试 --repl是进入交互模式
+google-chrome --headless --no-sandbox --enable-unsafe-swiftshader --remote-debugging-port=9222 --disable-gpu --repl 
+https://www.google.com 
+```
