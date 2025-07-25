@@ -1,0 +1,20 @@
+[project]
+name = "mcp-server-demo-lei"
+version = "0.1.1"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "chasespace", email = "random2035@qq.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp>=1.9.3",
+]
+
+[project.scripts]
+mcp-server-demo-lei = "mcp_server_demo_lei:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

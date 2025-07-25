@@ -1,0 +1,13 @@
+[project]
+name = "spider"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiohttp>=3.12.4",
+    "aiometer>=1.0.0",
+    "lxml>=5.4.0",
+    "peewee>=3.18.1",
+    "requests>=2.32.3",
+]

@@ -1,0 +1,19 @@
+[project]
+name = "pythonx"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "html2text>=2025.4.15",
+    "requests>=2.32.3",
+    "twine>=6.1.0",
+]
+
+[tool.uv.workspace]
+members = [
+    "spider",
+    "mcp_weather",
+    "mcp-server-demo",
+    "zt_query_table",
+]
