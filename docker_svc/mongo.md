@@ -8,10 +8,10 @@ docker run -d --name mongo --restart=always \
   -p 27017:27017 \
   -v $dir/data:/data/db \
   -v $dir/logs:/var/log/mongodb \
+  -e TZ=Asia/Shanghai \
   -e MONGO_INITDB_ROOT_USERNAME=root \
   -e MONGO_INITDB_ROOT_PASSWORD=123 \
   mongo:latest
-
 ```
 
 ### 基本操作
