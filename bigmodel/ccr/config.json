@@ -1,0 +1,103 @@
+{
+  "APIKEY": "",
+  "PROXY_URL": "",
+  "LOG": true,
+  "API_TIMEOUT_MS": 600000,
+  "NON_INTERACTIVE_MODE": false,
+  "Providers": [
+    {
+      "name": "modelscope",
+      "api_base_url": "https://api-inference.modelscope.cn/v1/chat/completions",
+      "api_key": "ms-066f97cc-1014-4439-ac7e-x",
+      "models": [
+        "Qwen/Qwen3-Coder-480B-A35B-Instruct"
+      ],
+      "transformer": {
+        "use": [
+          [
+            "maxtoken",
+            {
+              "max_tokens": 262144
+            }
+          ],
+          "enhancetool"
+        ],
+        "Qwen/Qwen3-235B-A22B-Thinking-2507": {
+          "use": [
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "name": "modelscope",
+      "api_base_url": "https://api-inference.modelscope.cn/v1/chat/completions",
+      "api_key": "ms-066f97cc-1014-4439-ac7e-x",
+      "models": [
+        "moonshotai/Kimi-K2-Instruct-0905"
+      ],
+      "transformer": {
+        "use": [
+          [
+            "maxtoken",
+            {
+              "max_tokens": 131072
+            }
+          ],
+          "enhancetool"
+        ]
+      }
+    },
+    {
+      "name": "DMX",
+      "api_base_url": "https://www.dmxapi.cn/v1/chat/completions",
+      "api_key": "sk-x",
+      "models": [
+        "deepseek-v3.1-nothinking"
+      ],
+      "transformer": {
+        "use": [
+          [
+            "maxtoken",
+            {
+              "max_tokens": 8192
+            }
+          ],
+          "enhancetool"
+        ],
+        "deepseek-v3.1-nothinking": {
+          "use": [
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Ali",
+      "api_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "api_key": "sk-x",
+      "models": [
+        "qwen3-max-preview"
+      ],
+      "transformer": {
+        "use": [
+          [
+            "maxtoken",
+            {
+              "max_tokens": 258048
+            }
+          ],
+          "enhancetool"
+        ]
+      }
+    }
+  ],
+  "Router": {
+    "note": "这里选择使用以上哪个配置项，将对应default后的-去掉。",
+    "default-": "modelscope,Qwen/Qwen3-Coder-480B-A35B-Instruct",
+    "default": "modelscope,moonshotai/Kimi-K2-Instruct-0905",
+    "default-": "DMX,deepseek-v3.1-nothinking",
+    "default-": "Ali,qwen3-max-preview"
+  }
+}
+
