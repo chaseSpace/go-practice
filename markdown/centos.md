@@ -14,7 +14,7 @@ yum makecache
 ## 常用
 
 ```shell
-yum install -y git wget
+yum install -y git wget make
 ```
 
 ```shell

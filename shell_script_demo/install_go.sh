@@ -32,23 +32,24 @@ tar xzf $target && \
 rm -rf $target && \
 mkdir -p $GOPATH && mkdir -p $GOPATH/bin
 
-{
-  echo "export PATH=$PATH:$GO_INSTALL/go/bin:$GOPATH/bin"
-  echo "export GOPATH=$GOPATH"
-  echo "export GOPROXY=https://goproxy.cn"
-  echo "export GO111module=on"
-  echo "export GOROOT=$GO_INSTALL/go"
-}   >> $BASHRC && source $BASHRC
-
-
-if [ -f $ZSHRC ]; then
+# Set environment variables in shell config files
+# Check if ZSHRC exists, otherwise use BASHRC
+if [ -f "$ZSHRC" ]; then
   {
     echo "export PATH=$PATH:$GO_INSTALL/go/bin:$GOPATH/bin"
     echo "export GOPATH=$GOPATH"
     echo "export GOPROXY=https://goproxy.cn"
     echo "export GO111module=on"
     echo "export GOROOT=$GO_INSTALL/go"
-  }   >> $ZSHRC && source $ZSHRC
+  } >> $ZSHRC && source $ZSHRC
+else
+  {
+    echo "export PATH=$PATH:$GO_INSTALL/go/bin:$GOPATH/bin"
+    echo "export GOPATH=$GOPATH"
+    echo "export GOPROXY=https://goproxy.cn"
+    echo "export GO111module=on"
+    echo "export GOROOT=$GO_INSTALL/go"
+  } >> $BASHRC && source $BASHRC
 fi
 
 cd $now && go version

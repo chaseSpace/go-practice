@@ -37,4 +37,7 @@ echo 'DISABLE_AUTO_UPDATE=true' >> ~/.zshrc
 
 # 生效
 source ~/.zshrc
+
+# 自启
+sudo usermod -s /usr/bin/zsh $USER
 ```

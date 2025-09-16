@@ -1,8 +1,10 @@
 ## MongoDB Docker部署
 
 ```shell
-dir=/Users/lei/docker/mongo
+dir=~/docker/mongo
 mkdir -p $dir/{data,logs}
+
+export MONGO_PASS='123'
 
 docker run -d --name mongo --restart=always \
   -p 27017:27017 \
@@ -10,7 +12,7 @@ docker run -d --name mongo --restart=always \
   -v $dir/logs:/var/log/mongodb \
   -e TZ=Asia/Shanghai \
   -e MONGO_INITDB_ROOT_USERNAME=root \
-  -e MONGO_INITDB_ROOT_PASSWORD=123 \
+  -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASS \
   mongo:latest
 ```
 
