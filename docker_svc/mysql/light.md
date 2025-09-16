@@ -15,7 +15,7 @@ docker run -d --name mysql \
 
 ```shell
 docker run -d --name mysqlv8 \
-      -p 3306:3306 \
+      -p 33061:3306 \
       -v ~/docker/mysqlv8/data:/var/lib/mysql \
       -v /etc/localtime:/etc/localtime \
       -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \

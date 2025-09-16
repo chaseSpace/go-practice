@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "tavily": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tavily-mcp"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "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"
+      }
+    }
+  }
+}
