@@ -59,9 +59,3 @@ chmod +x /usr/local/bin/docker-compose
 docker --version
 docker-compose --version
 ```
-
-### 推荐的发行版
-
-AlmaLinux，作为CentOS的替代品。
-
-[wsl_almalinux.md](wsl_almalinux.md) 是笔者的使用笔记。

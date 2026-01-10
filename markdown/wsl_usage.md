@@ -54,3 +54,9 @@ wsl --terminate <Distro>
 wsl -t <Distro>
 wsl --shutdown
 ```
+
+### 推荐的发行版
+
+AlmaLinux，作为CentOS的替代品。
+
+[wsl_almalinux.md](wsl_almalinux.md) 是笔者的使用笔记。
