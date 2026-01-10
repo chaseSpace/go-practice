@@ -1,11 +1,17 @@
 ## AlmaLinux-10
 
+### 介绍
+
+AlmaLinux是从RHEL分叉出来的Linux发行版，完全兼容RHEL以及CentOS，默认下载命令是dnf（基本类似yum用法）。
+
 ### 初始化
 
 ```shell
-sudo dnf install -y wget curl git vim unzip zip telnet net-tools 
+dnf install -y wget curl git vim unzip zip telnet net-tools 
 dnf install -y binutils bison gcc make
 ```
+
+使用WSL时，建议切换root使用。
 
 ### 网络相关
 

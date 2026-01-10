@@ -1,5 +1,11 @@
 ## WSL 使用
 
+### 介绍
+
+使用WSL在Windows进行开发工作可以提供极大的便利，相比VMware或其他虚拟机方式，WSL可以使用PowerShell携带的指令进行快速下载启动，还可指定喜好的发行版。
+
+最大的优势是在Windows上为WSL设置网络的镜像模式，以便WSL可以直接使用Windows的Clash代理（设置http_proxy）。
+
 ### 使用镜像网络
 
 windows 搜索 `wsl settings`，修改网络——网络模式——Mirrored，重启 WSL 。
