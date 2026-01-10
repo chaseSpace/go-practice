@@ -2,8 +2,10 @@ package main_test
 
 import (
 	"fmt"
-	"github.com/chaseSpace/bear"
 	"testing"
+	"time"
+
+	"github.com/chaseSpace/bear"
 )
 
 type Person struct {
@@ -24,4 +26,7 @@ func TestMapReduce(t *testing.T) {
 	var s3 = bear.NewComputableSlice(2.0, 3.0, 4.2)
 	var sum = s3.Append(5.0).PopLeft().Append(6.0).Avg()
 	fmt.Println("Sum:", sum) // 4.55
+
+	t1, _ := time.ParseInLocation("2006-01-02 15:04", "2021-01-01 08:00", time.UTC)
+	print(t1.String())
 }

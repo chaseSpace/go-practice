@@ -16,6 +16,9 @@ systemctl start docker
 systemctl enable docker
 ```
 
+> **如何让虚拟机使用宿主机代理**：将宿主机的以太网卡共享给 VMNET8，虚拟机无需设置任何proxy。
+> - 经过测试，即使clash允许lan连接，虚拟机也无法访问宿主机的clash端口，应该是VMware限制。
+
 ### 安装docker-compose
 
 ```shell

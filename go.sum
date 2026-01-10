@@ -61,6 +61,8 @@ github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/chaseSpace/bear v0.0.1-alpha5 h1:8Tnp5VOBafTLQoG7au4srqtjW0iU8dxo5ZmrMiy+lIQ=
 github.com/chaseSpace/bear v0.0.1-alpha5/go.mod h1:FOKdSOPjalTigar33N0KXu+38LN9mUWCPL4hBhScGNs=
+github.com/chaseSpace/bear v0.0.1-beta1 h1:ZLgwJeQm0TWCaPNqJm4vZPbxDj5vBOZ9BdduObN6sxM=
+github.com/chaseSpace/bear v0.0.1-beta1/go.mod h1:FOKdSOPjalTigar33N0KXu+38LN9mUWCPL4hBhScGNs=
 github.com/clbanning/mxj/v2 v2.5.5/go.mod h1:hNiWqW14h+kc+MdF9C6/YoRfjEJoR3ou6tn/Qo+ve2s=
 github.com/clbanning/mxj/v2 v2.7.0 h1:WA/La7UGCanFe5NpHF0Q3DNtnCsVoxbPKuyBNHWRyME=
 github.com/clbanning/mxj/v2 v2.7.0/go.mod h1:hNiWqW14h+kc+MdF9C6/YoRfjEJoR3ou6tn/Qo+ve2s=

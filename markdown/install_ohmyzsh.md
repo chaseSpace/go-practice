@@ -41,3 +41,9 @@ source ~/.zshrc
 # 自启
 sudo usermod -s /usr/bin/zsh $USER
 ```
+
+Alias：
+
+```shell
+echo "alias zz='cd /mnt/c/Users/yangr/Desktop/git'" >> ~/.zshrc && source ~/.zshrc
+```

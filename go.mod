@@ -7,7 +7,7 @@ require (
 	github.com/alibabacloud-go/darabonba-openapi/v2 v2.0.10
 	github.com/alibabacloud-go/tea v1.2.2
 	github.com/antchfx/htmlquery v1.3.0
-	github.com/chaseSpace/bear v0.0.1-alpha5
+	github.com/chaseSpace/bear v0.0.1-beta1
 	github.com/go-rod/rod v0.116.2
 	github.com/gogf/gf/v2 v2.9.0
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.136
