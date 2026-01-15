@@ -3,9 +3,9 @@ package main_test
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/chaseSpace/bear"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Person struct {
@@ -27,6 +27,11 @@ func TestMapReduce(t *testing.T) {
 	var sum = s3.Append(5.0).PopLeft().Append(6.0).Avg()
 	fmt.Println("Sum:", sum) // 4.55
 
-	t1, _ := time.ParseInLocation("2006-01-02 15:04", "2021-01-01 08:00", time.UTC)
-	print(t1.String())
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("123"), bcrypt.DefaultCost)
+	hashedPassword2, _ := bcrypt.GenerateFromPassword([]byte("123"), bcrypt.DefaultCost)
+
+	fmt.Println(string(hashedPassword), string(hashedPassword2))
+
+	err := bcrypt.CompareHashAndPassword(hashedPassword, []byte("123x"))
+	fmt.Println(err)
 }
