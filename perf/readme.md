@@ -81,6 +81,22 @@ block 采集的是【goroutine 在“同步原语”上阻塞的时间】，即�
 
 todo
 
-### 定位开辟 goroutine 最多的函数
+### 使用 Trace
 
-todo
+**使用时机**
+
+当使用前面的方式在CLI中无法定位到具体异常的代码行时，就需要用到trace对程序进行全面分析。它能够帮助你深入了解程序的执行路径、并发模式、goroutine
+调度耗时、锁竞争等。
+
+**使用步骤**
+
+同样的，添加 pprof 代码后，在**有浏览器**的本地或远程环境执行：
+
+```shell
+curl -o trace.out http://216.45.63.187:9999/debug/pprof/trace?seconds=30
+go tool trace trace.out # 
+```
+
+根据经验，进入页面直接点击 `Goroutine analysis`，查看目前运行中的协程列表（耗时倒序排列），耗时达到秒级别一般是存在问题的。
+
+> 注意：通过curl拉取trace信息时，不要在代码中调用 `trace.Start` 方法，否则会报错。
