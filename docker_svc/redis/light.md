@@ -7,7 +7,7 @@ docker run --name redis5 --rm -p 6379:6379 redis:5.0 --requirepass "123"
 如果可以，再运行
 
 ```shell
-export REDIE_PASS='123'
+export REDIE_PASS='51WVPKqGNA2o/dFQ'
 
 docker run --name redis5 -d -p 6379:6379 redis:5.0 --requirepass $REDIE_PASS
 ```

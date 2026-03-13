@@ -1,5 +1,16 @@
 # CentOS
 
+## Tencent OS
+
+```shell
+yum install docker -y
+
+systemctl enable docker
+systemctl start docker
+
+docker info
+```
+
 ## 更新源
 
 仅国内机器需要。

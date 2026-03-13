@@ -3,6 +3,7 @@ _ignore/  # 各种本地配置
 dist/
 node_modules/
 zzz/
+logs
 http-client.env.json
 temp.http
 *.db
