@@ -1,0 +1,29 @@
+INFO     [Agent] 📍 Step 7:
+INFO     [Agent]   👍 Eval: Successfully loaded search results page showing agent 开发 positions with partial JD visible. Salary info is hidden (**--**元) and full JD requires login. Verdict: Success
+INFO     [Agent]   🧠 Memory: Found agent 开发 positions on boss 直聘. Multiple jobs visible including AI Agent 开发，agent 开发，AI Agent开发工程师等。Salary shows as **--**元 (hidden) and JD requires login to view complete content. Need to call check_if_need_login function as per user request.
+INFO     [Agent]   🎯 Next goal: Call check_if_need_login function to determine if login credentials are needed to view complete salary and JD information
+WARNING  [Agent] Model returned empty action. Retrying...
+INFO     [Agent]   👍 Eval: Successfully navigated to job listing page showing partial JD and hidden salary info. Login appears to be required for complete details. Verdict: Success
+INFO     [Agent]   🧠 Memory: Found agent 开发 positions on boss 直聘. Salary is hidden (**--**元) and full JD requires login. Need to determine if login credentials are available or inform user about this limitation.
+INFO     [Agent]   🎯 Next goal: Call check_if_need_login function to determine if login is needed and what credentials might be available
+WARNING  [Agent] Model still returned empty after retry. Inserting safe noop action.
+WARNING  [Agent] ❌ Result failed 2/6 times: Invalid model output format. Please follow the correct schema.
+Details: 24 validation errors for ActionModelUnion
+DoneActionModel
+  Input should be a valid dictionary or instance of DoneActionModel [type=model_type, input_value=PydanticUndefined, input_type=PydanticUndefinedType]
+    For further information visit https://errors.pydantic.dev/2.11/v/model_type
+SearchActionModel
+  Input should be a valid dictionary or instance of SearchActionModel [type=model_type, input_value=PydanticUndefined, input_type=PydanticUndefinedType]
+    For further information visit https://errors.pydantic.dev/2.11/v/model_type
+NavigateActionModel
+  Input should be a valid dictionary or instance of NavigateActionModel [type=model_type, input_value=PydanticUndefined, input_type=PydanticUndefinedType]
+    For further information visit https://errors.pydantic.dev/2.11/v/model_type
+GoBackActionModel
+  Input should be a valid dictionary or instance of GoBackActionModel [type=model_type, input_value=PydanticUndefined, input_type=PydanticUndefinedType]
+    For further information visit https://errors.pydantic.dev/2.11/v/model_type
+WaitActionModel
+  Input should be a valid dictionary or instance of WaitActionModel [type=model_type, input_value=PydanticUndefined, input_type=PydanticUndefinedType]
+    For further information visit https://errors.pydantic.dev/2.11/v/model_type
+ClickActionModel
+  Input should be a valid dictionary or instance of ClickActionModel [type=model_type, input_value=PydanticUndefined, input_type=PydanticUndefinedType]
+    For further information visit https://errors.pydantic.dev/2.11/v/model_type
