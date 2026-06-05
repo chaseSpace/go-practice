@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"context"
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -15,25 +17,23 @@ func ParseTagSetting(str string, sep string) map[string]string {
 	settings := map[string]string{}
 	names := strings.Split(str, sep)
 
+	var parsedNames []string
 	for i := 0; i < len(names); i++ {
-		j := i
-		if len(names[j]) > 0 {
-			for {
-				if names[j][len(names[j])-1] == '\\' {
-					i++
-					names[j] = names[j][0:len(names[j])-1] + sep + names[i]
-					names[i] = ""
-				} else {
-					break
-				}
-			}
+		s := names[i]
+		for strings.HasSuffix(s, "\\") && i+1 < len(names) {
+			i++
+			s = s[:len(s)-1] + sep + names[i]
 		}
+		parsedNames = append(parsedNames, s)
+	}
 
-		values := strings.Split(names[j], ":")
+	for _, tag := range parsedNames {
+		values := strings.Split(tag, ":")
 		k := strings.TrimSpace(strings.ToUpper(values[0]))
-
 		if len(values) >= 2 {
-			settings[k] = strings.Join(values[1:], ":")
+			val := strings.Join(values[1:], ":")
+			val = strings.ReplaceAll(val, `\"`, `"`)
+			settings[k] = val
 		} else if k != "" {
 			settings[k] = k
 		}
@@ -58,14 +58,22 @@ func removeSettingFromTag(tag reflect.StructTag, names ...string) reflect.Struct
 	return tag
 }
 
+func appendSettingFromTag(tag reflect.StructTag, value string) reflect.StructTag {
+	t := tag.Get("gorm")
+	if strings.Contains(t, value) {
+		return tag
+	}
+	return reflect.StructTag(fmt.Sprintf(`gorm:"%s;%s"`, value, t))
+}
+
 // GetRelationsValues get relations's values from a reflect value
-func GetRelationsValues(reflectValue reflect.Value, rels []*Relationship) (reflectResults reflect.Value) {
+func GetRelationsValues(ctx context.Context, reflectValue reflect.Value, rels []*Relationship) (reflectResults reflect.Value) {
 	for _, rel := range rels {
-		reflectResults = reflect.MakeSlice(reflect.SliceOf(reflect.PtrTo(rel.FieldSchema.ModelType)), 0, 1)
+		reflectResults = reflect.MakeSlice(reflect.SliceOf(reflect.PointerTo(rel.FieldSchema.ModelType)), 0, 1)
 
 		appendToResults := func(value reflect.Value) {
-			if _, isZero := rel.Field.ValueOf(value); !isZero {
-				result := reflect.Indirect(rel.Field.ReflectValueOf(value))
+			if _, isZero := rel.Field.ValueOf(ctx, value); !isZero {
+				result := reflect.Indirect(rel.Field.ReflectValueOf(ctx, value))
 				switch result.Kind() {
 				case reflect.Struct:
 					reflectResults = reflect.Append(reflectResults, result.Addr())
@@ -97,7 +105,7 @@ func GetRelationsValues(reflectValue reflect.Value, rels []*Relationship) (refle
 }
 
 // GetIdentityFieldValuesMap get identity map from fields
-func GetIdentityFieldValuesMap(reflectValue reflect.Value, fields []*Field) (map[string][]reflect.Value, [][]interface{}) {
+func GetIdentityFieldValuesMap(ctx context.Context, reflectValue reflect.Value, fields []*Field) (map[string][]reflect.Value, [][]interface{}) {
 	var (
 		results       = [][]interface{}{}
 		dataResults   = map[string][]reflect.Value{}
@@ -105,12 +113,28 @@ func GetIdentityFieldValuesMap(reflectValue reflect.Value, fields []*Field) (map
 		notZero, zero bool
 	)
 
+	if reflectValue.Kind() == reflect.Ptr ||
+		reflectValue.Kind() == reflect.Interface {
+		reflectValue = reflectValue.Elem()
+	}
+
 	switch reflectValue.Kind() {
+	case reflect.Map:
+		results = [][]interface{}{make([]interface{}, len(fields))}
+		for idx, field := range fields {
+			mapValue := reflectValue.MapIndex(reflect.ValueOf(field.DBName))
+			if mapValue.IsZero() {
+				mapValue = reflectValue.MapIndex(reflect.ValueOf(field.Name))
+			}
+			results[0][idx] = mapValue.Interface()
+		}
+
+		dataResults[utils.ToStringKey(results[0]...)] = []reflect.Value{reflectValue}
 	case reflect.Struct:
 		results = [][]interface{}{make([]interface{}, len(fields))}
 
 		for idx, field := range fields {
-			results[0][idx], zero = field.ValueOf(reflectValue)
+			results[0][idx], zero = field.ValueOf(ctx, reflectValue)
 			notZero = notZero || !zero
 		}
 
@@ -123,7 +147,7 @@ func GetIdentityFieldValuesMap(reflectValue reflect.Value, fields []*Field) (map
 		for i := 0; i < reflectValue.Len(); i++ {
 			elem := reflectValue.Index(i)
 			elemKey := elem.Interface()
-			if elem.Kind() != reflect.Ptr {
+			if elem.Kind() != reflect.Ptr && elem.CanAddr() {
 				elemKey = elem.Addr().Interface()
 			}
 
@@ -135,7 +159,7 @@ func GetIdentityFieldValuesMap(reflectValue reflect.Value, fields []*Field) (map
 			fieldValues := make([]interface{}, len(fields))
 			notZero = false
 			for idx, field := range fields {
-				fieldValues[idx], zero = field.ValueOf(elem)
+				fieldValues[idx], zero = field.ValueOf(ctx, elem)
 				notZero = notZero || !zero
 			}
 
@@ -155,12 +179,12 @@ func GetIdentityFieldValuesMap(reflectValue reflect.Value, fields []*Field) (map
 }
 
 // GetIdentityFieldValuesMapFromValues get identity map from fields
-func GetIdentityFieldValuesMapFromValues(values []interface{}, fields []*Field) (map[string][]reflect.Value, [][]interface{}) {
+func GetIdentityFieldValuesMapFromValues(ctx context.Context, values []interface{}, fields []*Field) (map[string][]reflect.Value, [][]interface{}) {
 	resultsMap := map[string][]reflect.Value{}
 	results := [][]interface{}{}
 
 	for _, v := range values {
-		rm, rs := GetIdentityFieldValuesMap(reflect.Indirect(reflect.ValueOf(v)), fields)
+		rm, rs := GetIdentityFieldValuesMap(ctx, reflect.Indirect(reflect.ValueOf(v)), fields)
 		for k, v := range rm {
 			resultsMap[k] = append(resultsMap[k], v...)
 		}
