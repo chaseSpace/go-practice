@@ -74,6 +74,15 @@ systemctl start nginx && systemctl enable nginx
 
 https://github.com/acmesh-official/acme.sh/wiki/说明
 
+快速参考
+
+```shell
+# 使用name.com
+export Namecom_Username=xxx
+export Namecom_Token=xxx
+acme.sh --issue --dns dns_namecom -d admin.cn.cocktailhack.io
+```
+
 ## 安装chrome
 
 ```shell

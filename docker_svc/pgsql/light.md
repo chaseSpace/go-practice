@@ -39,6 +39,27 @@ docker exec -it pgsql psql -U postgres
 
 # 删除容器
 docker stop pgsql && docker rm pgsql
+
+# 进入pg shell
+\l  # 查全部库
+\l *name*
+\c db_name
+
+\dn  # 查库中的schema
+\dt # 默认查看 public 下的表
+\dt public.* # 查看 public下的表
+\dt *.* # 查全部schema中的表
+\dt *table_name* # 搜表
+\d table_name # 查结构
+
+DROP SCHEMA schema_名称; # 安全删除（仅限空 Schema）：
+DROP SCHEMA schema_名称 CASCADE;  # 强制删除（连同里面的所有表、数据一起删掉，最常用）：
+DROP TABLE schema_名称.表_名称;
+DROP TABLE auth.users;
+
+# 删库
+\c postgres  # 切换到其他库，才能删除当前库
+DROP DATABASE 数据库_名称 WITH (FORCE);  # 后面的参数是忽略已有的连接
 ```
 
 ## 设置 pgsql 远程登录
