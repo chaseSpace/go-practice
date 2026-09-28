@@ -1,0 +1,4 @@
+p_backend/data/
+p_frontend/node_modules/
+p_frontend/dist/
+p_frontend/.vite/

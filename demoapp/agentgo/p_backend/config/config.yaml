@@ -1,0 +1,37 @@
+server:
+  address: ":8080"
+  read_header_timeout_seconds: 5
+  # 覆盖 LLM 单次 60 秒请求、两次重试及少量调度开销。
+  report_rebuild_timeout_seconds: 210
+
+security:
+  allowed_origins:
+    - "http://localhost:5173"
+  request_body_max_bytes: 1048576
+
+task_store:
+  path: "./data/agentgo.db"
+  task_ttl_hours: 24
+
+scanner:
+  connect_timeout_seconds: 10
+  max_concurrent_workers: 3
+
+execution:
+  enabled: false
+  allowed_hosts: []
+
+llm:
+  # LLM 是服务启动的必填依赖。请替换为实际兼容 OpenAI Chat Completions 的服务。
+  enabled: true
+  endpoint: "https://maas-api.antdigital.com/v1"
+  api_key_env: "MAAS_API_KEY"
+  model: "lingdt-3.0-flash"
+  startup_check_timeout_seconds: 15
+  # 每次模型调用的网络与推理超时；失败后最多额外重试两次。
+  request_timeout_seconds: 60
+  index_advice:
+    enabled: true
+    min_estimated_rows: 100000
+  report_summary:
+    enabled: true

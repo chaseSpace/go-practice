@@ -1,0 +1,58 @@
+version: "builtin-0.3"
+
+# Worker 只定义调度与规则集合；AI 指令必须绑定到具体的 ai_rules 规则。
+# 规则等级和 DML 模板仍由后端代码固定。
+workers:
+  schema-collector:
+    enabled: true
+    rules: []
+  naming-convention:
+    enabled: true
+    rules: ["NAME-001", "NAME-002", "NAME-003"]
+  index-performance:
+    enabled: true
+    rules: ["INDEX-001", "INDEX-002", "INDEX-003", "INDEX-004", "INDEX-005", "AI-INDEX-001"]
+  type-constraint:
+    enabled: true
+    rules: ["TYPE-001", "TYPE-002", "TYPE-003", "TYPE-004"]
+  semantic-governance:
+    enabled: true
+    rules: ["AI-SEMANTIC-001"]
+    batch_max_columns: 80
+    max_parallel_batches: 3
+  finding-normalizer:
+    enabled: true
+    rules: []
+  ddl-generator:
+    enabled: true
+    rules: ["AI-DDL-001"]
+    max_input_findings: 40
+  report-generator:
+    enabled: true
+    rules: ["AI-REPORT-001"]
+
+ai_rules:
+  AI-INDEX-001:
+    title: "大表静态索引建议"
+    prompt: |
+      请基于该表的静态元数据给出索引审查建议。不要分析或假设查询需求、慢查询、业务数据或执行计划；不要生成可直接执行的 DDL。建议必须明确为待人工验证的假设。
+  AI-SEMANTIC-001:
+    title: "字段语义与类型一致性"
+    prompt: |
+      仅基于静态元数据审查下列候选，所有结论均需人工复核：
+      - 状态、类型、级别、标记等枚举字段允许 VARCHAR 或 CHAR；其注释必须列出全部允许值和业务含义，并解释默认值。
+      - 除只含少量固定代码/名称、或纯关联 ID 且无可变业务属性的特别简洁表外，业务表应有 created_at 和 updated_at；缺少时指出缺少项。
+      - 只评估非通用业务字段的注释；id、主键 id、created_at、updated_at、deleted_at、created_by、updated_by 可忽略。其他字段注释为空、重复字段名、与名称/类型冲突，或缺少单位、时区、金额精度等语义时提示。
+      - 字段名、注释、类型或默认值存在明显冲突（金额、比例、时间、布尔标记）时提示。
+      没有候选时只输出“无需要人工复核的语义与治理风险”。
+  AI-DDL-001:
+    title: "DDL 建议人工复核"
+    prompt: |
+      只审查输入中确定性规则生成的索引、主键、外键等 Schema 变更建议。总结需要人工确认的前置条件、影响范围、执行顺序、锁表风险和回滚关注点。
+      不得生成、补全、改写或推荐可执行 SQL、DDL、DML；不得假设业务数据、执行计划或影响行数。若没有需要补充的复核点，只输出“无需要补充的 DDL 复核建议”。
+  AI-REPORT-001:
+    title: "数据库体检报告总结"
+    prompt: |
+      请据此写一篇面向研发负责人的中文 Markdown 数据库体检报告。
+      报告必须包含：一个一级标题和生成结论；执行摘要（紧急/一般/建议数量）；Worker 执行概况；优先处理项；按“紧急”“一般”“建议”汇总的问题类别与数量；未检查对象；建议整改顺序；限制与风险说明。
+      不得逐条列出或转述 Finding；只能从提供的“代表性示例”中选择最多两条，简要说明问题表现和人工复核边界。除代表性示例外，不得输出对象名、字段名、证据、DML/DDL 或 SQL；完整明细由 Finding 页面提供。不得编造查询负载、慢查询、业务数据、执行计划或没有提供的事实。只输出 Markdown 文章，不输出 HTML、JSON、代码围栏或前后说明。

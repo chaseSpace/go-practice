@@ -1,0 +1,7 @@
+# Local credentials for the Eino learning examples.
+.env
+base_loop/testfiles/.env
+
+# Private source documents and derived local RAG indexes.
+learn_rag/data/raw/
+learn_rag/data/derived/
