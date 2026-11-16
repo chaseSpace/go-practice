@@ -66,5 +66,13 @@ else
   echo "[5/5] 系统未安装 auditd，跳过恢复"
 fi
 
+# 卸载绑定挂载
+sudo umount /run/utmp
+
+# 删除占位文件
+sudo chattr -i /etc/empty_utmp 2>/dev/null
+sudo rm -f /etc/empty_utmp
+
+
 echo "=== ✅ 全部恢复完成！所有登录与审计日志已恢复正常记录 ==="
 EOF
